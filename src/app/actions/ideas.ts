@@ -31,3 +31,24 @@ export async function saveIdeaAction(title: string, niche: string = 'fitness') {
   revalidatePath('/dashboard/ideas')
   return { success: true }
 }
+
+export async function deleteIdeaAction(ideaId: string) {
+  if (!ideaId) return { error: 'Idea ID is required' }
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Unauthorized' }
+
+  const { error } = await supabase
+    .from('idea_history')
+    .delete()
+    .match({ id: ideaId, user_id: user.id }) // Ensure user owns the idea
+
+  if (error) {
+    console.error('Failed to delete idea:', error)
+    return { error: 'Failed to delete idea' }
+  }
+
+  revalidatePath('/dashboard/ideas')
+  return { success: true }
+}

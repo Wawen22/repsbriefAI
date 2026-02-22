@@ -50,10 +50,10 @@ export async function POST(req: Request) {
       case 'customer.subscription.deleted': {
         const subscription = event.data.object as Stripe.Subscription
         
-        // Find profile by subscription ID and set plan back to free/expired
+        // Find profile by subscription ID and set plan back to starter/expired
         const { error } = await supabaseAdmin
           .from('profiles')
-          .update({ plan: 'free' })
+          .update({ plan: 'starter' })
           .eq('stripe_subscription_id', subscription.id)
 
         if (error) throw error

@@ -67,11 +67,11 @@ export default async function DashboardPage() {
           ) : (
             <Tabs defaultValue="all" className="space-y-8">
               <TabsList className="bg-slate-900 border-slate-800 p-1">
-                <TabsTrigger value="all" className="data-[state=active]:bg-slate-800 px-6">All Formats</TabsTrigger>
-                <TabsTrigger value="reel" className="data-[state=active]:bg-slate-800 px-6">Reels</TabsTrigger>
-                <TabsTrigger value="carousel" className="data-[state=active]:bg-slate-800 px-6">Carousels</TabsTrigger>
-                <TabsTrigger value="thread" className="data-[state=active]:bg-slate-800 px-6">Threads</TabsTrigger>
-                <TabsTrigger value="newsletter" className="data-[state=active]:bg-slate-800 px-6">Newsletter</TabsTrigger>
+                <TabsTrigger value="all" className="text-slate-400 data-[state=active]:text-slate-100 data-[state=active]:bg-slate-800 px-6">All Formats</TabsTrigger>
+                <TabsTrigger value="reel" className="text-slate-400 data-[state=active]:text-slate-100 data-[state=active]:bg-slate-800 px-6">Reels</TabsTrigger>
+                <TabsTrigger value="carousel" className="text-slate-400 data-[state=active]:text-slate-100 data-[state=active]:bg-slate-800 px-6">Carousels</TabsTrigger>
+                <TabsTrigger value="thread" className="text-slate-400 data-[state=active]:text-slate-100 data-[state=active]:bg-slate-800 px-6">Threads</TabsTrigger>
+                <TabsTrigger value="newsletter" className="text-slate-400 data-[state=active]:text-slate-100 data-[state=active]:bg-slate-800 px-6">Newsletter</TabsTrigger>
               </TabsList>
 
               <TabsContent value="all" className="focus-visible:outline-none">

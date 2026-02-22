@@ -29,7 +29,7 @@ export function BriefCard({ idea }: BriefCardProps) {
         </Badge>
       </CardHeader>
       <CardContent className="space-y-4">
-        <CardTitle className="text-lg leading-snug group-hover:text-blue-400 transition-colors">
+        <CardTitle className="text-lg text-slate-100 leading-snug group-hover:text-blue-400 transition-colors">
           {idea.title}
         </CardTitle>
         <div className="space-y-2">

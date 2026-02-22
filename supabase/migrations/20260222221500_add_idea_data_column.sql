@@ -1,0 +1,1 @@
+ALTER TABLE idea_history ADD COLUMN IF NOT EXISTS idea_data JSONB;

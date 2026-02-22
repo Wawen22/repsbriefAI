@@ -35,6 +35,13 @@ export default async function DashboardPage() {
   const ideas: IdeaObject[] = brief?.ideas || []
   const hasBrief = ideas.length > 0
 
+  const { data: savedData } = await supabase
+    .from('idea_history')
+    .select('idea_hash')
+    .eq('user_id', user.id)
+
+  const savedHashes = new Set(savedData?.map(row => row.idea_hash) || [])
+
   return (
     <>
       <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
@@ -75,23 +82,23 @@ export default async function DashboardPage() {
               </TabsList>
 
               <TabsContent value="all" className="focus-visible:outline-none">
-                <BriefList ideas={ideas} />
+                <BriefList ideas={ideas} savedHashes={savedHashes} />
               </TabsContent>
               
               <TabsContent value="reel" className="focus-visible:outline-none">
-                <BriefList ideas={ideas.filter(i => i.format === 'Reel')} />
+                <BriefList ideas={ideas.filter(i => i.format === 'Reel')} savedHashes={savedHashes} />
               </TabsContent>
               
               <TabsContent value="carousel" className="focus-visible:outline-none">
-                <BriefList ideas={ideas.filter(i => i.format === 'Carousel')} />
+                <BriefList ideas={ideas.filter(i => i.format === 'Carousel')} savedHashes={savedHashes} />
               </TabsContent>
 
               <TabsContent value="thread" className="focus-visible:outline-none">
-                <BriefList ideas={ideas.filter(i => i.format === 'Thread')} />
+                <BriefList ideas={ideas.filter(i => i.format === 'Thread')} savedHashes={savedHashes} />
               </TabsContent>
 
               <TabsContent value="newsletter" className="focus-visible:outline-none">
-                <BriefList ideas={ideas.filter(i => i.format === 'Newsletter')} />
+                <BriefList ideas={ideas.filter(i => i.format === 'Newsletter')} savedHashes={savedHashes} />
               </TabsContent>
             </Tabs>
       )}

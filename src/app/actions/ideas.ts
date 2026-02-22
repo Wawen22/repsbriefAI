@@ -2,8 +2,9 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { IdeaObject } from '@/types/niche'
 
-export async function saveIdeaAction(title: string, niche: string = 'fitness') {
+export async function saveIdeaAction(title: string, niche: string = 'fitness', ideaData?: IdeaObject) {
   if (!title || title.trim().length === 0) return { error: 'Title is required' }
   
   const supabase = await createClient()
@@ -20,6 +21,7 @@ export async function saveIdeaAction(title: string, niche: string = 'fitness') {
       niche: niche,
       idea_title: title.trim(),
       idea_hash: hash,
+      idea_data: ideaData || null,
       used_at: new Date().toISOString()
     })
 

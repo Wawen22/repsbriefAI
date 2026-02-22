@@ -3,19 +3,25 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { IdeaObject } from "@/types/niche"
-import { Video, Layers, Hash, Mail } from "lucide-react"
+import { Video, Layers, Hash, Mail, Lightbulb } from "lucide-react"
+import { SaveIdeaButton } from "@/components/ui/SaveIdeaButton"
+import { DeleteIdeaButton } from "@/components/ui/DeleteIdeaButton"
 
 interface BriefCardProps {
   idea: IdeaObject
+  isSaved?: boolean
+  hideSaveButton?: boolean
+  dbId?: string
 }
 
-export function BriefCard({ idea }: BriefCardProps) {
+export function BriefCard({ idea, isSaved = false, hideSaveButton = false, dbId }: BriefCardProps) {
   const getIcon = (format: string) => {
     switch (format) {
       case 'Reel': return <Video className="w-4 h-4" />
       case 'Carousel': return <Layers className="w-4 h-4" />
       case 'Thread': return <Hash className="w-4 h-4" />
       case 'Newsletter': return <Mail className="w-4 h-4" />
+      case 'Idea': return <Lightbulb className="w-4 h-4" />
       default: return null
     }
   }
@@ -29,9 +35,16 @@ export function BriefCard({ idea }: BriefCardProps) {
         </Badge>
       </CardHeader>
       <CardContent className="space-y-4">
-        <CardTitle className="text-lg text-slate-100 leading-snug group-hover:text-blue-400 transition-colors">
-          {idea.title}
-        </CardTitle>
+        <div className="flex items-start justify-between gap-4">
+          <CardTitle className="text-lg text-slate-100 leading-snug group-hover:text-blue-400 transition-colors pr-8">
+            {idea.title}
+          </CardTitle>
+          {!hideSaveButton ? (
+            <SaveIdeaButton title={idea.title} ideaData={idea} initialSaved={isSaved} />
+          ) : dbId ? (
+            <DeleteIdeaButton id={dbId} />
+          ) : null}
+        </div>
         <div className="space-y-2">
           <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">The Hook</p>
           <p className="text-sm font-medium italic text-blue-100/90 leading-relaxed border-l-2 border-blue-500/30 pl-3">

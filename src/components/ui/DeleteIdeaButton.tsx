@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Trash2, Loader2 } from 'lucide-react'
 import { deleteIdeaAction } from '@/app/actions/ideas'
+import { toast } from "sonner"
 
 export function DeleteIdeaButton({ id }: { id: string }) {
   const [isDeleting, setIsDeleting] = useState(false)
@@ -13,10 +14,12 @@ export function DeleteIdeaButton({ id }: { id: string }) {
     try {
       const result = await deleteIdeaAction(id)
       if (!result?.success) {
-        alert(result?.error || 'Failed to delete idea')
+        toast.error(result?.error || 'Failed to delete idea')
+      } else {
+        toast.success("Idea deleted")
       }
     } catch (e) {
-      alert('An expected error occurred while deleting')
+      toast.error('An expected error occurred while deleting')
     } finally {
       setIsDeleting(false)
     }

@@ -26,7 +26,7 @@ export interface IdeaObject {
   title: string
   hook: string
   description: string
-  format: 'Reel' | 'Carousel' | 'Thread' | 'Newsletter'
+  format: 'Reel' | 'Carousel' | 'Thread' | 'Newsletter' | 'Idea'
   whyItWorks: string
 }
 

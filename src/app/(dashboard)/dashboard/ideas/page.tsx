@@ -1,8 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { AddIdeaModal } from "@/components/ui/AddIdeaModal"
-import { DeleteIdeaButton } from "@/components/ui/DeleteIdeaButton"
-import { Clock } from "lucide-react"
+import { BriefCard } from "@/components/brief/BriefCard"
 
 export const dynamic = 'force-dynamic'
 
@@ -37,25 +36,21 @@ export default async function MyIdeasPage() {
           <AddIdeaModal />
         </div>
       ) : (
-        <div className="grid gap-4">
-          {ideas.map((idea) => (
-            <div key={idea.id} className="bg-slate-900 border border-slate-800 rounded-xl p-6 flex items-start justify-between gap-4 group hover:border-blue-500/50 transition-colors">
-              <div className="space-y-2">
-                <p className="text-slate-100 font-medium leading-relaxed">{idea.idea_title}</p>
-                <div className="flex items-center gap-2 text-xs text-slate-500">
-                  <Clock className="w-3.5 h-3.5" />
-                  {new Date(idea.used_at).toLocaleDateString(undefined, {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric'
-                  })}
-                </div>
-              </div>
-              <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                <DeleteIdeaButton id={idea.id} />
-              </div>
-            </div>
-          ))}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {ideas.map((item) => {
+            const ideaObj = item.idea_data || {
+               title: item.idea_title,
+               format: 'Idea',
+               hook: `Saved manually on ${new Date(item.used_at).toLocaleDateString()}`,
+               angle: 'This idea was saved without rich AI details.',
+               description: 'You saved this idea directly from the dashboard before the rich data feature was added.',
+               whyItWorks: 'It caught your attention!'
+            }
+
+            return (
+               <BriefCard key={item.id} idea={ideaObj} hideSaveButton dbId={item.id} />
+            )
+          })}
         </div>
       )}
     </>

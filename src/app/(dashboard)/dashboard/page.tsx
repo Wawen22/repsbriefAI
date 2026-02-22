@@ -1,10 +1,12 @@
 // src/app/(dashboard)/dashboard/page.tsx
 
-import { supabase } from "@/lib/supabase"
+import { createClient } from "@/lib/supabase/server"
+import { redirect } from "next/navigation"
 import { IdeaObject } from "@/types/niche"
 import { BriefCard } from "@/components/brief/BriefCard"
 import { BriefList } from "@/components/brief/BriefList"
 import { NichePicker } from "@/components/niche/NichePicker"
+import { AddIdeaModal } from "@/components/ui/AddIdeaModal"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -16,14 +18,17 @@ export const dynamic = 'force-dynamic'
 export default async function DashboardPage() {
   const weekDate = new Date().toISOString().split('T')[0]
   
-  // In a real app, we'd get the user session first
-  // const { data: { user } } = await supabase.auth.getUser()
-  // if (!user) redirect('/login')
+  const supabase = await createClient()
+  
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    redirect('/login')
+  }
 
   const { data: brief } = await supabase
     .from('briefs')
     .select('*')
-    // .eq('user_id', user.id)
+    .eq('user_id', user.id)
     .eq('week_date', weekDate)
     .single()
 
@@ -31,40 +36,8 @@ export default async function DashboardPage() {
   const hasBrief = ideas.length > 0
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-50 flex flex-col">
-      {/* Sidebar Placeholder for layout */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* Left Sidebar */}
-        <aside className="w-64 border-r border-slate-900 bg-slate-950 p-6 hidden lg:flex flex-col gap-8 sticky top-0 h-screen">
-           <div className="flex items-center gap-2 px-2">
-             <Zap className="w-6 h-6 text-blue-500 fill-blue-500" />
-             <span className="text-xl font-bold tracking-tight">RepsBrief</span>
-           </div>
-           
-           <nav className="space-y-1">
-             <Button variant="ghost" className="w-full justify-start gap-3 text-blue-400 bg-blue-500/5 hover:bg-blue-500/10 hover:text-blue-300">
-               <LayoutGrid className="w-4 h-4" /> This Week
-             </Button>
-             <Button variant="ghost" className="w-full justify-start gap-3 text-slate-400 hover:text-white hover:bg-slate-900">
-               <Calendar className="w-4 h-4" /> History
-             </Button>
-             <Button variant="ghost" className="w-full justify-start gap-3 text-slate-400 hover:text-white hover:bg-slate-900">
-               <Inbox className="w-4 h-4" /> My Ideas
-             </Button>
-           </nav>
-
-           <div className="mt-auto p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-4">
-              <div className="flex items-center gap-2 text-sm font-semibold">
-                <Crown className="w-4 h-4 text-yellow-500" /> Pro Plan Active
-              </div>
-              <p className="text-[12px] text-slate-500">Your next strategy brief arrives next Monday morning.</p>
-              <Button size="sm" variant="outline" className="w-full h-8 text-[12px] border-slate-700">Manage Billing</Button>
-           </div>
-        </aside>
-
-        {/* Main Content */}
-        <main className="flex-1 overflow-y-auto p-6 md:p-10">
-          <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+    <>
+      <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
               <div className="flex items-center gap-2 mb-4 text-slate-400">
                 <NichePicker />
@@ -76,9 +49,7 @@ export default async function DashboardPage() {
                <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 py-1.5 px-3">
                  <Zap className="w-3.5 h-3.5 mr-1.5 fill-emerald-500" /> Fresh Data
                </Badge>
-               <Button className="bg-blue-600 hover:bg-blue-700">
-                 <Plus className="w-4 h-4 mr-2" /> Add My Idea
-               </Button>
+               <AddIdeaModal />
             </div>
           </header>
 
@@ -123,9 +94,7 @@ export default async function DashboardPage() {
                 <BriefList ideas={ideas.filter(i => i.format === 'Newsletter')} />
               </TabsContent>
             </Tabs>
-          )}
-        </main>
-      </div>
-    </div>
+      )}
+    </>
   )
 }

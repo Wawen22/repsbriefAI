@@ -56,6 +56,8 @@ export async function generateBrief(
         { role: 'user', content: userPrompt }
       ], { jsonMode: true, maxTokens: 4096 })
 
+      console.log(`[Generator] RAW AI Response:`, response.text)
+
       const rawJson = JSON.parse(response.text)
       
       // Some providers might wrap the array in an object (e.g. { "ideas": [...] })
@@ -65,9 +67,9 @@ export async function generateBrief(
       
       console.log(`[Generator] Successfully generated brief using ${response.provider} (${response.model})`)
       return validatedBrief
-    } catch (err) {
+    } catch (err: any) {
       attempts++
-      console.error(`[Generator] Attempt ${attempts} failed:`, err)
+      console.error(`[Generator] Attempt ${attempts} failed:`, err.message || err)
       if (attempts === maxAttempts) {
         throw new Error('Failed to generate a valid brief after 2 attempts.')
       }

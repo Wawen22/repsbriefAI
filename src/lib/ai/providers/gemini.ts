@@ -28,7 +28,7 @@ export class GeminiProvider implements AIProvider {
 
     const chat = model.startChat({
       history: history.slice(0, -1),
-      systemInstruction: systemMessage
+      systemInstruction: systemMessage ? { role: 'system', parts: [{ text: systemMessage }] } : undefined
     })
 
     const lastMessage = history[history.length - 1].parts[0].text || ''

@@ -1,0 +1,312 @@
+
+> repsbrief@0.1.0 dev
+> next dev
+
+⚠ Port 3000 is in use by an unknown process, using available port 3002 instead.
+▲ Next.js 16.1.6 (Turbopack)
+- Local:         http://localhost:3002
+- Network:       http://10.255.255.254:3002
+- Environments: .env
+
+✓ Starting...
+✓ Ready in 2.8s
+○ Compiling /api/cron/weeklyBrief ...
+[Scraper] Starting reddit for Fitness & Nutrition...
+[Scraper] Successfully cached reddit (8 items)
+[Scraper] Starting youtube for Fitness & Nutrition...
+[YouTube] Failed to scrape keyword "workout": Error: Method doesn't allow unregistered callers (callers without established identity). Please use API Key or other form of API consumer identity to call this API.
+    at async Object.scrapeYouTube [as scraper] (src/app/api/scraper/youtube.ts:18:24)
+    at async scrapeNiche (src/app/api/scraper/index.ts:23:20)
+    at async POST (src/app/api/cron/weeklyBrief/route.ts:33:7)
+  16 |   for (const keyword of googleTrendsKeywords.slice(0, 3)) { // Limit to 3 keywords to avoid quota exhaustion
+  17 |     try {
+> 18 |       const response = await youtube.search.list({
+     |                        ^
+  19 |         key: process.env.YOUTUBE_API_KEY,
+  20 |         part: ['id', 'snippet'],
+  21 |         q: keyword, {
+  config: [Object],
+  response: [Response],
+  code: 403,
+  status: 403,
+  error: undefined,
+  [cause]: [Object]
+}
+[YouTube] Failed to scrape keyword "diet": Error: Method doesn't allow unregistered callers (callers without established identity). Please use API Key or other form of API consumer identity to call this API.
+    at async Object.scrapeYouTube [as scraper] (src/app/api/scraper/youtube.ts:18:24)
+    at async scrapeNiche (src/app/api/scraper/index.ts:23:20)
+    at async POST (src/app/api/cron/weeklyBrief/route.ts:33:7)
+  16 |   for (const keyword of googleTrendsKeywords.slice(0, 3)) { // Limit to 3 keywords to avoid quota exhaustion
+  17 |     try {
+> 18 |       const response = await youtube.search.list({
+     |                        ^
+  19 |         key: process.env.YOUTUBE_API_KEY,
+  20 |         part: ['id', 'snippet'],
+  21 |         q: keyword, {
+  config: [Object],
+  response: [Response],
+  code: 403,
+  status: 403,
+  error: undefined,
+  [cause]: [Object]
+}
+[YouTube] Failed to scrape keyword "protein": Error: Method doesn't allow unregistered callers (callers without established identity). Please use API Key or other form of API consumer identity to call this API.
+    at async Object.scrapeYouTube [as scraper] (src/app/api/scraper/youtube.ts:18:24)
+    at async scrapeNiche (src/app/api/scraper/index.ts:23:20)
+    at async POST (src/app/api/cron/weeklyBrief/route.ts:33:7)
+  16 |   for (const keyword of googleTrendsKeywords.slice(0, 3)) { // Limit to 3 keywords to avoid quota exhaustion
+  17 |     try {
+> 18 |       const response = await youtube.search.list({
+     |                        ^
+  19 |         key: process.env.YOUTUBE_API_KEY,
+  20 |         part: ['id', 'snippet'],
+  21 |         q: keyword, {
+  config: [Object],
+  response: [Response],
+  code: 403,
+  status: 403,
+  error: undefined,
+  [cause]: [Object]
+}
+[Scraper] Starting google-trends for Fitness & Nutrition...
+[Scraper] Starting rss for Fitness & Nutrition...
+[RSS] Failed to scrape feed "https://examine.com/feed/": Error: Status code 404
+    at ignore-listed frames
+[RSS] Failed to scrape feed "https://renaissanceperiodization.com/feed": Error: Status code 404
+    at ignore-listed frames
+[RSS] Failed to scrape feed "https://www.t-nation.com/feed/": Error: Status code 404
+    at ignore-listed frames
+[Scraper] Successfully cached rss (10 items)
+[Generator] Attempt 1 failed: [GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent: [400 Bad Request] Invalid value at 'system_instruction' (type.googleapis.com/google.ai.generativelanguage.v1beta.Content), "You are a content strategist specialized in fitness and nutrition. Your goal is to provide 20 fresh, high-impact content ideas for Fitness & Nutrition creators based on current trends." [{"@type":"type.googleapis.com/google.rpc.BadRequest","fieldViolations":[{"field":"system_instruction","description":"Invalid value at 'system_instruction' (type.googleapis.com/google.ai.generativelanguage.v1beta.Content), \"You are a content strategist specialized in fitness and nutrition. Your goal is to provide 20 fresh, high-impact content ideas for Fitness & Nutrition creators based on current trends.\""}]}]
+[Generator] Attempt 2 failed: [GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent: [400 Bad Request] Invalid value at 'system_instruction' (type.googleapis.com/google.ai.generativelanguage.v1beta.Content), "You are a content strategist specialized in fitness and nutrition. Your goal is to provide 20 fresh, high-impact content ideas for Fitness & Nutrition creators based on current trends." [{"@type":"type.googleapis.com/google.rpc.BadRequest","fieldViolations":[{"field":"system_instruction","description":"Invalid value at 'system_instruction' (type.googleapis.com/google.ai.generativelanguage.v1beta.Content), \"You are a content strategist specialized in fitness and nutrition. Your goal is to provide 20 fresh, high-impact content ideas for Fitness & Nutrition creators based on current trends.\""}]}]
+[Cron] Failure for user 5cf4219b-2ec5-41ab-b6ce-a2ed03d00168: Error: Failed to generate a valid brief after 2 attempts.
+    at generateBrief (src/app/api/generator/briefGenerator.ts:74:15)
+    at async POST (src/app/api/cron/weeklyBrief/route.ts:71:23)
+  72 |       console.error(`[Generator] Attempt ${attempts} failed:`, err.message || err)
+  73 |       if (attempts === maxAttempts) {
+> 74 |         throw new Error('Failed to generate a valid brief after 2 attempts.')
+     |               ^
+  75 |       }
+  76 |     }
+  77 |   }
+ POST /api/cron/weeklyBrief 200 in 29.3s (compile: 16.6s, render: 12.8s)
+[Scraper] Starting reddit for Fitness & Nutrition...
+[Scraper] Successfully cached reddit (8 items)
+[Scraper] Starting youtube for Fitness & Nutrition...
+[YouTube] Failed to scrape keyword "workout": Error: Method doesn't allow unregistered callers (callers without established identity). Please use API Key or other form of API consumer identity to call this API.
+    at async Object.scrapeYouTube [as scraper] (src/app/api/scraper/youtube.ts:18:24)
+    at async scrapeNiche (src/app/api/scraper/index.ts:23:20)
+    at async POST (src/app/api/cron/weeklyBrief/route.ts:33:7)
+  16 |   for (const keyword of googleTrendsKeywords.slice(0, 3)) { // Limit to 3 keywords to avoid quota exhaustion
+  17 |     try {
+> 18 |       const response = await youtube.search.list({
+     |                        ^
+  19 |         key: process.env.YOUTUBE_API_KEY,
+  20 |         part: ['id', 'snippet'],
+  21 |         q: keyword, {
+  config: [Object],
+  response: [Response],
+  code: 403,
+  status: 403,
+  error: undefined,
+  [cause]: [Object]
+}
+[YouTube] Failed to scrape keyword "diet": Error: Method doesn't allow unregistered callers (callers without established identity). Please use API Key or other form of API consumer identity to call this API.
+    at async Object.scrapeYouTube [as scraper] (src/app/api/scraper/youtube.ts:18:24)
+    at async scrapeNiche (src/app/api/scraper/index.ts:23:20)
+    at async POST (src/app/api/cron/weeklyBrief/route.ts:33:7)
+  16 |   for (const keyword of googleTrendsKeywords.slice(0, 3)) { // Limit to 3 keywords to avoid quota exhaustion
+  17 |     try {
+> 18 |       const response = await youtube.search.list({
+     |                        ^
+  19 |         key: process.env.YOUTUBE_API_KEY,
+  20 |         part: ['id', 'snippet'],
+  21 |         q: keyword, {
+  config: [Object],
+  response: [Response],
+  code: 403,
+  status: 403,
+  error: undefined,
+  [cause]: [Object]
+}
+[YouTube] Failed to scrape keyword "protein": Error: Method doesn't allow unregistered callers (callers without established identity). Please use API Key or other form of API consumer identity to call this API.
+    at async Object.scrapeYouTube [as scraper] (src/app/api/scraper/youtube.ts:18:24)
+    at async scrapeNiche (src/app/api/scraper/index.ts:23:20)
+    at async POST (src/app/api/cron/weeklyBrief/route.ts:33:7)
+  16 |   for (const keyword of googleTrendsKeywords.slice(0, 3)) { // Limit to 3 keywords to avoid quota exhaustion
+  17 |     try {
+> 18 |       const response = await youtube.search.list({
+     |                        ^
+  19 |         key: process.env.YOUTUBE_API_KEY,
+  20 |         part: ['id', 'snippet'],
+  21 |         q: keyword, {
+  config: [Object],
+  response: [Response],
+  code: 403,
+  status: 403,
+  error: undefined,
+  [cause]: [Object]
+}
+[Scraper] Starting google-trends for Fitness & Nutrition...
+[Scraper] Starting rss for Fitness & Nutrition...
+[RSS] Failed to scrape feed "https://examine.com/feed/": Error: Status code 404
+    at ignore-listed frames
+[RSS] Failed to scrape feed "https://renaissanceperiodization.com/feed": Error: Status code 404
+    at ignore-listed frames
+[RSS] Failed to scrape feed "https://www.t-nation.com/feed/": Error: Status code 404
+    at ignore-listed frames
+[Scraper] Successfully cached rss (10 items)
+[Generator] RAW AI Response: [
+  {
+    "title": "Busting the Plateau Myth: How More Food Can Lead to More Progress",
+    "hook": "Ever heard that eating *more* can actually help you lose weight? A recent Reddit post shows it's not just a myth!",
+    "description": "Explore the concept of diet breaks and strategic refeeds, demonstrating how a temporary increase in calories can sometimes kickstart a stalled metabolism or reset hormonal balance, leading to unexpected breakthroughs in weight loss plateaus. We'll break down the science and practical application.",
+    "format": "Carousel",
+    "whyItWorks": "This directly addresses the Reddit trend where someone broke a plateau after a significant calorie surplus, offering a science-backed explanation."
+  },
+  {
+    "title": "From Heartbreak to Health: Turning Life's Lows into Fitness Fuel",
+    "hook": "A tough breakup can feel like the end of the world, but for one Redditor, it became the ultimate motivation for change.",
+    "description": "Discover how major life events, even painful ones, can serve as powerful catalysts for committing to a fitness journey. We'll share strategies for harnessing emotional energy into sustainable habits, focusing on internal motivation and long-term well-being rather than revenge.",
+    "format": "Reel",
+    "whyItWorks": "This capitalizes on the Reddit trend of someone using a relationship ending as a strong impetus to commit to their health journey."
+  },
+  {
+    "title": "The 'I Never Thought I'd See This Number Again' Moment: Celebrating Big Wins",
+    "hook": "That scale number you thought was impossible? A recent post proves that reaching it is not just a dream.",
+    "description": "Celebrate the incredible feeling of hitting a weight or fitness milestone you once deemed unreachable. This content will highlight the emotional journey, the consistency required, and the power of believing in yourself to achieve significant transformations.",
+    "format": "Thread",
+    "whyItWorks": "This connects directly to the Reddit success story of someone reaching a long-lost scale number, focusing on the emotional and inspirational aspect of achievement."
+  },
+  {
+    "title": "10k Steps a Day: Is It Really 'So Much Work'? Make It Effortless!",
+    "hook": "Feeling overwhelmed by the idea of 10,000 steps daily? You're not alone, but it doesn't have to be a chore!",
+    "description": "Break down the challenge of hitting daily step goals with practical, easy-to-implement strategies. We'll share tips for incorporating more movement seamlessly into your routine, making 'active living' feel less like 'work' and more like a natural part of your day.",
+    "format": "Carousel",
+    "whyItWorks": "This idea directly addresses the Reddit sentiment that 10k steps feels like 'so much work,' offering solutions to make it manageable."
+  },
+  {
+    "title": "Post-Weight Loss Body Changes: Do Boobs Perk Back Up? Realistic Expectations",
+    "hook": "Weight loss brings amazing benefits, but what about those aesthetic changes, like breast elasticity? Let's get real.",
+    "description": "Address the common, often unasked question about breast changes after significant weight loss. This content will offer realistic expectations, discuss factors like genetics and skin elasticity, and suggest ways to support overall body confidence through strength training.",
+    "format": "Reel",
+    "whyItWorks": "This directly responds to the Reddit question about breasts perking up after weight loss, providing factual and empathetic insights."
+  },
+  {
+    "title": "Lift Heavy to Crush Ice (and Conquer Life!): Unconventional Strength Goals",
+    "hook": "Forget the 'beach body.' What if your strength goal was as simple and awesome as 'crushing ice'?",
+    "description": "Explore the fun and functional side of strength training by embracing unconventional and practical goals beyond just aesthetics. This content will inspire viewers to find their unique 'why' for lifting, focusing on newfound confidence and everyday capabilities.",
+    "format": "Reel",
+    "whyItWorks": "This is a direct, humorous nod to the Reddit post about 'lifting heavy so I can crush ice,' highlighting practical and unconventional strength motivations."
+  },
+  {
+    "title": "The Fear of Posting: How to Share Your Fitness Journey (Even When You're 'Hesitant')",
+    "hook": "Taking that first step to share your fitness progress can be terrifying. A recent Reddit post shows many feel the same.",
+    "description": "Encourage and empower individuals to overcome self-doubt and fear of judgment when sharing their fitness journey online. We'll provide tips for building confidence, finding supportive communities, and understanding that vulnerability can be a powerful motivator for both yourself and others.",
+    "format": "Thread",
+    "whyItWorks": "This content directly addresses the 'Hesitant to even post this' Reddit trend, focusing on the emotional barrier to sharing progress."
+  },
+  {
+    "title": "2 Months to Visible Results: Real Transformations That Ignite Motivation",
+    "hook": "Two months. That's all it took for a Redditor to see amazing changes. Imagine what you could achieve!",
+    "description": "Showcase what's realistically achievable in a two-month fitness timeframe through consistent effort and smart training. This content will use visual examples (if possible, with user permission) and highlight key habits that lead to noticeable physical progress.",
+    "format": "Carousel",
+    "whyItWorks": "This capitalizes on the 'Pics taken 2 months apart' Reddit trend, emphasizing rapid but achievable visual progress and motivation."
+  },
+  {
+    "title": "High Volume vs. High Intensity: Which Wins for Muscle Growth?",
+    "hook": "Is it more reps or heavier weights that build bigger muscles? The debate rages on, and we have answers!",
+    "description": "Dive into the scientific discussion around high volume versus high intensity training for muscle hypertrophy. This content will explain the pros and cons of each approach, helping lifters understand which method might be more suitable for their goals and training style.",
+    "format": "Newsletter",
+    "whyItWorks": "This directly addresses the RSS query about 'High volume vs high intensity: which builds more muscle?', providing an educational comparison."
+  },
+  {
+    "title": "Lifting While Pregnant: Debunking Myths & Embracing Safe Strength",
+    "hook": "Expecting and want to keep lifting? You might be surprised by how much you can (and should!) do.",
+    "description": "Provide evidence-based guidance on the safety and benefits of strength training during pregnancy. This content will address common concerns, highlight modifications, and empower expectant mothers to stay active responsibly under professional guidance.",
+    "format": "Thread",
+    "whyItWorks": "This directly answers the RSS question 'Is lifting during pregnancy healthy?', providing expert advice for a specific demographic."
+  },
+  {
+    "title": "Sleep Deprivation & Your Workouts: The Hidden Performance Killer",
+    "hook": "Pushing through a workout on minimal sleep? You might be doing more harm than good to your progress.",
+    "description": "Explain in detail how sleep deprivation profoundly impacts workout performance, recovery, and overall fitness goals. This content will cover physiological effects and offer actionable tips for prioritizing sleep to optimize your training results.",
+    "format": "Newsletter",
+    "whyItWorks": "This directly tackles the RSS question 'How does sleep deprivation affect your workouts?', emphasizing its negative impact."
+  },
+  {
+    "title": "Alcohol for Lifters: Can a Little Be Healthy, or Is It Always a Setback?",
+    "hook": "The post-workout beer: friend or foe? Let's uncover the truth about alcohol and muscle gains.",
+    "description": "Explore the nuanced relationship between moderate alcohol consumption and fitness goals for lifters. This content will discuss the potential impact on muscle protein synthesis, recovery, and hydration, providing a balanced, evidence-based perspective.",
+    "format": "Carousel",
+    "whyItWorks": "This directly addresses the RSS question 'Can a little alcohol be healthy for lifters?', providing a balanced, evidence-based perspective."
+  },
+  {
+    "title": "Training Back-to-Back Days: Good or Bad? Optimize Your Recovery!",
+    "hook": "Hitting the gym every single day might feel productive, but is it the best strategy for muscle growth and recovery?",
+    "description": "Demystify the optimal frequency for training by discussing the pros and cons of back-to-back workout days. This content will explain the importance of rest, the concept of supercompensation, and how to structure your splits for maximum gains and injury prevention.",
+    "format": "Reel",
+    "whyItWorks": "This directly answers the RSS query 'Is training on back-to-back days bad?', offering guidance on training frequency and recovery."
+  },
+  {
+    "title": "The Seed Oil Scare: Are They Really Unhealthy, or Just Misunderstood?",
+    "hook": "From TikTok to your dinner plate, 'seed oils' are under fire. But is the hype justified or just misinformation?",
+    "description": "Debunk or confirm the claims surrounding seed oils by presenting an evidence-based analysis of their health implications. This content will differentiate between types of fats, discuss processing methods, and offer a balanced view on incorporating them into a healthy diet.",
+    "format": "Thread",
+    "whyItWorks": "This directly addresses the RSS trend 'Are 'seed oils' actually unhealthy?', tackling a popular nutrition debate."
+  },
+  {
+    "title": "Body Recomposition: Myth or Masterpiece? The Truth About Building Muscle & Losing Fat",
+    "hook": "Simultaneously losing fat AND gaining muscle? It sounds too good to be true, but it IS possible for many!",
+    "description": "Unpack the science behind body recomposition – the art of changing your body's fat-to-muscle ratio without significant weight change. This content will explain who can achieve it most effectively, and provide strategies for nutrition and training.",
+    "format": "Newsletter",
+    "whyItWorks": "This directly answers the RSS question 'Is body recomposition possible?', providing an explanation of this advanced fitness goal."
+  },
+  {
+    "title": "Weighted Vests: Are They Worth the Investment for Your Workouts?",
+    "hook": "Looking to level up your bodyweight exercises or cardio? A weighted vest might be your secret weapon, but is it worth it?",
+    "description": "Review the benefits and drawbacks of using weighted vests for various types of training, from walking and running to calisthenics. This content will help viewers decide if adding a vest is a smart investment for their fitness goals and how to use one safely.",
+    "format": "Carousel",
+    "whyItWorks": "This directly addresses the RSS query 'Are weighted vests worth it?', providing a practical equipment review."
+  },
+  {
+    "title": "Eccentric Overload Training: The Advanced Technique for Explosive Muscle Growth",
+    "hook": "Want to break through a muscle growth plateau? It might be time to focus on the 'negative' part of your lifts.",
+    "description": "Introduce the concept of eccentric overload training and its powerful potential for enhancing muscle growth and strength. This content will explain the physiological mechanisms, provide practical examples, and advise on safe implementation for advanced lifters.",
+    "format": "Thread",
+    "whyItWorks": "This directly explores the RSS topic 'Does eccentric overload training enhance muscle growth?', offering an advanced training technique."
+  },
+  {
+    "title": "Leucine Supplementation: Is This Amino Acid the Muscle-Building Secret Weapon?",
+    "hook": "You've heard of BCAAs, but what about the star player, Leucine? Is it a must-have for muscle gains?",
+    "description": "Delve into the role of leucine, an essential amino acid, in muscle protein synthesis and its effectiveness as a standalone supplement. This content will provide evidence-based insights into whether leucine supplementation is truly beneficial for building muscle, or if adequate protein intake suffices.",
+    "format": "Newsletter",
+    "whyItWorks": "This directly addresses the RSS query 'Is leucine supplementation actually useful for building muscle?', providing an analysis of a popular supplement."
+  },
+  {
+    "title": "The Strategic 'Cheat Meal': How a Calorie Surplus Can Reset Your Diet",
+    "hook": "Feeling guilty after a big meal? What if that 'slip-up' was actually a secret weapon for progress?",
+    "description": "Explore the psychological and physiological benefits of planned refeeds or diet breaks within a calorie deficit. This content will explain how a temporary calorie surplus can boost leptin levels, improve mood, and prevent metabolic adaptation, helping you stick to your diet long-term.",
+    "format": "Carousel",
+    "whyItWorks": "This expands on the Reddit trend of breaking a plateau after a large meal, offering a strategic approach to calorie cycling."
+  },
+  {
+    "title": "Turning Setbacks into Comebacks: Reigniting Motivation After a Major Life Change",
+    "hook": "Life throws curveballs, and sometimes they hit hard. But setbacks can be your greatest fuel for transformation.",
+    "description": "Guide individuals through the process of re-committing to their fitness journey after significant life disruptions or emotional setbacks. This content will focus on resilience, setting realistic new goals, and building sustainable habits from a place of renewed determination.",
+    "format": "Reel",
+    "whyItWorks": "This builds on the Reddit trend of using a relationship ending as a catalyst, focusing on broader resilience and motivation post-setback."
+  }
+]
+[Generator] Successfully generated brief using gemini (gemini-2.5-flash)
+[Cron] Failure for user 5cf4219b-2ec5-41ab-b6ce-a2ed03d00168: Error: Missing API key. Pass it to the constructor `new Resend("re_123")`
+    at module evaluation (src/app/api/email/sendBrief.ts:8:16)
+    at POST (src/app/api/cron/weeklyBrief/route.ts:96:28)
+   6 | import * as React from 'react'
+   7 |
+>  8 | const resend = new Resend(process.env.RESEND_API_KEY)
+     |                ^
+   9 |
+  10 | export async function sendBrief(
+  11 |   userEmail: string, 
+ POST /api/cron/weeklyBrief 200 in 33.2s (compile: 1780ms, render: 31.4s)

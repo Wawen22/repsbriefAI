@@ -1,14 +1,32 @@
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { BriefList } from "@/components/brief/BriefList"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { 
+  CalendarDays, 
+  FileText, 
+  Dumbbell, 
+  History, 
+  ChevronRight, 
+  Clock, 
+  Sparkles, 
+  Orbit, 
+  ArrowRight,
+  ArrowUpRight,
+  Layers,
+  Video,
+  Hash,
+  Mail,
+  Maximize2
+} from "lucide-react"
+import Link from "next/link"
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
-import { Badge } from "@/components/ui/badge"
-import { CalendarDays, FileText, Dumbbell, History, ChevronRight, Clock } from "lucide-react"
 
 export const dynamic = 'force-dynamic'
 
@@ -18,6 +36,13 @@ const NICHE_ICON_MAP: Record<string, string> = {
   b2b_marketing: '📊',
   parenting: '👨‍👩‍👧',
   tech_ai: '🤖',
+}
+
+const formatIcons: Record<string, any> = {
+  Reel: Video,
+  Carousel: Layers,
+  Thread: Hash,
+  Newsletter: Mail,
 }
 
 export default async function HistoryPage() {
@@ -45,94 +70,140 @@ export default async function HistoryPage() {
   const totalIdeas = briefs?.reduce((acc, b) => acc + (b.ideas?.length || 0), 0) || 0
 
   return (
-    <div className="space-y-12">
-      <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+    <div className="space-y-12 pb-20">
+      {/* Dynamic Header */}
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8">
         <div className="space-y-4">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-blue-500/10 border border-blue-500/20">
-              <History className="w-5 h-5 text-blue-400" />
+            <div className="p-2.5 rounded-2xl bg-blue-500/10 border border-blue-500/20">
+              <History className="w-6 h-6 text-blue-400" />
             </div>
-            <Badge variant="outline" className="bg-blue-500/5 text-blue-300 border-blue-500/20 px-2 py-0.5 rounded-md text-[10px] font-bold tracking-widest uppercase">
-              Archive
-            </Badge>
+            <div className="space-y-0.5">
+               <Badge variant="outline" className="bg-blue-500/5 text-blue-300 border-blue-500/20 px-2 py-0.5 rounded-md text-[10px] font-bold tracking-widest uppercase">
+                 Strategy Vault
+               </Badge>
+               <p className="text-[10px] font-medium text-slate-500 uppercase tracking-widest">Archive of your content growth</p>
+            </div>
           </div>
-          <div className="space-y-1">
-            <h1 className="text-4xl md:text-5xl font-black tracking-tighter text-white">
-              Brief <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">History</span>
-            </h1>
-            <p className="text-slate-400 text-lg max-w-xl font-light">
-              Explore all your past content plans and data-driven insights.
-            </p>
-          </div>
+          <h1 className="text-5xl md:text-6xl font-black tracking-tighter text-white">
+            Brief <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400 font-extrabold">History</span>
+          </h1>
         </div>
         
         {hasHistory && (
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-slate-300 text-sm font-medium">
-              <FileText className="w-4 h-4 text-slate-500" />
-              {briefs!.length} Briefs
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-white/[0.03] border border-white/10 p-4 rounded-3xl min-w-[140px] text-center space-y-1">
+               <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Total Briefs</p>
+               <p className="text-2xl font-bold text-white tracking-tighter">{briefs!.length}</p>
             </div>
-            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-slate-300 text-sm font-medium">
-              <Dumbbell className="w-4 h-4 text-slate-500" />
-              {totalIdeas} Ideas
+            <div className="bg-white/[0.03] border border-white/10 p-4 rounded-3xl min-w-[140px] text-center space-y-1">
+               <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Ideas Generated</p>
+               <p className="text-2xl font-bold text-white tracking-tighter">{totalIdeas}</p>
             </div>
           </div>
         )}
       </header>
 
       {!hasHistory ? (
-        <div className="relative py-24 flex flex-col items-center justify-center text-center overflow-hidden rounded-3xl border border-white/5 bg-white/[0.02]">
+        <div className="relative py-32 flex flex-col items-center justify-center text-center overflow-hidden rounded-[3rem] border border-white/5 bg-white/[0.02]">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.05),transparent_70%)]" />
-          <div className="relative z-10 space-y-6 max-w-md">
-            <div className="w-20 h-20 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto shadow-2xl">
-               <Clock className="w-10 h-10 text-slate-600" />
+          <div className="relative z-10 space-y-8 max-w-md">
+            <div className="w-24 h-24 rounded-[2rem] bg-white/5 border border-white/10 flex items-center justify-center mx-auto shadow-2xl">
+               <Clock className="w-12 h-12 text-slate-700" />
             </div>
-            <div className="space-y-2">
-              <h2 className="text-2xl font-bold text-white tracking-tight">No history found</h2>
-              <p className="text-slate-500 leading-relaxed font-light px-6">
-                Your archive will automatically populate after your first weekly briefing is generated.
+            <div className="space-y-3">
+              <h2 className="text-3xl font-bold text-white tracking-tight">Vault is Empty</h2>
+              <p className="text-slate-500 text-lg font-light leading-relaxed px-6">
+                Generate your first weekly brief to start building your strategic content archive.
               </p>
+            </div>
+            <div className="pt-4">
+               <Link href="/dashboard">
+                 <Button className="bg-white text-black hover:bg-slate-200 rounded-full font-bold h-12 px-8 group">
+                    Generate My First Brief <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                 </Button>
+               </Link>
             </div>
           </div>
         </div>
       ) : (
-        <div className="space-y-6">
-          <Accordion type="single" collapsible className="space-y-4">
+        <div className="space-y-8">
+          <Accordion type="single" collapsible className="space-y-6">
             {briefs!.map((brief) => {
               const dateObj = new Date(brief.week_date)
-              const readableDate = dateObj.toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-              })
+              const month = dateObj.toLocaleDateString('en-US', { month: 'long' })
+              const day = dateObj.toLocaleDateString('en-US', { day: 'numeric' })
+              const year = dateObj.getFullYear()
               const nicheIcon = NICHE_ICON_MAP[brief.niche] || '📌'
-              const ideaCount = brief.ideas?.length || 0
+              
+              // Group ideas by format for summary
+              const formats = (brief.ideas || []).reduce((acc: any, curr: any) => {
+                acc[curr.format] = (acc[curr.format] || 0) + 1
+                return acc
+              }, {})
 
               return (
                 <AccordionItem
                   key={brief.id}
                   value={brief.id}
-                  className="bg-white/[0.02] border border-white/10 rounded-2xl px-2 overflow-hidden transition-all hover:bg-white/[0.04] hover:border-white/20"
+                  className="bg-white/[0.02] border border-white/10 rounded-[2.5rem] overflow-hidden transition-all hover:bg-white/[0.04] hover:border-white/20 px-2"
                 >
-                  <AccordionTrigger className="hover:no-underline px-6 py-6 rounded-2xl transition-all data-[state=open]:rounded-b-none data-[state=open]:bg-white/5 group">
-                    <div className="flex items-center gap-5 text-left w-full">
-                      <div className="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center shrink-0 group-hover:bg-blue-500/20 transition-colors">
-                        <CalendarDays className="w-6 h-6 text-blue-400" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-xl font-bold text-white group-hover:text-blue-300 transition-colors">Week of {readableDate}</h3>
-                        <div className="flex items-center gap-3 mt-1.5">
-                           <Badge variant="outline" className="bg-white/5 text-slate-400 border-none text-[10px] px-2 py-0.5 font-bold uppercase tracking-wider">
-                             {nicheIcon} {brief.niche.replace('_', ' ')}
-                           </Badge>
-                           <div className="h-1 w-1 rounded-full bg-slate-700" />
-                           <span className="text-xs text-slate-500 font-medium">{ideaCount} ideas curated</span>
+                  <AccordionTrigger className="hover:no-underline p-8 lg:p-10 group outline-none">
+                    <div className="flex flex-col lg:flex-row lg:items-center justify-between w-full gap-8 text-left">
+                      {/* Left: Date & Niche */}
+                      <div className="flex items-center gap-6">
+                        <div className="flex flex-col items-center justify-center bg-white/5 border border-white/10 rounded-3xl w-20 h-24 shrink-0 group-hover:bg-blue-500/10 group-hover:border-blue-500/20 transition-colors">
+                           <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">{month.slice(0,3)}</span>
+                           <span className="text-3xl font-black text-white">{day}</span>
+                           <span className="text-[10px] font-bold text-slate-600 mt-1">{year}</span>
                         </div>
+                        <div className="space-y-2">
+                           <div className="flex items-center gap-2">
+                              <h3 className="text-2xl font-bold text-white group-hover:text-blue-400 transition-colors tracking-tight">Week of {month} {day}</h3>
+                              <div className="p-1 rounded-full bg-white/10 group-data-[state=open]:rotate-180 transition-transform">
+                                <ChevronRight className="w-4 h-4 text-slate-400" />
+                              </div>
+                           </div>
+                           <div className="flex items-center gap-3">
+                              <Badge variant="outline" className="bg-white/5 text-slate-400 border-none text-[10px] px-2 py-0.5 font-bold uppercase tracking-wider">
+                                {nicheIcon} {brief.niche.replace('_', ' ')}
+                              </Badge>
+                              <div className="h-1 w-1 rounded-full bg-slate-700" />
+                              <span className="text-xs text-slate-500 font-medium">{brief.ideas?.length || 0} strategic ideas</span>
+                           </div>
+                        </div>
+                      </div>
+
+                      {/* Right: Idea Summary Chips */}
+                      <div className="flex flex-wrap items-center gap-3 lg:justify-end">
+                         {Object.entries(formats).map(([format, count]: [any, any]) => {
+                           const Icon = formatIcons[format] || Sparkles
+                           return (
+                             <div key={format} className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/5 border border-white/5 text-slate-400">
+                                <Icon className="w-3.5 h-3.5" />
+                                <span className="text-[10px] font-bold uppercase tracking-widest">{count} {format}s</span>
+                             </div>
+                           )
+                         })}
+                         <div className="hidden md:flex w-10 h-10 rounded-full bg-blue-600/10 border border-blue-500/20 items-center justify-center group-hover:bg-blue-600 group-hover:scale-110 transition-all duration-500">
+                            <ArrowUpRight className="w-5 h-5 text-blue-400 group-hover:text-white" />
+                         </div>
                       </div>
                     </div>
                   </AccordionTrigger>
-                  <AccordionContent className="pt-10 pb-10 px-6 bg-black/40">
-                    <BriefList ideas={brief.ideas || []} savedHashes={savedHashes} />
+                  
+                  <AccordionContent className="p-8 lg:p-12 bg-black/40 border-t border-white/5 pt-12 animate-in fade-in slide-in-from-top-4 duration-500">
+                    <div className="space-y-10">
+                       <div className="flex items-center gap-4 mb-8">
+                          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                          <div className="flex items-center gap-2 text-slate-500">
+                             <Orbit className="w-4 h-4 animate-spin-slow" />
+                             <span className="text-[10px] font-black uppercase tracking-[0.3em]">Full Deployment Brief</span>
+                          </div>
+                          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                       </div>
+                       <BriefList ideas={brief.ideas || []} savedHashes={savedHashes} />
+                    </div>
                   </AccordionContent>
                 </AccordionItem>
               )

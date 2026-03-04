@@ -1,22 +1,20 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { IdeaObject } from '@/types/niche'
 import { BriefCard } from '@/components/brief/BriefCard'
 import { 
-  ChevronRight, 
-  ChevronLeft, 
   Inbox, 
   PenTool, 
   Video, 
   CheckCircle2, 
   MoreHorizontal,
-  ArrowRight,
   GripVertical
 } from 'lucide-react'
 import { updateIdeaStatusAction } from '@/app/actions/ideas'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
+import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd'
 
 interface KanbanIdea {
   id: string
@@ -35,14 +33,27 @@ const COLUMNS = [
 
 export function KanbanBoard({ initialIdeas }: { initialIdeas: KanbanIdea[] }) {
   const [ideas, setIdeas] = useState(initialIdeas)
+  const [isMounted, setIsMounted] = useState(false)
 
-  const moveIdea = async (id: string, newStatus: string) => {
-    // Optimistic UI
+  // Prevent hydration issues with DND
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  const onDragEnd = async (result: DropResult) => {
+    const { destination, source, draggableId } = result
+
+    if (!destination) return
+    if (destination.droppableId === source.droppableId && destination.index === source.index) return
+
+    const newStatus = destination.droppableId
     const previousIdeas = [...ideas]
-    setIdeas(ideas.map(i => i.id === id ? { ...i, status: newStatus } : i))
+    
+    // Optimistic UI update
+    setIdeas(ideas.map(i => i.id === draggableId ? { ...i, status: newStatus } : i))
 
     try {
-      const res = await updateIdeaStatusAction(id, newStatus)
+      const res = await updateIdeaStatusAction(draggableId, newStatus)
       if (res.error) throw new Error(res.error)
       toast.success(`Moved to ${newStatus}`)
     } catch (err) {
@@ -51,74 +62,84 @@ export function KanbanBoard({ initialIdeas }: { initialIdeas: KanbanIdea[] }) {
     }
   }
 
+  if (!isMounted) return <div className="h-[70vh] w-full bg-white/[0.01] animate-pulse rounded-3xl" />
+
   return (
-    <div className="flex flex-col lg:flex-row gap-6 h-full min-h-[70vh] overflow-x-auto pb-10 custom-scrollbar">
-      {COLUMNS.map((col) => {
-        const Icon = col.icon
-        const colIdeas = ideas.filter(i => i.status === col.id)
+    <DragDropContext onDragEnd={onDragEnd}>
+      <div className="flex flex-col lg:flex-row gap-6 h-full min-h-[70vh] overflow-x-auto pb-10 custom-scrollbar">
+        {COLUMNS.map((col) => {
+          const Icon = col.icon
+          const colIdeas = ideas.filter(i => i.status === col.id)
 
-        return (
-          <div key={col.id} className="flex-1 min-w-[320px] flex flex-col gap-4">
-            {/* Column Header */}
-            <div className="flex items-center justify-between px-4 py-2 bg-white/[0.03] border border-white/5 rounded-2xl">
-              <div className="flex items-center gap-3">
-                <div className={cn("p-1.5 rounded-lg border border-white/5", col.bg)}>
-                  <Icon className={cn("w-4 h-4", col.color)} />
+          return (
+            <div key={col.id} className="flex-1 min-w-[320px] flex flex-col gap-4">
+              {/* Column Header */}
+              <div className="flex items-center justify-between px-4 py-2 bg-white/[0.03] border border-white/5 rounded-2xl">
+                <div className="flex items-center gap-3">
+                  <div className={cn("p-1.5 rounded-lg border border-white/5", col.bg)}>
+                    <Icon className={cn("w-4 h-4", col.color)} />
+                  </div>
+                  <span className="text-sm font-bold text-white tracking-tight uppercase tracking-widest">{col.label}</span>
+                  <span className="text-[10px] font-black text-slate-600 bg-white/5 px-2 py-0.5 rounded-full">{colIdeas.length}</span>
                 </div>
-                <span className="text-sm font-bold text-white tracking-tight uppercase tracking-widest">{col.label}</span>
-                <span className="text-[10px] font-black text-slate-600 bg-white/5 px-2 py-0.5 rounded-full">{colIdeas.length}</span>
+                <button className="text-slate-600 hover:text-white transition-colors">
+                  <MoreHorizontal className="w-4 h-4" />
+                </button>
               </div>
-              <button className="text-slate-600 hover:text-white transition-colors">
-                <MoreHorizontal className="w-4 h-4" />
-              </button>
-            </div>
 
-            {/* Column Content */}
-            <div className={cn(
-              "flex-1 rounded-3xl border border-dashed border-white/5 p-3 space-y-4 transition-colors",
-              colIdeas.length === 0 ? "bg-transparent" : "bg-white/[0.01]"
-            )}>
-              {colIdeas.map((idea) => (
-                <div key={idea.id} className="group relative">
-                  <BriefCard 
-                    idea={idea.idea_data || { title: idea.idea_title, format: 'Idea', hook: 'Custom idea', description: '', whyItWorks: '' }} 
-                    hideSaveButton 
-                    dbId={idea.id} 
-                    variant="compact"
-                  />
-                  
-                  {/* Status Move Buttons (Professional 2026 Floating UI) */}
-                  <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-20">
-                    {col.id !== 'backlog' && (
-                      <button 
-                        onClick={(e) => { e.stopPropagation(); moveIdea(idea.id, COLUMNS[COLUMNS.findIndex(c => c.id === col.id) - 1].id) }}
-                        className="p-1.5 rounded-lg bg-black/80 backdrop-blur-md border border-white/10 text-slate-400 hover:text-white transition-all"
-                      >
-                        <ChevronLeft className="w-3.5 h-3.5" />
-                      </button>
+              {/* Column Content (Droppable) */}
+              <Droppable droppableId={col.id}>
+                {(provided, snapshot) => (
+                  <div 
+                    {...provided.droppableProps}
+                    ref={provided.innerRef}
+                    className={cn(
+                      "flex-1 rounded-3xl border border-dashed p-3 space-y-4 transition-all duration-300 min-h-[150px]",
+                      snapshot.isDraggingOver ? "bg-white/[0.05] border-blue-500/30 border-solid" : "bg-transparent border-white/5",
+                      colIdeas.length > 0 && !snapshot.isDraggingOver && "bg-white/[0.01]"
                     )}
-                    {col.id !== 'published' && (
-                      <button 
-                        onClick={(e) => { e.stopPropagation(); moveIdea(idea.id, COLUMNS[COLUMNS.findIndex(c => c.id === col.id) + 1].id) }}
-                        className="p-1.5 rounded-lg bg-black/80 backdrop-blur-md border border-white/10 text-slate-400 hover:text-white transition-all flex items-center gap-1 px-2"
-                      >
-                        <span className="text-[9px] font-black uppercase">Next</span>
-                        <ChevronRight className="w-3.5 h-3.5" />
-                      </button>
+                  >
+                    {colIdeas.map((idea, index) => (
+                      <Draggable key={idea.id} draggableId={idea.id} index={index}>
+                        {(provided, snapshot) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            className={cn(
+                              "relative group transition-transform duration-200",
+                              snapshot.isDragging && "z-50 scale-105 rotate-2"
+                            )}
+                          >
+                            <BriefCard 
+                              idea={idea.idea_data || { title: idea.idea_title, format: 'Idea', hook: 'Custom idea', description: '', whyItWorks: '' }} 
+                              hideSaveButton 
+                              dbId={idea.id} 
+                              variant="compact"
+                            />
+                            
+                            {/* Drag Indicator */}
+                            <div className="absolute top-1/2 -left-1 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity p-1">
+                               <GripVertical className="w-3 h-3 text-slate-600" />
+                            </div>
+                          </div>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+
+                    {colIdeas.length === 0 && !snapshot.isDraggingOver && (
+                      <div className="h-32 flex flex-col items-center justify-center text-center p-6 border-2 border-dashed border-white/[0.02] rounded-3xl">
+                         <p className="text-[10px] font-bold text-slate-700 uppercase tracking-widest">Drop here</p>
+                      </div>
                     )}
                   </div>
-                </div>
-              ))}
-
-              {colIdeas.length === 0 && (
-                <div className="h-32 flex flex-col items-center justify-center text-center p-6 border-2 border-dashed border-white/[0.02] rounded-3xl">
-                   <p className="text-[10px] font-bold text-slate-700 uppercase tracking-widest">No tasks in {col.label}</p>
-                </div>
-              )}
+                )}
+              </Droppable>
             </div>
-          </div>
-        )
-      })}
-    </div>
+          )
+        })}
+      </div>
+    </DragDropContext>
   )
 }

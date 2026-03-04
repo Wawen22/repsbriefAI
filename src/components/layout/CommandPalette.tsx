@@ -65,7 +65,7 @@ export function CommandPalette() {
   return (
     <>
       {/* Visual Indicator in UI (optional, but good for UX) */}
-      <div className="fixed bottom-6 right-6 z-50 hidden lg:block">
+      <div className="fixed top-6 right-6 z-50 hidden lg:block">
          <button 
            onClick={() => setOpen(true)}
            className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-slate-500 hover:text-white hover:bg-white/10 transition-all text-[10px] font-bold uppercase tracking-widest backdrop-blur-md"

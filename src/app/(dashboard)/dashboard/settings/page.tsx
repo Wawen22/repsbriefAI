@@ -3,9 +3,10 @@ import { redirect } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { CreditCard, User, Dumbbell, Crown, Check, Zap, Settings, ShieldCheck, Mail, ArrowRight, Sparkles } from "lucide-react"
+import { CreditCard, User, Dumbbell, Crown, Check, Zap, Settings, ShieldCheck, Mail, ArrowRight, Sparkles, BrainCircuit } from "lucide-react"
 import { createCustomerPortalSession } from "@/app/actions/stripe"
 import { NicheSwitcher } from "@/components/settings/NicheSwitcher"
+import { BrandVoiceSettings } from "@/components/settings/BrandVoiceSettings"
 
 export const dynamic = 'force-dynamic'
 
@@ -117,6 +118,23 @@ export default async function SettingsPage() {
               </div>
             </div>
             <NicheSwitcher currentNiche={profile.active_niche || 'fitness'} />
+          </div>
+
+          {/* Brand Voice Tuning Section */}
+          <div className="bg-white/[0.02] border border-white/10 rounded-3xl p-8 space-y-8">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-purple-500/10 flex items-center justify-center border border-purple-500/20">
+                <BrainCircuit className="w-6 h-6 text-purple-400" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-white tracking-tight">Personalized Brand Voice</h2>
+                <p className="text-sm text-slate-500">Train the AI to write scripts in your unique style.</p>
+              </div>
+            </div>
+            <BrandVoiceSettings 
+              initialSamples={profile.writing_samples || []} 
+              currentAnalysis={profile.brand_voice || null} 
+            />
           </div>
 
         </div>

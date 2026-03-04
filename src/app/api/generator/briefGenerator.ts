@@ -3,6 +3,7 @@
 import { getAIProvider } from '@/lib/ai'
 import { z } from 'zod'
 import { NicheConfig, TrendItem, IdeaObject } from '@/types/niche'
+import { createClient } from '@/lib/supabase/server'
 
 const IdeaSchema = z.object({
   title: z.string().min(1),
@@ -16,13 +17,13 @@ const IdeaSchema = z.object({
   keyVisuals: z.string().optional(),
 })
 
-// Accept 15-25 ideas (AI doesn't always nail exactly 20) — we trim or keep as-is
 const BriefSchema = z.array(IdeaSchema).min(10).max(25)
 
 export async function generateBrief(
   trendsData: TrendItem[], 
   ideaHistory: string[], 
-  niche: NicheConfig
+  niche: NicheConfig,
+  userId?: string
 ): Promise<IdeaObject[]> {
   // ── Pre-flight checks ───────────────────────────────────────────────────
   const provider = process.env.AI_PROVIDER ?? 'openai'
@@ -30,6 +31,21 @@ export async function generateBrief(
 
   if (!model) {
     throw new Error(`AI_MODEL env var is not set. Set it to a model supported by "${provider}" (e.g. gpt-4o-mini, gemini-1.5-flash).`)
+  }
+
+  // Fetch user brand voice if available
+  let brandVoice = ""
+  if (userId) {
+    const supabase = await createClient()
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('brand_voice')
+      .eq('id', userId)
+      .single()
+    
+    if (profile?.brand_voice) {
+      brandVoice = `\n\nUSER'S UNIQUE BRAND VOICE PROFILE:\n${profile.brand_voice}\nIMPORTANT: You MUST write all hooks and scripts in this exact style and tone. This is the most critical requirement.`
+    }
   }
 
   // Validate that the required API key exists for the chosen provider
@@ -42,7 +58,7 @@ export async function generateBrief(
   }
 
   if (!keyMap[provider]) {
-    throw new Error(`API key for provider "${provider}" is missing. Set the corresponding env var (e.g. OPENAI_API_KEY, GEMINI_API_KEY).`)
+    throw new Error(`API key for provider "${provider}" is missing.`)
   }
 
   const ai = getAIProvider()
@@ -52,12 +68,11 @@ export async function generateBrief(
 
   if (trendsData.length > 0) {
     trendsSummary = trendsData
-      .slice(0, 80) // cap to avoid token overflow
+      .slice(0, 80)
       .map(t => `- [${t.source.toUpperCase()}] ${t.title}${t.score ? ` (score: ${t.score})` : ''}`)
       .join('\n')
   } else {
-    // Fallback: no scraped data available — instruct AI to use its own knowledge
-    trendsSummary = `No live scraped data is available right now. Use your knowledge of the latest trends in ${niche.label} to generate timely, relevant ideas. Focus on topics that are currently popular among ${niche.label} creators on social media.`
+    trendsSummary = `No live scraped data is available right now. Use your knowledge of the latest trends in ${niche.label} to generate timely ideas.`
   }
 
   const historySection = ideaHistory.length > 0
@@ -65,7 +80,7 @@ export async function generateBrief(
     : ''
 
   const systemPrompt = `You are ${niche.claudePersona}. Your goal is to provide 20 fresh, high-impact content ideas for ${niche.label} creators based on current trends. 
-You provide extremely detailed strategies for every idea to help creators execute immediately.`
+You provide extremely detailed strategies for every idea to help creators execute immediately.${brandVoice}`
   
   const userPrompt = `
 Analyze the following trends from the last 7 days:
@@ -86,10 +101,7 @@ Return a JSON array of exactly 20 content ideas. Each idea MUST follow this exac
 }
 
 IMPORTANT:
-- The "format" field MUST be one of exactly: "Reel", "Carousel", "Thread", "Newsletter"
-- "scriptDraft" should be actionable and ready to record or write.
-- Respond ONLY with the JSON array. No markdown, no explanation, no wrapping object.
-- The response must be valid parseable JSON starting with [ and ending with ]
+- Respond ONLY with the JSON array.
 `
 
   // ── Generate with retry ─────────────────────────────────────────────────
@@ -98,55 +110,28 @@ IMPORTANT:
 
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
-      console.log(`[Generator] Attempt ${attempt} — calling AI provider (${provider} / ${model})...`)
       const response = await ai.complete([
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt },
       ], { jsonMode: true, maxTokens: 8192 })
 
-      console.log(`[Generator] Attempt ${attempt} — provider: ${response.provider}, model: ${response.model}, tokens: ${response.tokensUsed ?? 'n/a'}`)
-      
       let text = response.text.trim()
       text = text.replace(/^\uFEFF/, '')
       text = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/m, '').trim()
       const arrayStart = text.indexOf('[')
       const arrayEnd = text.lastIndexOf(']')
-      if (arrayStart !== -1 && arrayEnd > arrayStart && !text.startsWith('[') && !text.startsWith('{')) {
+      if (arrayStart !== -1 && arrayEnd > arrayStart) {
         text = text.substring(arrayStart, arrayEnd + 1)
       }
-      text = text.replace(/,\s*([}\]])/g, '$1')
 
-      let rawJson: unknown
-      try {
-        rawJson = JSON.parse(text)
-      } catch (parseErr) {
-        throw new Error(`AI returned invalid JSON: ${text.substring(0, 300)}...`)
-      }
-
-      let ideasArray: unknown
-      if (Array.isArray(rawJson)) {
-        ideasArray = rawJson
-      } else if (typeof rawJson === 'object' && rawJson !== null) {
-        const values = Object.values(rawJson as Record<string, unknown>)
-        ideasArray = values.find(v => Array.isArray(v))
-        if (!ideasArray) {
-          throw new Error(`AI returned an object but no array field found.`)
-        }
-      } else {
-        throw new Error(`AI returned unexpected type: ${typeof rawJson}`)
-      }
-
-      const validated = BriefSchema.parse(ideasArray)
-      const final = validated.slice(0, 20)
-
-      console.log(`[Generator] ✅ Brief validated with full strategy: ${final.length} ideas`)
-      return final
+      const ideasArray = JSON.parse(text)
+      const validated = BriefSchema.parse(Array.isArray(ideasArray) ? ideasArray : [])
+      return validated.slice(0, 20)
     } catch (err: any) {
       lastError = err
-      console.error(`[Generator] Attempt ${attempt}/${maxAttempts} failed:`, err.message || err)
-      if (err.message?.includes('API key') || err.message?.includes('env var')) throw err
+      if (err.message?.includes('API key')) throw err
     }
   }
 
-  throw new Error(`Brief generation failed after ${maxAttempts} attempts. Last error: ${lastError?.message || 'Unknown'}`)
+  throw new Error(`Brief generation failed after ${maxAttempts} attempts.`)
 }

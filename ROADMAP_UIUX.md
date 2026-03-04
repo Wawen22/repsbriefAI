@@ -12,22 +12,18 @@ This document tracks the strategic UI/UX improvements to elevate RepsBrief into 
 | 4 | **Command Palette (CMD+K)** | 🟡 Medium | ✅ Done | Instant navigation and action tool for power users (change niche, add idea, jump to history). |
 | 5 | **Strategic Impact Stats** | 🟢 Low | ✅ Done | Minimalist dashboard widgets showing format trends and AI suggestions over time. |
 | 6 | **Premium Micro-interactions** | 🟢 Low | ✅ Done | Add "Sparkle" effects on saving ideas and other subtle haptic-like animations. |
-| 7 | **Creator Kanban Board** | 🔴 High | ⬜ Todo | Transform "Saved Ideas" into a workflow management tool (To Review, Scripting, Ready, Published). |
-| 8 | **AI Remix & Refine** | 🔴 High | ⬜ Todo | Add interactive "Magic Wand" tools to scripts to instantly change tone, length, or format. |
-| 9 | **Brand Voice Tuning** | 🟡 Medium | ⬜ Todo | Analyze user's past successful posts to clone their exact writing style for future briefs. |
-| 10 | **Notion/Ecosystem Sync** | 🟢 Low | ⬜ Todo | 1-click export of strategies to Notion, Trello, or Markdown files. |
+| 7 | **Creator Kanban Board** | 🔴 High | ✅ Done | Transform "Saved Ideas" into a workflow management tool with Drag & Drop functionality. |
+| 8 | **AI Remix & Refine** | 🔴 High | ✅ Done | Interactive "Magic Wand" tools to instantly change tone, length, or format with full persistence. |
+| 9 | **Brand Voice Tuning** | 🟡 Medium | ✅ Done | Analyze user's past successful posts to clone their exact writing style for future briefs. |
+| 10 | **Notion/Ecosystem Sync** | 🟢 Low | 🚧 In Progress | 1-click export of strategies to Notion, Trello, or Markdown files. |
 
 ---
 
 ## ✅ Completed Refactors
 
 - [x] **2026 Modern Design System:** Deep black theme, ambient glows, glassmorphism, and high-contrast typography.
-- [x] **Upper Utility Bar:** Separated Niche selection from main content for better hierarchy.
-- [x] **Evolved Niche Picker:** Replaced buttons with a premium Popover/Command interface.
-- [x] **Segmented Filter Control:** Modern pill-style format filters with fluid transitions.
-- [x] **High-Contrast Card Icons:** Formats now have vibrant, distinct color identities for perfect visibility.
-- [x] **Add My Idea Modal:** Redesigned with atmospheric glows and premium typography.
-- [x] **Immersive Generation UX:** Multi-step visual feedback during AI brief creation.
-- [x] **Deep-Dive Strategy Cards:** Widescreen expanded view with AI-generated scripts, trending audio, and alternative hooks.
-- [x] **Strategic Impact Stats:** Multi-widget analysis dashboard for format velocity and market sentiment.
-- [x] **Accessibility (A11y) Fixes:** Hidden Dialog titles and descriptions for screen readers compliance.
+- [x] **Kanban Workflow:** Fully interactive board with `@hello-pangea/dnd` for production management.
+- [x] **AI Interactivity:** Real-time persistence for AI remixed strategies.
+- [x] **Brand Voice Cloning:** AI-driven linguistic analysis to personalize script generation.
+- [x] **Growth History Timeline:** Redesigned vault experience with master cards and strategic summaries.
+- [x] **Command Palette (⌘K):** Professional navigation and quick action tool.

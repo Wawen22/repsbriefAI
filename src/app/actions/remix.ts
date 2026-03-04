@@ -13,10 +13,21 @@ export async function remixScriptAction(
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Unauthorized' }
 
+  // Fetch user brand voice if available
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('brand_voice')
+    .eq('id', user.id)
+    .single()
+
+  const brandVoice = profile?.brand_voice 
+    ? `\n\nUSER'S UNIQUE BRAND VOICE PROFILE:\n${profile.brand_voice}\nIMPORTANT: You MUST write the remixed hook and script in this exact style and tone.`
+    : ""
+
   const ai = getAIProvider()
   
   const systemPrompt = `You are a professional content strategist and world-class copywriter for ${niche} creators. 
-Your goal is to refine and remix an existing content brief based on specific user instructions while maintaining high-engagement standards.`
+Your goal is to refine and remix an existing content brief based on specific user instructions while maintaining high-engagement standards.${brandVoice}`
 
   const userPrompt = `
 ORIGINAL BRIEF:

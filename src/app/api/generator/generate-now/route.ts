@@ -105,7 +105,7 @@ export async function POST() {
 
     let ideas
     try {
-      ideas = await generateBrief(allTrends, historyTitles, niche)
+      ideas = await generateBrief(allTrends, historyTitles, niche, user.id)
     } catch (genErr: any) {
       console.error('[GenerateNow] Generation failed:', genErr.message)
       console.error('[GenerateNow] Full error stack:', genErr.stack || genErr)

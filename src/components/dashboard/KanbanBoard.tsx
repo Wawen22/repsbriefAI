@@ -84,6 +84,7 @@ export function KanbanBoard({ initialIdeas }: { initialIdeas: KanbanIdea[] }) {
                     idea={idea.idea_data || { title: idea.idea_title, format: 'Idea', hook: 'Custom idea', description: '', whyItWorks: '' }} 
                     hideSaveButton 
                     dbId={idea.id} 
+                    variant="compact"
                   />
                   
                   {/* Status Move Buttons (Professional 2026 Floating UI) */}

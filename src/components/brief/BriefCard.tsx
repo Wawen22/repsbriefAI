@@ -16,17 +16,25 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog"
+import { cn } from "@/lib/utils"
 
 interface BriefCardProps {
   idea: IdeaObject
   isSaved?: boolean
   hideSaveButton?: boolean
   dbId?: string
+  variant?: 'default' | 'compact'
 }
 
 type CopyField = 'title' | 'hook' | 'all' | 'script' | null
 
-export function BriefCard({ idea, isSaved = false, hideSaveButton = false, dbId }: BriefCardProps) {
+export function BriefCard({ 
+  idea, 
+  isSaved = false, 
+  hideSaveButton = false, 
+  dbId,
+  variant = 'default'
+}: BriefCardProps) {
   const [copied, setCopied] = useState<CopyField>(null)
   const [isExpanded, setIsExpanded] = useState(false)
 
@@ -80,10 +88,192 @@ export function BriefCard({ idea, isSaved = false, hideSaveButton = false, dbId 
     </Button>
   )
 
+  if (variant === 'compact') {
+    return (
+      <>
+        <div className="group relative">
+          <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500/0 via-blue-500/0 to-blue-500/0 group-hover:from-blue-500/10 group-hover:to-emerald-500/10 rounded-2xl blur opacity-0 group-hover:opacity-100 transition duration-500" />
+          
+          <Card 
+            className="relative bg-white/[0.03] border-white/10 group-hover:bg-white/[0.05] group-hover:border-white/20 transition-all duration-300 rounded-2xl overflow-hidden cursor-pointer p-4"
+            onClick={() => setIsExpanded(true)}
+          >
+            <div className="flex items-start gap-4">
+              <div className="p-2 rounded-xl bg-white/5 border border-white/5 group-hover:bg-blue-500/10 transition-colors shrink-0">
+                {getIcon(idea.format)}
+              </div>
+              <div className="space-y-1 flex-1 min-w-0">
+                <div className="flex items-center justify-between gap-2">
+                  <Badge variant="outline" className="border-none bg-blue-500/5 text-blue-400 text-[9px] px-1 py-0 font-bold uppercase tracking-widest leading-none h-fit">
+                    {idea.format}
+                  </Badge>
+                  {isSaved && <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />}
+                </div>
+                <h3 className="text-sm font-bold text-white group-hover:text-blue-200 transition-colors leading-snug">
+                  {idea.title}
+                </h3>
+              </div>
+            </div>
+          </Card>
+        </div>
+        {/* Deep Dive Modal Shared Component */}
+        {renderModal()}
+      </>
+    )
+  }
+
+  function renderModal() {
+    return (
+      <Dialog open={isExpanded} onOpenChange={setIsExpanded}>
+        <DialogContent className="max-w-[95vw] lg:max-w-[1400px] w-full max-h-[90vh] overflow-hidden p-0 bg-black border-white/10 text-slate-50 shadow-[0_0_50px_-12px_rgba(59,130,246,0.3)] flex flex-col rounded-3xl">
+          <DialogHeader className="sr-only">
+            <DialogTitle>{idea.title}</DialogTitle>
+            <DialogDescription>Full content strategy and script for {idea.title}</DialogDescription>
+          </DialogHeader>
+
+          {/* Modal Background Glow */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/10 rounded-full blur-[100px] pointer-events-none" />
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-emerald-600/5 rounded-full blur-[100px] pointer-events-none" />
+
+          <div className="p-8 pb-4 relative z-10">
+            <div className="text-left">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 rounded-xl bg-white/5 border border-white/5">
+                  {getIcon(idea.format)}
+                </div>
+                <Badge variant="outline" className="bg-blue-500/5 text-blue-300 border-blue-500/20 px-2 py-0.5 rounded-md text-[10px] font-bold tracking-widest uppercase">
+                  {idea.format} Strategy
+                </Badge>
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-2 leading-tight text-white">
+                {idea.title}
+              </h2>
+              <div className="flex items-center gap-4">
+                <CopyBtn field="all" text={formatFullIdea()} label="Copy Full Brief" />
+              </div>
+            </div>
+          </div>
+
+          <div className="flex-1 overflow-y-auto px-8 py-6 space-y-10 relative z-10 custom-scrollbar">
+            {/* Hook Section */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
+                    <Zap className="w-4 h-4 text-blue-400" />
+                  </div>
+                  <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">The Winning Hook</h4>
+                </div>
+                <CopyBtn field="hook" text={idea.hook} label="Copy Hook" />
+              </div>
+              <div className="p-6 rounded-2xl bg-white/[0.03] border border-white/5 relative overflow-hidden group">
+                <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b from-blue-500 to-blue-700 rounded-full" />
+                <p className="text-xl md:text-2xl font-light italic text-white leading-relaxed pl-4">
+                  &ldquo;{idea.hook}&rdquo;
+                </p>
+              </div>
+            </div>
+
+            {/* Script / Body Section */}
+            <div className="grid md:grid-cols-2 gap-10">
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center border border-purple-500/20">
+                    <FileText className="w-4 h-4 text-purple-400" />
+                  </div>
+                  <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Content Concept</h4>
+                </div>
+                <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/5 min-h-[200px]">
+                  <p className="text-slate-300 leading-relaxed font-light">
+                    {idea.description}
+                  </p>
+                  {idea.scriptDraft && (
+                    <div className="mt-6 pt-6 border-t border-white/5 space-y-4">
+                       <h5 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Suggested Script</h5>
+                       <p className="text-sm text-slate-400 whitespace-pre-wrap font-mono bg-black/40 p-4 rounded-xl border border-white/5">
+                         {idea.scriptDraft}
+                       </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="space-y-8">
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
+                      <TrendingUp className="w-4 h-4 text-emerald-400" />
+                    </div>
+                    <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Strategist Analysis</h4>
+                  </div>
+                  <div className="p-6 rounded-2xl bg-emerald-500/5 border border-emerald-500/10">
+                    <p className="text-sm text-emerald-100/80 leading-relaxed italic">
+                      {idea.whyItWorks}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 gap-4">
+                   <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/5 flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-xl bg-rose-500/10 flex items-center justify-center border border-rose-500/20">
+                         <Music className="w-5 h-5 text-rose-400" />
+                      </div>
+                      <div>
+                         <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">Trending Audio</p>
+                         <p className="text-sm text-slate-300 font-medium">{idea.trendingAudioSuggestion || 'Fast-paced rhythmic beat'}</p>
+                      </div>
+                   </div>
+
+                   <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/5 flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center border border-amber-500/20">
+                         <Wand2 className="w-5 h-5 text-amber-400" />
+                      </div>
+                      <div className="flex-1">
+                         <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">Alternative Hook</p>
+                         <p className="text-sm text-slate-300 font-medium italic line-clamp-1">
+                           {idea.alternativeHooks?.[0] || `The #1 mistake you're making with ${idea.title.split(' ').slice(0, 3).join(' ')}...`}
+                         </p>
+                      </div>
+                   </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="p-8 bg-gradient-to-t from-blue-900/20 to-transparent border-t border-white/10 relative z-20 backdrop-blur-sm">
+            <div className="flex items-center justify-between gap-6 max-w-[1400px] mx-auto">
+              <div className="hidden md:block text-left">
+                <p className="text-sm font-medium text-slate-400">Ready to create?</p>
+                <p className="text-[10px] text-slate-600 uppercase tracking-widest">Record this using the strategy above.</p>
+              </div>
+              
+              <div className="flex items-center gap-3 ml-auto">
+                <Button 
+                  variant="outline"
+                  className="bg-white text-black hover:bg-slate-200 border-none rounded-full font-bold px-8 h-12 transition-all shadow-xl"
+                  onClick={() => setIsExpanded(false)}
+                >
+                  Got it
+                </Button>
+                {!hideSaveButton && (
+                  <SaveIdeaButton 
+                    title={idea.title} 
+                    ideaData={idea} 
+                    initialSaved={isSaved} 
+                    variant="prominent" 
+                  />
+                )}
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    )
+  }
+
   return (
     <>
       <div className="group relative h-full">
-        {/* Outer Glow on Hover */}
         <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500/0 via-blue-500/0 to-blue-500/0 group-hover:from-blue-500/10 group-hover:to-emerald-500/10 rounded-[22px] blur opacity-0 group-hover:opacity-100 transition duration-500" />
         
         <Card 
@@ -138,7 +328,6 @@ export function BriefCard({ idea, isSaved = false, hideSaveButton = false, dbId 
               </div>
             </div>
 
-            {/* Hover Action: Deep Dive */}
             <div className="mt-4 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all transform translate-y-2 group-hover:translate-y-0">
                <div className="bg-white text-black text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-full flex items-center gap-2 shadow-xl shadow-white/5">
                   Expand Strategy <ArrowUpRight className="w-3 h-3" />
@@ -157,152 +346,7 @@ export function BriefCard({ idea, isSaved = false, hideSaveButton = false, dbId 
           </CardContent>
         </Card>
       </div>
-
-      {/* Expanded Strategy Modal */}
-      <Dialog open={isExpanded} onOpenChange={setIsExpanded}>
-        <DialogContent className="max-w-[95vw] lg:max-w-[1400px] w-full max-h-[90vh] overflow-hidden p-0 bg-black border-white/10 text-slate-50 shadow-[0_0_50px_-12px_rgba(59,130,246,0.3)] flex flex-col rounded-3xl">
-          {/* Modal Background Glow */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/10 rounded-full blur-[100px] pointer-events-none" />
-          <div className="absolute bottom-0 left-0 w-64 h-64 bg-emerald-600/5 rounded-full blur-[100px] pointer-events-none" />
-
-          <div className="p-8 pb-4 relative z-10">
-            <DialogHeader className="text-left">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 rounded-xl bg-white/5 border border-white/5">
-                  {getIcon(idea.format)}
-                </div>
-                <Badge variant="outline" className="bg-blue-500/5 text-blue-300 border-blue-500/20 px-2 py-0.5 rounded-md text-[10px] font-bold tracking-widest uppercase">
-                  {idea.format} Strategy
-                </Badge>
-              </div>
-              <DialogTitle className="text-3xl md:text-4xl font-bold tracking-tight mb-2 leading-tight">
-                {idea.title}
-              </DialogTitle>
-              <div className="flex items-center gap-4">
-                <CopyBtn field="all" text={formatFullIdea()} label="Copy Full Brief" />
-              </div>
-            </DialogHeader>
-          </div>
-
-          <div className="flex-1 overflow-y-auto px-8 py-6 space-y-10 relative z-10 custom-scrollbar">
-            {/* Hook Section */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
-                    <Zap className="w-4 h-4 text-blue-400" />
-                  </div>
-                  <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">The Winning Hook</h4>
-                </div>
-                <CopyBtn field="hook" text={idea.hook} label="Copy Hook" />
-              </div>
-              <div className="p-6 rounded-2xl bg-white/[0.03] border border-white/5 relative overflow-hidden group">
-                <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b from-blue-500 to-blue-700 rounded-full" />
-                <p className="text-xl md:text-2xl font-light italic text-white leading-relaxed pl-4">
-                  &ldquo;{idea.hook}&rdquo;
-                </p>
-              </div>
-            </div>
-
-            {/* Script / Body Section */}
-            <div className="grid md:grid-cols-2 gap-10">
-              <div className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center border border-purple-500/20">
-                    <FileText className="w-4 h-4 text-purple-400" />
-                  </div>
-                  <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Content Concept</h4>
-                </div>
-                <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/5 min-h-[200px]">
-                  <p className="text-slate-300 leading-relaxed font-light">
-                    {idea.description}
-                  </p>
-                  {idea.scriptDraft && (
-                    <div className="mt-6 pt-6 border-t border-white/5 space-y-4">
-                       <h5 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Suggested Script</h5>
-                       <p className="text-sm text-slate-400 whitespace-pre-wrap font-mono bg-black/40 p-4 rounded-xl border border-white/5">
-                         {idea.scriptDraft}
-                       </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="space-y-8">
-                {/* Why it works */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
-                      <TrendingUp className="w-4 h-4 text-emerald-400" />
-                    </div>
-                    <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Strategist Analysis</h4>
-                  </div>
-                  <div className="p-6 rounded-2xl bg-emerald-500/5 border border-emerald-500/10">
-                    <p className="text-sm text-emerald-100/80 leading-relaxed italic">
-                      {idea.whyItWorks}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Additional Metadata */}
-                <div className="grid grid-cols-1 gap-4">
-                   {/* Trending Audio */}
-                   <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/5 flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-rose-500/10 flex items-center justify-center border border-rose-500/20">
-                         <Music className="w-5 h-5 text-rose-400" />
-                      </div>
-                      <div>
-                         <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">Trending Audio</p>
-                         <p className="text-sm text-slate-300 font-medium">{idea.trendingAudioSuggestion || 'Fast-paced rhythmic beat'}</p>
-                      </div>
-                   </div>
-
-                   {/* Alternative Hook */}
-                   <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/5 flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center border border-amber-500/20">
-                         <Wand2 className="w-5 h-5 text-amber-400" />
-                      </div>
-                      <div className="flex-1">
-                         <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">Alternative Hook</p>
-                         <p className="text-sm text-slate-300 font-medium italic line-clamp-1">
-                           {idea.alternativeHooks?.[0] || `The #1 mistake you're making with ${idea.title.split(' ').slice(0, 3).join(' ')}...`}
-                         </p>
-                      </div>
-                   </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Footer CTA */}
-          <div className="p-8 bg-gradient-to-t from-blue-900/20 to-transparent border-t border-white/10 relative z-20 backdrop-blur-sm">
-            <div className="flex items-center justify-between gap-6 max-w-[1400px] mx-auto">
-              <div className="hidden md:block text-left">
-                <p className="text-sm font-medium text-slate-400">Ready to create?</p>
-                <p className="text-[10px] text-slate-600 uppercase tracking-widest">Record this using the strategy above.</p>
-              </div>
-              
-              <div className="flex items-center gap-3 ml-auto">
-                <Button 
-                  variant="outline"
-                  className="bg-white text-black hover:bg-slate-200 border-none rounded-full font-bold px-8 h-12 transition-all shadow-xl"
-                  onClick={() => setIsExpanded(false)}
-                >
-                  Got it
-                </Button>
-                {!hideSaveButton && (
-                  <SaveIdeaButton 
-                    title={idea.title} 
-                    ideaData={idea} 
-                    initialSaved={isSaved} 
-                    variant="prominent" 
-                  />
-                )}
-              </div>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {renderModal()}
     </>
   )
 }

@@ -25,7 +25,7 @@ export default async function DashboardPage() {
   const todayStart = new Date()
   todayStart.setHours(0, 0, 0, 0)
 
-  const [{ data: brief }, { data: savedData }, { data: generatedToday }, { data: profile }] = await Promise.all([
+  const [{ data: brief }, { data: savedHistory }, { data: generatedToday }, { data: profile }] = await Promise.all([
     supabase
       .from('briefs')
       .select('*')
@@ -35,9 +35,8 @@ export default async function DashboardPage() {
       .maybeSingle(),
     supabase
       .from('idea_history')
-      .select('idea_hash')
-      .eq('user_id', user.id)
-      .eq('saved', true),
+      .select('id, idea_hash, idea_data, saved')
+      .eq('user_id', user.id),
     supabase
       .from('briefs')
       .select('id')
@@ -52,10 +51,30 @@ export default async function DashboardPage() {
       .single()
   ])
 
-  const ideas: IdeaObject[] = brief?.ideas || []
+  // Create a map of remixed/saved data by hash for merging
+  const historyMap = new Map(
+    (savedHistory || []).map(row => [row.idea_hash, row])
+  )
+
+  const rawIdeas: IdeaObject[] = brief?.ideas || []
+  
+  // Merge: If an idea from the brief has a match in history with idea_data, use the history version
+  const ideas: IdeaObject[] = rawIdeas.map(idea => {
+    const hash = Buffer.from(idea.title.trim()).toString('base64').substring(0, 64)
+    const historyEntry = historyMap.get(hash)
+    if (historyEntry?.idea_data) {
+      return historyEntry.idea_data as IdeaObject
+    }
+    return idea
+  })
+
   const hasBrief = ideas.length > 0
   const alreadyGeneratedToday = !!generatedToday
-  const savedHashes = new Set(savedData?.map(row => row.idea_hash) || [])
+  const savedHashes = new Set(
+    (savedHistory || [])
+      .filter(row => row.saved)
+      .map(row => row.idea_hash)
+  )
   const activeNiche = profile?.active_niche || 'fitness'
 
   const briefDate = brief?.week_date

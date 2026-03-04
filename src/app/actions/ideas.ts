@@ -4,7 +4,12 @@ import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { IdeaObject } from '@/types/niche'
 
-export async function saveIdeaAction(title: string, niche: string = 'fitness', ideaData?: IdeaObject) {
+export async function saveIdeaAction(
+  title: string, 
+  niche: string = 'fitness', 
+  ideaData?: IdeaObject,
+  status: string = 'backlog'
+) {
   if (!title || title.trim().length === 0) return { error: 'Title is required' }
   
   const supabase = await createClient()
@@ -15,12 +20,13 @@ export async function saveIdeaAction(title: string, niche: string = 'fitness', i
 
   const { data: existing } = await supabase
     .from('idea_history')
-    .select('id')
+    .select('id, status')
     .eq('user_id', user.id)
     .eq('idea_hash', hash)
     .maybeSingle()
 
   let error
+  let newId
 
   if (existing) {
     const result = await supabase
@@ -30,11 +36,16 @@ export async function saveIdeaAction(title: string, niche: string = 'fitness', i
         idea_data: ideaData || null,
         idea_title: title.trim(),
         used_at: new Date().toISOString(),
-        status: 'backlog'
+        // Keep existing status if already saved, otherwise use provided status
+        status: existing.status || status 
       })
       .eq('id', existing.id)
       .eq('user_id', user.id)
+      .select('id')
+      .single()
+    
     error = result.error
+    newId = result.data?.id
   } else {
     const result = await supabase
       .from('idea_history')
@@ -46,18 +57,25 @@ export async function saveIdeaAction(title: string, niche: string = 'fitness', i
         idea_data: ideaData || null,
         saved: true,
         used_at: new Date().toISOString(),
-        status: 'backlog'
+        status: status
       })
+      .select('id')
+      .single()
+    
     error = result.error
+    newId = result.data?.id
   }
 
   if (error) {
-    console.error('Failed to save idea:', error)
-    return { error: 'Failed to save idea' }
+    console.error('Failed to save/upsert idea:', error)
+    return { error: 'Failed to persist idea' }
   }
 
+  revalidatePath('/dashboard')
   revalidatePath('/dashboard/ideas')
-  return { success: true }
+  revalidatePath('/dashboard/history')
+  
+  return { success: true, id: newId }
 }
 
 export async function updateIdeaStatusAction(ideaId: string, status: string) {
@@ -99,5 +117,6 @@ export async function deleteIdeaAction(ideaId: string) {
   }
 
   revalidatePath('/dashboard/ideas')
+  revalidatePath('/dashboard')
   return { success: true }
 }

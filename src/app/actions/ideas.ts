@@ -11,10 +11,8 @@ export async function saveIdeaAction(title: string, niche: string = 'fitness', i
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Unauthorized' }
 
-  // Simple base64 encoding for hash simulation (to match existing schema length constraint if any)
   const hash = Buffer.from(title.trim()).toString('base64').substring(0, 64)
 
-  // Check if this idea already exists (from dedup insert during generation)
   const { data: existing } = await supabase
     .from('idea_history')
     .select('id')
@@ -25,7 +23,6 @@ export async function saveIdeaAction(title: string, niche: string = 'fitness', i
   let error
 
   if (existing) {
-    // Row exists (dedup entry) — update it to saved=true with full data
     const result = await supabase
       .from('idea_history')
       .update({
@@ -33,12 +30,12 @@ export async function saveIdeaAction(title: string, niche: string = 'fitness', i
         idea_data: ideaData || null,
         idea_title: title.trim(),
         used_at: new Date().toISOString(),
+        status: 'backlog'
       })
       .eq('id', existing.id)
       .eq('user_id', user.id)
     error = result.error
   } else {
-    // No existing row — insert new
     const result = await supabase
       .from('idea_history')
       .insert({
@@ -48,7 +45,8 @@ export async function saveIdeaAction(title: string, niche: string = 'fitness', i
         idea_hash: hash,
         idea_data: ideaData || null,
         saved: true,
-        used_at: new Date().toISOString()
+        used_at: new Date().toISOString(),
+        status: 'backlog'
       })
     error = result.error
   }
@@ -56,6 +54,27 @@ export async function saveIdeaAction(title: string, niche: string = 'fitness', i
   if (error) {
     console.error('Failed to save idea:', error)
     return { error: 'Failed to save idea' }
+  }
+
+  revalidatePath('/dashboard/ideas')
+  return { success: true }
+}
+
+export async function updateIdeaStatusAction(ideaId: string, status: string) {
+  if (!ideaId) return { error: 'Idea ID is required' }
+  
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Unauthorized' }
+
+  const { error } = await supabase
+    .from('idea_history')
+    .update({ status })
+    .match({ id: ideaId, user_id: user.id })
+
+  if (error) {
+    console.error('Failed to update status:', error)
+    return { error: 'Failed to update status' }
   }
 
   revalidatePath('/dashboard/ideas')
@@ -72,7 +91,7 @@ export async function deleteIdeaAction(ideaId: string) {
   const { error } = await supabase
     .from('idea_history')
     .delete()
-    .match({ id: ideaId, user_id: user.id }) // Ensure user owns the idea
+    .match({ id: ideaId, user_id: user.id })
 
   if (error) {
     console.error('Failed to delete idea:', error)

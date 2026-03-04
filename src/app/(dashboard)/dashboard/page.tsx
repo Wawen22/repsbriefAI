@@ -9,7 +9,7 @@ import { AddIdeaModal } from "@/components/ui/AddIdeaModal"
 import { GenerateNowButton } from "@/components/dashboard/GenerateNowButton"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
-import { CalendarDays, LayoutGrid, Zap } from "lucide-react"
+import { CalendarDays, LayoutGrid, Zap, Sparkles, Orbit, Plus } from "lucide-react"
 
 export const dynamic = 'force-dynamic'
 
@@ -21,7 +21,6 @@ export default async function DashboardPage() {
     redirect('/login')
   }
 
-  // Get the most recent brief (not just today's — cron runs on Monday but users open on other days)
   const todayStart = new Date()
   todayStart.setHours(0, 0, 0, 0)
 
@@ -52,109 +51,116 @@ export default async function DashboardPage() {
   const alreadyGeneratedToday = !!generatedToday
   const savedHashes = new Set(savedData?.map(row => row.idea_hash) || [])
 
-  // Format the brief's date for display
   const briefDate = brief?.week_date
     ? new Date(brief.week_date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
     : null
 
   return (
-    <>
-      <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
-        <div>
-          <div className="flex items-center gap-2 mb-4 text-slate-400">
-            <NichePicker />
+    <div className="space-y-10">
+      {/* Upper Utility Bar */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 py-2 border-b border-white/5">
+        <div className="flex items-center gap-4">
+          <NichePicker />
+          <div className="h-4 w-px bg-white/10" />
+          <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 uppercase tracking-widest">
+            <Orbit className="w-3 h-3 animate-[spin_4s_linear_infinite]" />
+            Live Data Feed
           </div>
-          <h1 className="text-4xl font-extrabold tracking-tight">The Weekly Reps</h1>
-          <p className="text-slate-400 mt-2">Your 20 high-impact content ideas generated from this week's data.</p>
         </div>
-        <div className="flex items-center gap-3">
-          {hasBrief && briefDate && (
-            <Badge variant="outline" className="border-slate-700 text-slate-500 gap-1.5 py-1.5 px-3">
-              <CalendarDays className="w-3.5 h-3.5" />
-              {briefDate}
-            </Badge>
-          )}
-          <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 py-1.5 px-3">
-            <Zap className="w-3.5 h-3.5 mr-1.5 fill-emerald-500" /> Fresh Data
-          </Badge>
+        
+        {hasBrief && briefDate && (
+          <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 text-slate-400 text-[11px] font-bold uppercase tracking-wider border border-white/5">
+            <CalendarDays className="w-3.5 h-3.5" />
+            Week of {briefDate}
+          </div>
+        )}
+      </div>
+
+      {/* Main Action Header */}
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8">
+        <div className="space-y-2">
+          <h1 className="text-5xl md:text-6xl font-black tracking-tighter text-white leading-tight">
+            The Weekly <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">Reps</span>
+          </h1>
+          <p className="text-slate-400 text-lg font-light max-w-xl">
+            20 high-impact content ideas, AI-filtered from the top 1% of digital trends.
+          </p>
+        </div>
+
+        <div className="shrink-0">
           <AddIdeaModal />
         </div>
       </header>
 
       {!hasBrief ? (
-        // ── Empty State ────────────────────────────────────────────────────────
-        <div className="flex flex-col items-center justify-center gap-10 py-20">
-          {/* Decorative grid */}
-          <div className="relative w-full max-w-sm">
-            <div className="absolute inset-0 bg-blue-500/10 blur-3xl rounded-full" />
-            <div className="relative grid grid-cols-2 gap-3 opacity-40 pointer-events-none select-none">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-2">
-                  <div className="h-3 w-16 bg-blue-500/30 rounded-full" />
-                  <div className="h-2 w-full bg-slate-800 rounded-full" />
-                  <div className="h-2 w-4/5 bg-slate-800 rounded-full" />
-                  <div className="h-2 w-3/5 bg-slate-800 rounded-full" />
-                </div>
-              ))}
+        <div className="relative py-24 flex flex-col items-center justify-center text-center overflow-hidden rounded-3xl border border-white/5 bg-white/[0.02] shadow-2xl">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.05),transparent_70%)]" />
+          
+          <div className="relative z-10 space-y-8 max-w-lg">
+            <div className="w-20 h-20 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto shadow-2xl group cursor-pointer hover:bg-blue-500/10 hover:border-blue-500/20 transition-all duration-500">
+               <Sparkles className="w-10 h-10 text-blue-400 group-hover:scale-110 transition-transform" />
             </div>
-          </div>
+            
+            <div className="space-y-3">
+              <h2 className="text-3xl font-bold text-white tracking-tight">Your briefing is ready to generate</h2>
+              <p className="text-slate-400 text-lg leading-relaxed font-light px-6">
+                Our engine has analyzed the latest Reddit, YouTube, and Google trends for your niche.
+              </p>
+            </div>
 
-          <div className="text-center space-y-2 max-w-md">
-            <h2 className="text-2xl font-bold text-slate-100">Your brief isn't here yet</h2>
-            <p className="text-slate-500 leading-relaxed">
-              The weekly cron runs every Monday at 6 AM. Can't wait? Generate your first brief right now — it takes about 30 seconds.
-            </p>
-          </div>
-
-          <GenerateNowButton alreadyGeneratedToday={alreadyGeneratedToday} />
-
-          <div className="flex items-center gap-8 text-xs text-slate-700">
-            <span className="flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-              Reddit trends
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-              YouTube data
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-purple-500" />
-              Google Trends
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-orange-500" />
-              RSS feeds
-            </span>
+            <div className="pt-4 flex flex-col items-center gap-4">
+              <GenerateNowButton alreadyGeneratedToday={alreadyGeneratedToday} />
+              <p className="text-[10px] text-slate-600 font-bold uppercase tracking-[0.2em]">Takes ~30 seconds to analyze</p>
+            </div>
           </div>
         </div>
       ) : (
-        // ── Brief Tabs ─────────────────────────────────────────────────────────
         <Tabs defaultValue="all" className="space-y-8">
-          <TabsList className="bg-slate-900 border-slate-800 p-1">
-            <TabsTrigger value="all" className="text-slate-400 data-[state=active]:text-slate-100 data-[state=active]:bg-slate-800 px-6">All Formats</TabsTrigger>
-            <TabsTrigger value="reel" className="text-slate-400 data-[state=active]:text-slate-100 data-[state=active]:bg-slate-800 px-6">Reels</TabsTrigger>
-            <TabsTrigger value="carousel" className="text-slate-400 data-[state=active]:text-slate-100 data-[state=active]:bg-slate-800 px-6">Carousels</TabsTrigger>
-            <TabsTrigger value="thread" className="text-slate-400 data-[state=active]:text-slate-100 data-[state=active]:bg-slate-800 px-6">Threads</TabsTrigger>
-            <TabsTrigger value="newsletter" className="text-slate-400 data-[state=active]:text-slate-100 data-[state=active]:bg-slate-800 px-6">Newsletter</TabsTrigger>
-          </TabsList>
+          {/* Pill Filter Bar */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <TabsList className="bg-white/5 border border-white/10 p-1.5 rounded-2xl h-auto gap-1 self-start">
+              {[
+                { value: 'all', label: 'All Formats' },
+                { value: 'reel', label: 'Reels' },
+                { value: 'carousel', label: 'Carousels' },
+                { value: 'thread', label: 'Threads' },
+                { value: 'newsletter', label: 'Newsletters' }
+              ].map((tab) => (
+                <TabsTrigger 
+                  key={tab.value}
+                  value={tab.value} 
+                  className="rounded-xl px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-500 hover:text-white hover:bg-white/5 data-[state=active]:bg-white data-[state=active]:text-black transition-all shadow-none border-none"
+                >
+                  {tab.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+            
+            <div className="hidden lg:flex items-center gap-3 px-4 py-2 rounded-2xl bg-emerald-500/5 border border-emerald-500/10">
+               <Zap className="w-4 h-4 text-emerald-400 fill-emerald-400/20" />
+               <span className="text-[11px] font-bold text-emerald-400 uppercase tracking-widest">20 ideas generated</span>
+            </div>
+          </div>
 
-          <TabsContent value="all" className="focus-visible:outline-none">
-            <BriefList ideas={ideas} savedHashes={savedHashes} />
-          </TabsContent>
-          <TabsContent value="reel" className="focus-visible:outline-none">
-            <BriefList ideas={ideas.filter(i => i.format === 'Reel')} savedHashes={savedHashes} />
-          </TabsContent>
-          <TabsContent value="carousel" className="focus-visible:outline-none">
-            <BriefList ideas={ideas.filter(i => i.format === 'Carousel')} savedHashes={savedHashes} />
-          </TabsContent>
-          <TabsContent value="thread" className="focus-visible:outline-none">
-            <BriefList ideas={ideas.filter(i => i.format === 'Thread')} savedHashes={savedHashes} />
-          </TabsContent>
-          <TabsContent value="newsletter" className="focus-visible:outline-none">
-            <BriefList ideas={ideas.filter(i => i.format === 'Newsletter')} savedHashes={savedHashes} />
-          </TabsContent>
+          <div className="min-h-[400px]">
+            <TabsContent value="all" className="mt-0 focus-visible:outline-none animate-in fade-in slide-in-from-bottom-2 duration-500">
+              <BriefList ideas={ideas} savedHashes={savedHashes} />
+            </TabsContent>
+            <TabsContent value="reel" className="mt-0 focus-visible:outline-none animate-in fade-in slide-in-from-bottom-2 duration-500">
+              <BriefList ideas={ideas.filter(i => i.format === 'Reel')} savedHashes={savedHashes} />
+            </TabsContent>
+            <TabsContent value="carousel" className="mt-0 focus-visible:outline-none animate-in fade-in slide-in-from-bottom-2 duration-500">
+              <BriefList ideas={ideas.filter(i => i.format === 'Carousel')} savedHashes={savedHashes} />
+            </TabsContent>
+            <TabsContent value="thread" className="mt-0 focus-visible:outline-none animate-in fade-in slide-in-from-bottom-2 duration-500">
+              <BriefList ideas={ideas.filter(i => i.format === 'Thread')} savedHashes={savedHashes} />
+            </TabsContent>
+            <TabsContent value="newsletter" className="mt-0 focus-visible:outline-none animate-in fade-in slide-in-from-bottom-2 duration-500">
+              <BriefList ideas={ideas.filter(i => i.format === 'Newsletter')} savedHashes={savedHashes} />
+            </TabsContent>
+          </div>
         </Tabs>
       )}
-    </>
+    </div>
   )
 }

@@ -3,7 +3,7 @@ import { redirect } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { CreditCard, User, Dumbbell, Crown, Check, Zap } from "lucide-react"
+import { CreditCard, User, Dumbbell, Crown, Check, Zap, Settings, ShieldCheck, Mail, ArrowRight, Sparkles } from "lucide-react"
 import { createCustomerPortalSession } from "@/app/actions/stripe"
 import { NicheSwitcher } from "@/components/settings/NicheSwitcher"
 
@@ -16,9 +16,9 @@ const PLAN_FEATURES: Record<string, string[]> = {
 }
 
 const PLAN_COLOR: Record<string, string> = {
-  starter: 'text-slate-400 border-slate-700',
-  pro: 'text-emerald-400 border-emerald-500/40',
-  team: 'text-purple-400 border-purple-500/40',
+  starter: 'text-slate-400 border-white/5 bg-white/[0.02]',
+  pro: 'text-blue-400 border-blue-500/20 bg-blue-500/5',
+  team: 'text-purple-400 border-purple-500/20 bg-purple-500/5',
 }
 
 export default async function SettingsPage() {
@@ -36,7 +36,7 @@ export default async function SettingsPage() {
     .single()
 
   if (!profile) {
-    return <div>Profile not found.</div>
+    return <div className="p-12 text-center text-slate-500">Profile not found.</div>
   }
 
   const plan = profile.plan || 'starter'
@@ -46,139 +46,149 @@ export default async function SettingsPage() {
   const planColor = PLAN_COLOR[plan] || PLAN_COLOR.starter
 
   return (
-    <>
-      <header className="mb-10">
-        <h1 className="text-4xl font-extrabold tracking-tight">Account Settings</h1>
-        <p className="text-slate-400 mt-2">Manage your profile, niche, and subscription.</p>
+    <div className="space-y-12">
+      <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-blue-500/10 border border-blue-500/20">
+              <Settings className="w-5 h-5 text-blue-400" />
+            </div>
+            <Badge variant="outline" className="bg-blue-500/5 text-blue-300 border-blue-500/20 px-2 py-0.5 rounded-md text-[10px] font-bold tracking-widest uppercase">
+              Preferences
+            </Badge>
+          </div>
+          <div className="space-y-1">
+            <h1 className="text-4xl md:text-5xl font-black tracking-tighter text-white">
+              Account <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">Settings</span>
+            </h1>
+            <p className="text-slate-400 text-lg max-w-xl font-light">
+              Manage your personal vault, niche strategy, and subscription.
+            </p>
+          </div>
+        </div>
       </header>
 
-      <div className="grid gap-8 max-w-4xl">
-        {/* Profile Card */}
-        <Card className="bg-slate-900 border-slate-800">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <User className="w-5 h-5 text-blue-400" />
-              Profile Information
-            </CardTitle>
-            <CardDescription className="text-slate-400">
-              Your personal details and account info.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-1">
-                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Email Address</p>
-                <p className="text-slate-100 font-medium">{profile.email}</p>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        {/* Main Settings Column */}
+        <div className="lg:col-span-8 space-y-8">
+          
+          {/* Profile Section */}
+          <div className="bg-white/[0.02] border border-white/10 rounded-3xl p-8 space-y-8">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10">
+                <User className="w-6 h-6 text-slate-400" />
               </div>
-              <div className="space-y-1">
-                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Full Name</p>
-                <p className="text-slate-100 font-medium">{profile.full_name || '—'}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Member Since</p>
-                <p className="text-slate-100 font-medium">
-                  {new Date(profile.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-                </p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Active Niche</p>
-                <p className="text-slate-100 font-medium capitalize">{(profile.active_niche || 'fitness').replace('_', ' ')}</p>
+              <div>
+                <h2 className="text-2xl font-bold text-white tracking-tight">Identity</h2>
+                <p className="text-sm text-slate-500">Your personal profile and account credentials.</p>
               </div>
             </div>
-          </CardContent>
-        </Card>
 
-        {/* Niche Card */}
-        <Card className="bg-slate-900 border-slate-800">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Dumbbell className="w-5 h-5 text-blue-400" />
-              Content Niche
-            </CardTitle>
-            <CardDescription className="text-slate-400">
-              Choose the niche your weekly brief is generated for. Additional niches are coming soon.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-600 uppercase tracking-[0.2em]">Email Address</label>
+                <div className="flex items-center gap-3 p-3.5 rounded-xl bg-white/5 border border-white/5">
+                   <Mail className="w-4 h-4 text-slate-500" />
+                   <p className="text-slate-100 font-medium">{profile.email}</p>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-600 uppercase tracking-[0.2em]">Member Since</label>
+                <div className="flex items-center gap-3 p-3.5 rounded-xl bg-white/5 border border-white/5">
+                   <ShieldCheck className="w-4 h-4 text-slate-500" />
+                   <p className="text-slate-100 font-medium">
+                     {new Date(profile.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                   </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Niche Strategy Section */}
+          <div className="bg-white/[0.02] border border-white/10 rounded-3xl p-8 space-y-8">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
+                <Dumbbell className="w-6 h-6 text-blue-400" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-white tracking-tight">Content Strategy</h2>
+                <p className="text-sm text-slate-500">Change your active niche to pivot your briefing data.</p>
+              </div>
+            </div>
             <NicheSwitcher currentNiche={profile.active_niche || 'fitness'} />
-          </CardContent>
-        </Card>
+          </div>
 
-        {/* Subscription Card */}
-        <Card className="bg-slate-900 border-slate-800">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <CreditCard className="w-5 h-5 text-emerald-400" />
-              Subscription & Billing
-            </CardTitle>
-            <CardDescription className="text-slate-400">
-              Your current plan, included features, and billing management.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Current Plan */}
-            <div className={`flex items-start justify-between p-4 rounded-xl border bg-slate-950/50 ${planColor}`}>
-              <div className="space-y-3">
-                <div>
-                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Current Plan</p>
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl font-bold tracking-tight text-slate-100 capitalize">{plan}</span>
-                    {isPro && (
-                      <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/30">
-                        Active
-                      </Badge>
-                    )}
-                  </div>
-                </div>
-                <ul className="space-y-1.5">
-                  {features.map((f) => (
-                    <li key={f} className="flex items-center gap-2 text-sm text-slate-400">
-                      <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
+        </div>
+
+        {/* Sidebar / Billing Column */}
+        <div className="lg:col-span-4 space-y-8">
+          
+          {/* Subscription Status Card */}
+          <div className={`rounded-3xl border p-1 relative overflow-hidden flex flex-col ${plan === 'pro' ? 'bg-blue-600/10 border-blue-500/20' : 'bg-white/[0.02] border-white/10'}`}>
+            <div className="p-7 space-y-6">
+              <div className="flex items-center justify-between">
+                <Badge variant="outline" className="bg-white/5 text-slate-400 border-none text-[10px] px-2 py-0.5 font-bold uppercase tracking-widest leading-normal">
+                   Subscription Plan
+                </Badge>
+                {isPro && (
+                  <div className="p-1 rounded-full bg-emerald-500/20"><Check className="w-3 h-3 text-emerald-400" /></div>
+                )}
               </div>
+
+              <div>
+                <h3 className="text-3xl font-black text-white capitalize tracking-tighter">{plan}</h3>
+                <p className="text-slate-500 text-sm mt-1">Included in your plan:</p>
+              </div>
+
+              <ul className="space-y-3">
+                {features.map((f) => (
+                  <li key={f} className="flex items-start gap-3 text-sm text-slate-300">
+                    <Check className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
+                    <span>{f}</span>
+                  </li>
+                ))}
+              </ul>
+
+              {!isPro && (
+                <div className="pt-4 border-t border-white/5">
+                   <Button className="w-full bg-blue-600 hover:bg-blue-500 text-white rounded-full font-bold h-12 group shadow-lg shadow-blue-500/20">
+                     Upgrade to Pro
+                     <Sparkles className="ml-2 w-4 h-4 group-hover:rotate-12 transition-transform" />
+                   </Button>
+                </div>
+              )}
+
+              {hasStripeCustomer && (
+                <form action={createCustomerPortalSession} className="w-full">
+                  <Button type="submit" variant="outline" className="w-full rounded-full border-white/10 hover:bg-white/5 text-slate-300 font-bold h-12">
+                    <CreditCard className="w-4 h-4 mr-2" />
+                    Manage Billing
+                  </Button>
+                </form>
+              )}
             </div>
 
-            {/* Upgrade CTA — only for non-pro users without Stripe */}
-            {!isPro && (
-              <div className="p-4 rounded-xl border border-blue-500/20 bg-blue-500/5 space-y-3">
-                <div className="flex items-center gap-2">
-                  <Crown className="w-4 h-4 text-blue-400" />
-                  <p className="text-sm font-semibold text-blue-400">Upgrade to Pro — $19/month</p>
-                </div>
-                <p className="text-xs text-slate-500">Get the full dashboard, 3-month brief history, format filters, and idea memory.</p>
-                <div className="flex gap-3">
-                  <Button size="sm" className="bg-blue-600 hover:bg-blue-700 gap-2">
-                    <Zap className="w-3.5 h-3.5" />
-                    Upgrade to Pro
-                  </Button>
-                  <Button size="sm" variant="ghost" className="text-slate-500 hover:text-slate-300">
-                    View Plans
-                  </Button>
-                </div>
-              </div>
+            {/* Subtle Gradient Glow for Pro */}
+            {plan === 'pro' && (
+              <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
             )}
+          </div>
 
-            {/* Stripe Portal */}
-            {hasStripeCustomer && (
-              <form action={createCustomerPortalSession}>
-                <Button type="submit" variant="outline" className="border-slate-700 hover:bg-slate-800">
-                  <CreditCard className="w-4 h-4 mr-2" />
-                  Manage Billing in Stripe
-                </Button>
-              </form>
-            )}
-            
-            {!hasStripeCustomer && !isPro && (
-              <p className="text-xs text-slate-600">
-                You'll be redirected to Stripe to manage billing after upgrading.
-              </p>
-            )}
-          </CardContent>
-        </Card>
+          {/* Additional Info Box */}
+          <div className="p-7 rounded-3xl bg-emerald-500/5 border border-emerald-500/10 space-y-4">
+             <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
+                <Zap className="w-5 h-5 text-emerald-400 fill-emerald-400/20" />
+             </div>
+             <div>
+                <h4 className="font-bold text-white mb-1">New Features Coming</h4>
+                <p className="text-[12px] text-slate-500 leading-relaxed font-light">We're building support for multiple niches and team collaboration. Stay tuned for our Q2 roadmap.</p>
+             </div>
+          </div>
+
+        </div>
+
       </div>
-    </>
+    </div>
   )
 }

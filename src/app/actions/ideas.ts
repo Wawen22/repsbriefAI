@@ -14,16 +14,44 @@ export async function saveIdeaAction(title: string, niche: string = 'fitness', i
   // Simple base64 encoding for hash simulation (to match existing schema length constraint if any)
   const hash = Buffer.from(title.trim()).toString('base64').substring(0, 64)
 
-  const { error } = await supabase
+  // Check if this idea already exists (from dedup insert during generation)
+  const { data: existing } = await supabase
     .from('idea_history')
-    .insert({
-      user_id: user.id,
-      niche: niche,
-      idea_title: title.trim(),
-      idea_hash: hash,
-      idea_data: ideaData || null,
-      used_at: new Date().toISOString()
-    })
+    .select('id')
+    .eq('user_id', user.id)
+    .eq('idea_hash', hash)
+    .maybeSingle()
+
+  let error
+
+  if (existing) {
+    // Row exists (dedup entry) — update it to saved=true with full data
+    const result = await supabase
+      .from('idea_history')
+      .update({
+        saved: true,
+        idea_data: ideaData || null,
+        idea_title: title.trim(),
+        used_at: new Date().toISOString(),
+      })
+      .eq('id', existing.id)
+      .eq('user_id', user.id)
+    error = result.error
+  } else {
+    // No existing row — insert new
+    const result = await supabase
+      .from('idea_history')
+      .insert({
+        user_id: user.id,
+        niche: niche,
+        idea_title: title.trim(),
+        idea_hash: hash,
+        idea_data: ideaData || null,
+        saved: true,
+        used_at: new Date().toISOString()
+      })
+    error = result.error
+  }
 
   if (error) {
     console.error('Failed to save idea:', error)

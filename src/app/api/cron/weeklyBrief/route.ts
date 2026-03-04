@@ -57,7 +57,7 @@ export async function POST(req: Request) {
 
         if (trendsError) throw trendsError
 
-        const allTrends = trends?.flatMap(t => t.data) || []
+        const allTrends = trends?.flatMap((t: { data: unknown[] }) => t.data) || []
         
         // Get user's idea history
         const { data: history } = await supabaseAdmin
@@ -65,7 +65,7 @@ export async function POST(req: Request) {
           .select('idea_title')
           .eq('user_id', user.id)
         
-        const historyTitles = history?.map(h => h.idea_title) || []
+        const historyTitles = history?.map((h: { idea_title: string | null }) => h.idea_title) || []
 
         // Generate Brief
         const ideas = await generateBrief(allTrends, historyTitles as string[], niche)
@@ -92,17 +92,22 @@ export async function POST(req: Request) {
 
         if (briefError) throw briefError
 
-        // 6. Send email via Resend
-        const { sendBrief } = require('../../email/sendBrief')
-        await sendBrief(user.email, briefData, niche)
+        // 6. Send email via Resend (optional if key is missing)
+        if (process.env.RESEND_API_KEY) {
+          const { sendBrief } = require('../../email/sendBrief')
+          await sendBrief(user.email, briefData, niche)
+        } else {
+          console.warn(`[Cron] Skipping email for user ${user.id} - RESEND_API_KEY not configured`)
+        }
 
-        // Record history
+        // Record history for deduplication (saved=false, not visible in My Ideas)
         await supabaseAdmin.from('idea_history').insert(
           ideas.map(i => ({
             user_id: user.id,
             niche: nicheId,
             idea_hash: Buffer.from(i.title).toString('base64'),
             idea_title: i.title,
+            saved: false,
           }))
         )
 

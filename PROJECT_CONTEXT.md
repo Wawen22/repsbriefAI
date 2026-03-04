@@ -2,8 +2,8 @@
 
 ## 📋 Task Status Tracking
 
-- [ ] **Current Task:** Live Testing with Initial Fitness Creators & Phase 3 UI Growth
-- [ ] **Next Task:** Deploy to Vercel
+- [ ] **Current Task:** Copy Button sulle BriefCard + Fix CTA Landing Page
+- [ ] **Next Task:** Trend Source Badges + Onboarding Welcome Modal
 - [ ] **Completed Tasks:**
   - [x] Initial Context & Prompt Review
   - [x] Architectural Summarization
@@ -23,13 +23,37 @@
   - [x] Supabase Auth (Login/Signup) Pages
   - [x] Verified Production Build
   - [x] Final Prototype Delivered (Phase 1-2 UI)
+  - [x] Settings Page: NicheSwitcher, Plan Features, Upgrade CTA, Stripe Portal
+  - [x] History Page: savedHashes sync, ai_model display, parallel fetch, badges
+  - [x] Ideas Page: NicheFilterBar (URL searchParams), saved count badge, improved empty states
+  - [x] Server Action: updateActiveNicheAction (profile.ts)
+  - [x] Fixed pre-existing TS errors in cron route
+  - [x] Generate Now Button: API route + GenerateNowButton component + animated loading states
+  - [x] Dashboard: fixed week_date bug (ora usa il brief più recente), empty state rinnovato con source badges
 
 > **Use this file as context when working on any part of the project.**
 > It contains all decisions already made: stack, architecture, business logic, and roadmap.
 
 ---
 
-## 📌 Product Overview
+## �️ Feature Improvement Backlog
+
+| # | Feature | Impatto | Sforzo | Stato | Descrizione |
+|---|---------|---------|--------|-------|-------------|
+| 1 | **Generate Now Button** | 🔴 Alto | 🟡 Medio | ✅ Fatto | Bottone on-demand nel dashboard empty state. Chiama scraper + generator per l'utente corrente. Rate limit: 1 volta/giorno. Fondamentale per l'onboarding — elimina l'attesa fino al lunedì. |
+| 2 | **Copy Button sulle BriefCard** | 🔴 Alto | 🟢 Basso | ⬜ Todo | Pulsanti "Copy Hook" e "Copy Title" su ogni card. Flusso principale: copiare → incollare in Notion/CapCut/Instagram. Feature più usata in tool simili. |
+| 3 | **Fix CTA Landing Page** | 🔴 Alto | 🟢 Basso | ⬜ Todo | 3 fix: (a) placeholder.svg → mockup dashboard in codice; (b) "Get Started" → /signup; (c) "See a Sample Brief" → modal con brief hardcodato. I bottoni Starter/Team usano `variant-outline` errato. |
+| 4 | **Trend Source Badges** | 🟡 Medio | 🟡 Medio | ⬜ Todo | Mostrare su ogni card l'origine del dato ("🔴 Reddit" / "📺 YouTube" / "📈 Google Trends"). Aumenta trust e percezione del valore. Richiede campo `source[]` dall'AI e aggiornamento del prompt. |
+| 5 | **Onboarding Welcome Modal** | 🟡 Medio | 🟡 Medio | ⬜ Todo | Modal al primo accesso con 3 step: scegli niche → cosa aspettarti → come funziona il brief. Riduce churn sul primo giorno. Usa localStorage per "dismissed". |
+| 6 | **Export Brief** | 🟡 Medio | 🟡 Medio | ⬜ Todo | (a) "Copy all ideas" → testo formattato Markdown per Notion; (b) PDF export via `@react-pdf/renderer`. Feature Pro che giustifica l'upgrade. |
+| 7 | **Mark as Used + Streak** | 🟡 Medio | 🟡 Medio | ⬜ Todo | Pulsante "Mark as Used" distinto da "Save". Alimenta l'idea memory nel generatore. Streak tracker "4 weeks of content 🔥" per gamification e retention. |
+| 8 | **Brief Preview Pubblica** | 🟡 Medio | 🟡 Medio | ⬜ Todo | Route `/preview/[id]` con brief anonimizzato. Usato dalla landing "See a Sample Brief". Funge anche da referral condivisibile. |
+| 9 | **BriefCard Collassabile** | 🟢 Basso | 🟢 Basso | ⬜ Todo | Mostrare solo title + hook di default. Click espande description, angle, whyItWorks. Le card sono dense, la lettura veloce è ostacolata. |
+| 10 | **Notifiche In-App** | 🟢 Basso | 🟡 Medio | ⬜ Todo | Badge rosso sulla sidebar quando il brief settimanale è disponibile. Porta l'utente a entrare attivamente ogni lunedì invece di dimenticarsene. |
+
+---
+
+## �📌 Product Overview
 
 **Name:** RepsBrief
 **Domain:** repsbr ief.com

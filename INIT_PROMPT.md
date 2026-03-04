@@ -14,14 +14,26 @@
     - [x] Google Trends Scraper
     - [x] RSS Scraper
     - [x] Brief Generator (AI Layer Integration)
-- [ ] **Phase 3: Automation & Delivery**
+- [x] **Phase 3: Automation & Delivery**
     - [x] Weekly Cron Job
     - [x] Resend Email Integration
     - [x] Stripe Payment Integration
-- [ ] **Phase 4: UI/UX**
+- [x] **Phase 4: UI/UX**
     - [x] Landing Page
     - [x] User Dashboard
     - [x] Niche Picker
+    - [x] Settings Page (NicheSwitcher, Plan, Stripe Portal)
+    - [x] History Page (Accordion, savedHashes, badges)
+    - [x] Ideas Page (NicheFilterBar, count, empty states)
+    - [x] Generate Now Button (on-demand brief generation, rate limited)
+    - [x] Dashboard bug fix (week_date → most recent brief, new empty state)
+- [ ] **Phase 5: Deploy & Live Testing**
+    - [ ] vercel.json with cron config
+    - [ ] Vercel env vars setup
+    - [ ] First production deploy
+    - [ ] End-to-end test (login → brief → email)
+    - [ ] Landing page real screenshot
+    - [ ] Stripe price IDs configured
 
 Copy and paste this prompt to start any session with an AI agent (Claude, Cursor, Copilot, Windsurf, etc.)
 Always attach PROJECT_CONTEXT.md alongside this prompt.

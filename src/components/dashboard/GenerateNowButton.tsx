@@ -1,3 +1,4 @@
+// src/components/dashboard/GenerateNowButton.tsx
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
@@ -71,7 +72,9 @@ export function GenerateNowButton({ alreadyGeneratedToday = false }: GenerateNow
 
       setState('success')
       setLogs(prev => [...prev, '> Brief validated.', '> 20 ideas ready for deployment.'])
-      toast.success(`Success! 20 ideas generated.`)
+      toast.success(`Success! 20 ideas generated.`, {
+        icon: <Sparkles className="w-4 h-4 text-blue-400" />
+      })
 
       setTimeout(() => router.refresh(), 1200)
     } catch (err: any) {
@@ -158,7 +161,7 @@ export function GenerateNowButton({ alreadyGeneratedToday = false }: GenerateNow
 
         <div className="flex items-center justify-between pt-6 border-t border-white/5">
            <div className="flex items-center gap-2">
-              <Orbit className="w-4 h-4 text-blue-500 animate-spin-slow" />
+              <Orbit className="w-4 h-4 text-blue-500 animate-[spin_4s_linear_infinite]" />
               <span className="text-[10px] font-black text-slate-600 uppercase tracking-[0.2em]">Neural Engine Processing</span>
            </div>
            <p className="text-[10px] text-slate-500 font-medium italic">Estimated completion: {30 - (currentStep * 7)}s</p>
@@ -170,7 +173,7 @@ export function GenerateNowButton({ alreadyGeneratedToday = false }: GenerateNow
   if (state === 'success') {
     return (
       <div className="flex flex-col items-center gap-6 animate-in zoom-in-95 duration-500">
-        <div className="w-20 h-20 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center shadow-[0_0_30px_rgba(16,185,129,0.2)]">
+        <div className="w-20 h-20 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center shadow-[0_0_30px_rgba(16,185,129,0.2)] animate-sparkle">
           <CheckCircle2 className="w-10 h-10 text-emerald-400" />
         </div>
         <div className="text-center space-y-2">
@@ -187,7 +190,7 @@ export function GenerateNowButton({ alreadyGeneratedToday = false }: GenerateNow
         size="lg"
         onClick={handleGenerate}
         disabled={state === 'loading'}
-        className="group bg-blue-600 hover:bg-blue-500 text-white h-14 px-10 rounded-full text-lg font-black shadow-lg shadow-blue-500/25 transition-all hover:scale-105 active:scale-95 gap-3"
+        className="group bg-blue-600 hover:bg-blue-500 text-white h-14 px-10 rounded-full text-lg font-black shadow-lg shadow-blue-500/25 transition-all hover:scale-105 active:scale-95 gap-3 animate-float"
       >
         <Sparkles className="w-5 h-5 group-hover:rotate-12 transition-transform" />
         Generate My Brief Now

@@ -56,14 +56,20 @@ export function SampleBriefButton() {
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden p-0 bg-black border-white/10 text-slate-50 shadow-[0_0_50px_-12px_rgba(59,130,246,0.3)] flex flex-col">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden p-0 bg-black border-white/10 text-slate-50 shadow-[0_0_50px_-12px_rgba(59,130,246,0.3)] flex flex-col rounded-3xl">
         
+        {/* Hidden but required for accessibility */}
+        <DialogHeader className="sr-only">
+          <DialogTitle>Weekly Brief Sample</DialogTitle>
+          <DialogDescription>A sample of the weekly content briefing delivered to our subscribers.</DialogDescription>
+        </DialogHeader>
+
         {/* Modal Background Glow */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/10 rounded-full blur-[100px] pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-emerald-600/5 rounded-full blur-[100px] pointer-events-none" />
 
         <div className="p-8 pb-4 relative z-10">
-          <DialogHeader className="text-left">
+          <div className="text-left">
             <div className="flex items-center gap-3 mb-2">
               <div className="p-2 rounded-lg bg-blue-500/10 border border-blue-500/20">
                 <Mail className="w-5 h-5 text-blue-400" />
@@ -72,13 +78,13 @@ export function SampleBriefButton() {
                 Monday Morning Briefing
               </Badge>
             </div>
-            <DialogTitle className="text-3xl md:text-4xl font-bold tracking-tight mb-2">
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-2">
               Your Weekly <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400 font-extrabold">RepsBrief</span>
-            </DialogTitle>
-            <DialogDescription className="text-slate-400 text-base max-w-2xl">
+            </h2>
+            <p className="text-slate-400 text-base max-w-2xl">
               This is exactly what our subscribers receive every Monday. Data-backed, trend-verified, and ready to record.
-            </DialogDescription>
-          </DialogHeader>
+            </p>
+          </div>
         </div>
 
         <div className="flex-1 overflow-y-auto px-8 py-4 space-y-6 relative z-10 custom-scrollbar">

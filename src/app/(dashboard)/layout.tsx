@@ -1,4 +1,5 @@
 import { DashboardSidebar } from "@/components/layout/DashboardSidebar"
+import { CommandPalette } from "@/components/layout/CommandPalette"
 import { createClient } from "@/lib/supabase/server"
 
 export default async function DashboardLayout({
@@ -30,6 +31,7 @@ export default async function DashboardLayout({
 
   return (
     <div className="h-screen bg-black text-slate-50 flex flex-col overflow-hidden relative font-sans">
+      <CommandPalette />
       {/* Background Gradients & Patterns */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         {/* Subtle grid pattern */}

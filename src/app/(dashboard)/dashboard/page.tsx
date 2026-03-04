@@ -7,6 +7,7 @@ import { BriefList } from "@/components/brief/BriefList"
 import { NichePicker } from "@/components/niche/NichePicker"
 import { AddIdeaModal } from "@/components/ui/AddIdeaModal"
 import { GenerateNowButton } from "@/components/dashboard/GenerateNowButton"
+import { StrategicStats } from "@/components/dashboard/StrategicStats"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { CalendarDays, LayoutGrid, Zap, Sparkles, Orbit, Plus } from "lucide-react"
@@ -24,7 +25,7 @@ export default async function DashboardPage() {
   const todayStart = new Date()
   todayStart.setHours(0, 0, 0, 0)
 
-  const [{ data: brief }, { data: savedData }, { data: generatedToday }] = await Promise.all([
+  const [{ data: brief }, { data: savedData }, { data: generatedToday }, { data: profile }] = await Promise.all([
     supabase
       .from('briefs')
       .select('*')
@@ -44,12 +45,18 @@ export default async function DashboardPage() {
       .gte('created_at', todayStart.toISOString())
       .limit(1)
       .maybeSingle(),
+    supabase
+      .from('profiles')
+      .select('active_niche')
+      .eq('id', user.id)
+      .single()
   ])
 
   const ideas: IdeaObject[] = brief?.ideas || []
   const hasBrief = ideas.length > 0
   const alreadyGeneratedToday = !!generatedToday
   const savedHashes = new Set(savedData?.map(row => row.idea_hash) || [])
+  const activeNiche = profile?.active_niche || 'fitness'
 
   const briefDate = brief?.week_date
     ? new Date(brief.week_date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
@@ -115,51 +122,56 @@ export default async function DashboardPage() {
           </div>
         </div>
       ) : (
-        <Tabs defaultValue="all" className="space-y-8">
-          {/* Pill Filter Bar */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <TabsList className="bg-white/5 border border-white/10 p-1.5 rounded-2xl h-auto gap-1 self-start">
-              {[
-                { value: 'all', label: 'All Formats' },
-                { value: 'reel', label: 'Reels' },
-                { value: 'carousel', label: 'Carousels' },
-                { value: 'thread', label: 'Threads' },
-                { value: 'newsletter', label: 'Newsletters' }
-              ].map((tab) => (
-                <TabsTrigger 
-                  key={tab.value}
-                  value={tab.value} 
-                  className="rounded-xl px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-500 hover:text-white hover:bg-white/5 data-[state=active]:bg-white data-[state=active]:text-black transition-all shadow-none border-none"
-                >
-                  {tab.label}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-            
-            <div className="hidden lg:flex items-center gap-3 px-4 py-2 rounded-2xl bg-emerald-500/5 border border-emerald-500/10">
-               <Zap className="w-4 h-4 text-emerald-400 fill-emerald-400/20" />
-               <span className="text-[11px] font-bold text-emerald-400 uppercase tracking-widest">20 ideas generated</span>
-            </div>
-          </div>
+        <div className="space-y-12">
+          {/* Strategic Impact Stats Section */}
+          <StrategicStats ideas={ideas} niche={activeNiche} />
 
-          <div className="min-h-[400px]">
-            <TabsContent value="all" className="mt-0 focus-visible:outline-none animate-in fade-in slide-in-from-bottom-2 duration-500">
-              <BriefList ideas={ideas} savedHashes={savedHashes} />
-            </TabsContent>
-            <TabsContent value="reel" className="mt-0 focus-visible:outline-none animate-in fade-in slide-in-from-bottom-2 duration-500">
-              <BriefList ideas={ideas.filter(i => i.format === 'Reel')} savedHashes={savedHashes} />
-            </TabsContent>
-            <TabsContent value="carousel" className="mt-0 focus-visible:outline-none animate-in fade-in slide-in-from-bottom-2 duration-500">
-              <BriefList ideas={ideas.filter(i => i.format === 'Carousel')} savedHashes={savedHashes} />
-            </TabsContent>
-            <TabsContent value="thread" className="mt-0 focus-visible:outline-none animate-in fade-in slide-in-from-bottom-2 duration-500">
-              <BriefList ideas={ideas.filter(i => i.format === 'Thread')} savedHashes={savedHashes} />
-            </TabsContent>
-            <TabsContent value="newsletter" className="mt-0 focus-visible:outline-none animate-in fade-in slide-in-from-bottom-2 duration-500">
-              <BriefList ideas={ideas.filter(i => i.format === 'Newsletter')} savedHashes={savedHashes} />
-            </TabsContent>
-          </div>
-        </Tabs>
+          <Tabs defaultValue="all" className="space-y-8">
+            {/* Pill Filter Bar */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+              <TabsList className="bg-white/5 border border-white/10 p-1.5 rounded-2xl h-auto gap-1 self-start">
+                {[
+                  { value: 'all', label: 'All Formats' },
+                  { value: 'reel', label: 'Reels' },
+                  { value: 'carousel', label: 'Carousels' },
+                  { value: 'thread', label: 'Threads' },
+                  { value: 'newsletter', label: 'Newsletters' }
+                ].map((tab) => (
+                  <TabsTrigger 
+                    key={tab.value}
+                    value={tab.value} 
+                    className="rounded-xl px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-500 hover:text-white hover:bg-white/5 data-[state=active]:bg-white data-[state=active]:text-black transition-all shadow-none border-none"
+                  >
+                    {tab.label}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+              
+              <div className="hidden lg:flex items-center gap-3 px-4 py-2 rounded-2xl bg-emerald-500/5 border border-emerald-500/10">
+                 <Zap className="w-4 h-4 text-emerald-400 fill-emerald-400/20" />
+                 <span className="text-[11px] font-bold text-emerald-400 uppercase tracking-widest">Analysis Verified</span>
+              </div>
+            </div>
+
+            <div className="min-h-[400px]">
+              <TabsContent value="all" className="mt-0 focus-visible:outline-none animate-in fade-in slide-in-from-bottom-2 duration-500">
+                <BriefList ideas={ideas} savedHashes={savedHashes} />
+              </TabsContent>
+              <TabsContent value="reel" className="mt-0 focus-visible:outline-none animate-in fade-in slide-in-from-bottom-2 duration-500">
+                <BriefList ideas={ideas.filter(i => i.format === 'Reel')} savedHashes={savedHashes} />
+              </TabsContent>
+              <TabsContent value="carousel" className="mt-0 focus-visible:outline-none animate-in fade-in slide-in-from-bottom-2 duration-500">
+                <BriefList ideas={ideas.filter(i => i.format === 'Carousel')} savedHashes={savedHashes} />
+              </TabsContent>
+              <TabsContent value="thread" className="mt-0 focus-visible:outline-none animate-in fade-in slide-in-from-bottom-2 duration-500">
+                <BriefList ideas={ideas.filter(i => i.format === 'Thread')} savedHashes={savedHashes} />
+              </TabsContent>
+              <TabsContent value="newsletter" className="mt-0 focus-visible:outline-none animate-in fade-in slide-in-from-bottom-2 duration-500">
+                <BriefList ideas={ideas.filter(i => i.format === 'Newsletter')} savedHashes={savedHashes} />
+              </TabsContent>
+            </div>
+          </Tabs>
+        </div>
       )}
     </div>
   )

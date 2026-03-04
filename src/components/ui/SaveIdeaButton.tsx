@@ -8,13 +8,23 @@ import { toast } from "sonner"
 import { cn } from '@/lib/utils'
 import { IdeaObject } from '@/types/niche'
 
-export function SaveIdeaButton({ title, ideaData, initialSaved = false }: { title: string, ideaData?: IdeaObject, initialSaved?: boolean }) {
+export function SaveIdeaButton({ 
+  title, 
+  ideaData, 
+  initialSaved = false,
+  variant = 'icon' 
+}: { 
+  title: string, 
+  ideaData?: IdeaObject, 
+  initialSaved?: boolean,
+  variant?: 'icon' | 'prominent'
+}) {
   const [isSaving, setIsSaving] = useState(false)
   const [isSaved, setIsSaved] = useState(initialSaved)
 
   const handleSave = async (e: React.MouseEvent) => {
-    e.preventDefault() // prevent any parent link clicks if any
-    if (isSaved) return // Already saved
+    e.preventDefault()
+    if (isSaved) return
 
     setIsSaving(true)
     try {
@@ -30,6 +40,28 @@ export function SaveIdeaButton({ title, ideaData, initialSaved = false }: { titl
     } finally {
       setIsSaving(false)
     }
+  }
+
+  if (variant === 'prominent') {
+    return (
+      <Button
+        onClick={handleSave}
+        disabled={isSaving || isSaved}
+        className={cn(
+          "rounded-full px-6 font-bold transition-all h-12 gap-2 shadow-lg",
+          isSaved 
+            ? "bg-yellow-500/20 text-yellow-500 border border-yellow-500/30 cursor-default shadow-none" 
+            : "bg-blue-600 hover:bg-blue-500 text-white shadow-blue-500/25 hover:scale-105 active:scale-95"
+        )}
+      >
+        {isSaving ? (
+          <Loader2 className="w-4 h-4 animate-spin" />
+        ) : (
+          <Star className={cn("w-4 h-4", isSaved && "fill-yellow-500")} />
+        )}
+        <span>{isSaved ? "Saved to Library" : "Save Strategy"}</span>
+      </Button>
+    )
   }
 
   return (

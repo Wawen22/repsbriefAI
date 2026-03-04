@@ -179,14 +179,6 @@ export function BriefCard({ idea, isSaved = false, hideSaveButton = false, dbId 
                 {idea.title}
               </DialogTitle>
               <div className="flex items-center gap-4">
-                <div onClick={(e) => e.stopPropagation()}>
-                  {!hideSaveButton ? (
-                    <SaveIdeaButton title={idea.title} ideaData={idea} initialSaved={isSaved} />
-                  ) : dbId ? (
-                    <DeleteIdeaButton id={dbId} />
-                  ) : null}
-                </div>
-                <div className="h-4 w-px bg-white/10" />
                 <CopyBtn field="all" text={formatFullIdea()} label="Copy Full Brief" />
               </div>
             </DialogHeader>
@@ -284,17 +276,29 @@ export function BriefCard({ idea, isSaved = false, hideSaveButton = false, dbId 
 
           {/* Footer CTA */}
           <div className="p-8 bg-gradient-to-t from-blue-900/20 to-transparent border-t border-white/10 relative z-20 backdrop-blur-sm">
-            <div className="flex items-center justify-between gap-6 max-w-3xl mx-auto">
-              <div>
+            <div className="flex items-center justify-between gap-6 max-w-[1400px] mx-auto">
+              <div className="hidden md:block text-left">
                 <p className="text-sm font-medium text-slate-400">Ready to create?</p>
                 <p className="text-[10px] text-slate-600 uppercase tracking-widest">Record this using the strategy above.</p>
               </div>
-              <Button 
-                className="bg-white text-black hover:bg-slate-200 rounded-full font-bold px-8 h-12 shadow-xl transition-all hover:scale-105"
-                onClick={() => setIsExpanded(false)}
-              >
-                Got it
-              </Button>
+              
+              <div className="flex items-center gap-3 ml-auto">
+                <Button 
+                  variant="outline"
+                  className="bg-white text-black hover:bg-slate-200 border-none rounded-full font-bold px-8 h-12 transition-all shadow-xl"
+                  onClick={() => setIsExpanded(false)}
+                >
+                  Got it
+                </Button>
+                {!hideSaveButton && (
+                  <SaveIdeaButton 
+                    title={idea.title} 
+                    ideaData={idea} 
+                    initialSaved={isSaved} 
+                    variant="prominent" 
+                  />
+                )}
+              </div>
             </div>
           </div>
         </DialogContent>

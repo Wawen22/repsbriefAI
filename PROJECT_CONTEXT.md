@@ -2,7 +2,7 @@
 
 ## 📋 Task Status Tracking
 
-- [ ] **Current Task:** Copy Button sulle BriefCard + Fix CTA Landing Page
+- [x] **Current Task:** Copy Button sulle BriefCard + Fix CTA Landing Page ✅
 - [ ] **Next Task:** Trend Source Badges + Onboarding Welcome Modal
 - [ ] **Completed Tasks:**
   - [x] Initial Context & Prompt Review
@@ -30,6 +30,12 @@
   - [x] Fixed pre-existing TS errors in cron route
   - [x] Generate Now Button: API route + GenerateNowButton component + animated loading states
   - [x] Dashboard: fixed week_date bug (ora usa il brief più recente), empty state rinnovato con source badges
+  - [x] briefGenerator: resilienza migliorata (fallback prompt, Zod rilassato min 10/max 25, markdown fence stripping, maxTokens 8192)
+  - [x] Gemini provider: riscritto con systemInstruction nativa, generateContent per single-turn
+  - [x] Error handling: messaggi d'errore reali propagati al client
+  - [x] idea_history: colonna `saved` (bool) per distinguere dedup vs salvataggio manuale
+  - [x] saveIdeaAction: select+update/insert invece di upsert, RLS policy UPDATE aggiunta
+  - [x] Dashboard/History: filtro savedHashes su `saved=true` per stelle accurate
 
 > **Use this file as context when working on any part of the project.**
 > It contains all decisions already made: stack, architecture, business logic, and roadmap.
@@ -41,8 +47,8 @@
 | # | Feature | Impatto | Sforzo | Stato | Descrizione |
 |---|---------|---------|--------|-------|-------------|
 | 1 | **Generate Now Button** | 🔴 Alto | 🟡 Medio | ✅ Fatto | Bottone on-demand nel dashboard empty state. Chiama scraper + generator per l'utente corrente. Rate limit: 1 volta/giorno. Fondamentale per l'onboarding — elimina l'attesa fino al lunedì. |
-| 2 | **Copy Button sulle BriefCard** | 🔴 Alto | 🟢 Basso | ⬜ Todo | Pulsanti "Copy Hook" e "Copy Title" su ogni card. Flusso principale: copiare → incollare in Notion/CapCut/Instagram. Feature più usata in tool simili. |
-| 3 | **Fix CTA Landing Page** | 🔴 Alto | 🟢 Basso | ⬜ Todo | 3 fix: (a) placeholder.svg → mockup dashboard in codice; (b) "Get Started" → /signup; (c) "See a Sample Brief" → modal con brief hardcodato. I bottoni Starter/Team usano `variant-outline` errato. |
+| 2 | **Copy Button sulle BriefCard** | 🔴 Alto | 🟢 Basso | ✅ Fatto | Pulsanti "Copy Hook" e "Copy Title" su ogni card. Flusso principale: copiare → incollare in Notion/CapCut/Instagram. Feature più usata in tool simili. |
+| 3 | **Fix CTA Landing Page** | 🔴 Alto | 🟢 Basso | ✅ Fatto | 3 fix: (a) placeholder.svg → mockup dashboard in codice; (b) "Get Started" → /signup; (c) "See a Sample Brief" → modal con brief hardcodato. I bottoni Starter/Team usano `variant-outline` errato. |
 | 4 | **Trend Source Badges** | 🟡 Medio | 🟡 Medio | ⬜ Todo | Mostrare su ogni card l'origine del dato ("🔴 Reddit" / "📺 YouTube" / "📈 Google Trends"). Aumenta trust e percezione del valore. Richiede campo `source[]` dall'AI e aggiornamento del prompt. |
 | 5 | **Onboarding Welcome Modal** | 🟡 Medio | 🟡 Medio | ⬜ Todo | Modal al primo accesso con 3 step: scegli niche → cosa aspettarti → come funziona il brief. Riduce churn sul primo giorno. Usa localStorage per "dismissed". |
 | 6 | **Export Brief** | 🟡 Medio | 🟡 Medio | ⬜ Todo | (a) "Copy all ideas" → testo formattato Markdown per Notion; (b) PDF export via `@react-pdf/renderer`. Feature Pro che giustifica l'upgrade. |

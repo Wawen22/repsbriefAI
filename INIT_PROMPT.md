@@ -27,6 +27,9 @@
     - [x] Ideas Page (NicheFilterBar, count, empty states)
     - [x] Generate Now Button (on-demand brief generation, rate limited)
     - [x] Dashboard bug fix (week_date → most recent brief, new empty state)
+    - [x] briefGenerator resilience (fallback prompt, relaxed Zod, maxTokens 8192)
+    - [x] Gemini provider rewrite (systemInstruction, generateContent)
+    - [x] Save/Unsave ideas (saved column, RLS UPDATE policy, accurate star state)
 - [ ] **Phase 5: Deploy & Live Testing**
     - [ ] vercel.json with cron config
     - [ ] Vercel env vars setup

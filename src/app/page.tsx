@@ -3,8 +3,9 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { CheckCircle2, TrendingUp, Mail, Zap, Clock, Users } from "lucide-react"
+import { CheckCircle2, TrendingUp, Mail, Zap, Clock, Users, Video, Layers, Hash, Star } from "lucide-react"
 import Link from "next/link"
+import { SampleBriefButton } from "@/components/landing/SampleBriefButton"
 
 export default function LandingPage() {
   return (
@@ -22,7 +23,9 @@ export default function LandingPage() {
             <Button variant="ghost" className="text-sm" asChild>
               <Link href="/login">Login</Link>
             </Button>
-            <Button className="bg-blue-600 hover:bg-blue-700 text-sm">Get Started</Button>
+            <Button className="bg-blue-600 hover:bg-blue-700 text-sm" asChild>
+              <Link href="/signup">Get Started</Link>
+            </Button>
           </div>
         </div>
       </nav>
@@ -40,23 +43,66 @@ export default function LandingPage() {
             </span>
           </h1>
           <p className="text-lg md:text-xl text-slate-400 mb-10 max-w-2xl mx-auto">
-            20 high-impact content ideas every Monday, based on what's trending on Reddit, YouTube, and Google Trends. 
+            20 high-impact content ideas every Monday, based on what&apos;s trending on Reddit, YouTube, and Google Trends. 
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button size="lg" className="bg-blue-600 hover:bg-blue-700 h-14 px-8 text-lg font-semibold w-full sm:w-auto">
-              Get Your First Brief Free
+            <Button size="lg" className="bg-blue-600 hover:bg-blue-700 h-14 px-8 text-lg font-semibold w-full sm:w-auto" asChild>
+              <Link href="/signup">Get Your First Brief Free</Link>
             </Button>
-            <Button size="lg" variant="outline" className="h-14 px-8 text-lg border-slate-700 text-slate-300 w-full sm:w-auto hover:bg-slate-900">
-              See a Sample Brief
-            </Button>
+            <SampleBriefButton />
           </div>
+
+          {/* Dashboard Mockup (replaces placeholder.svg) */}
           <div className="mt-16 relative">
             <div className="absolute inset-0 bg-blue-500/20 blur-[120px] rounded-full max-w-3xl mx-auto" />
-            <img 
-              src="/placeholder.svg" 
-              alt="Dashboard Preview" 
-              className="relative rounded-xl border border-slate-800 shadow-2xl mx-auto max-w-5xl"
-            />
+            <div className="relative rounded-xl border border-slate-800 shadow-2xl mx-auto max-w-5xl bg-slate-900 overflow-hidden">
+              {/* Fake browser bar */}
+              <div className="bg-slate-800 px-4 py-2.5 flex items-center gap-2 border-b border-slate-700">
+                <div className="flex gap-1.5">
+                  <div className="w-3 h-3 rounded-full bg-slate-600" />
+                  <div className="w-3 h-3 rounded-full bg-slate-600" />
+                  <div className="w-3 h-3 rounded-full bg-slate-600" />
+                </div>
+                <div className="flex-1 bg-slate-700 rounded-md px-3 py-1 text-xs text-slate-400 text-center max-w-sm mx-auto">
+                  repsbr ief.com/dashboard
+                </div>
+              </div>
+              {/* Dashboard content */}
+              <div className="p-6 space-y-4">
+                {/* Header */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-bold text-slate-100 text-left">The Weekly Reps</h3>
+                    <p className="text-xs text-slate-500 text-left">20 ideas — Monday, March 2</p>
+                  </div>
+                  <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-xs">
+                    <Zap className="w-3 h-3 mr-1 fill-emerald-500" /> Fresh Data
+                  </Badge>
+                </div>
+                {/* Idea cards grid */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  {[
+                    { title: "Why 10K Steps Is a Scam", hook: "Your step counter is lying to you...", format: "Reel", icon: <Video className="w-3 h-3" /> },
+                    { title: "$5 Meal Prep vs $60 Supplements", hook: "I spent $5 at the store and made...", format: "Carousel", icon: <Layers className="w-3 h-3" /> },
+                    { title: "3 Exercises Every Desk Worker Needs", hook: "If you sit 6+ hours a day...", format: "Thread", icon: <Hash className="w-3 h-3" /> },
+                  ].map((card, i) => (
+                    <div key={i} className="bg-slate-950 border border-slate-800 rounded-lg p-4 text-left space-y-2">
+                      <Badge variant="outline" className="border-blue-500/30 text-blue-400 gap-1 text-[10px] py-0.5 px-1.5">
+                        {card.icon} {card.format}
+                      </Badge>
+                      <p className="text-sm font-semibold text-slate-200 leading-snug">{card.title}</p>
+                      <p className="text-[11px] italic text-blue-100/70 border-l-2 border-blue-500/20 pl-2 leading-snug">&ldquo;{card.hook}&rdquo;</p>
+                      <div className="flex items-center gap-2 pt-1">
+                        <Star className="w-3 h-3 text-slate-600" />
+                        <span className="text-[10px] text-slate-600">Copy Title</span>
+                        <span className="text-[10px] text-slate-600">Copy Hook</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-center text-xs text-slate-600">+ 17 more ideas below</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -79,7 +125,7 @@ export default function LandingPage() {
             <div className="p-8 rounded-2xl bg-slate-950 border border-slate-800">
               <TrendingUp className="w-10 h-10 text-rose-500 mb-4 mx-auto" />
               <h3 className="text-xl font-semibold mb-2">Zero Strategy</h3>
-              <p className="text-slate-400">Creating content "vibes" instead of what people are actually searching for.</p>
+              <p className="text-slate-400">Creating content &ldquo;vibes&rdquo; instead of what people are actually searching for.</p>
             </div>
           </div>
         </div>
@@ -153,7 +199,9 @@ export default function LandingPage() {
                 <div className="flex gap-2 text-sm"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Weekly Email</div>
                 <div className="flex gap-2 text-sm"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> 20 Content Ideas</div>
                 <div className="flex gap-2 text-sm text-slate-500"><CheckCircle2 className="w-4 h-4 text-slate-700" /> Dashboard Access</div>
-                <Button className="w-full mt-6 variant-outline border-slate-800 text-white">Choose Starter</Button>
+                <Button variant="outline" className="w-full mt-6 border-slate-700 text-white hover:bg-slate-900" asChild>
+                  <Link href="/signup">Choose Starter</Link>
+                </Button>
               </CardContent>
             </Card>
 
@@ -169,7 +217,9 @@ export default function LandingPage() {
                 <div className="flex gap-2 text-sm"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> 3-Month History</div>
                 <div className="flex gap-2 text-sm"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Format Filters</div>
                 <div className="flex gap-2 text-sm"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Weekly Email</div>
-                <Button className="w-full mt-6 bg-blue-600 hover:bg-blue-700">Go Pro</Button>
+                <Button className="w-full mt-6 bg-blue-600 hover:bg-blue-700" asChild>
+                  <Link href="/signup">Go Pro</Link>
+                </Button>
               </CardContent>
             </Card>
 
@@ -184,7 +234,9 @@ export default function LandingPage() {
                 <div className="flex gap-2 text-sm"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> 2 Users</div>
                 <div className="flex gap-2 text-sm"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> White-label Email</div>
                 <div className="flex gap-2 text-sm"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Advanced Analytics</div>
-                <Button className="w-full mt-6 variant-outline border-slate-800 text-white">Choose Team</Button>
+                <Button variant="outline" className="w-full mt-6 border-slate-700 text-white hover:bg-slate-900" asChild>
+                  <Link href="/signup">Choose Team</Link>
+                </Button>
               </CardContent>
             </Card>
           </div>
@@ -203,7 +255,7 @@ export default function LandingPage() {
              <Link href="#" className="hover:text-slate-300">Terms of Service</Link>
              <Link href="#" className="hover:text-slate-300">Support</Link>
           </div>
-          <p className="text-sm text-slate-600">© 2026 RepsBrief. All rights reserved.</p>
+          <p className="text-sm text-slate-600">&copy; 2026 RepsBrief. All rights reserved.</p>
         </div>
       </footer>
     </div>

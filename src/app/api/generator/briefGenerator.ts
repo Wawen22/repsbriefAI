@@ -10,6 +10,10 @@ const IdeaSchema = z.object({
   description: z.string().min(1),
   format: z.enum(['Reel', 'Carousel', 'Thread', 'Newsletter']),
   whyItWorks: z.string().min(1),
+  scriptDraft: z.string().optional(),
+  alternativeHooks: z.array(z.string()).optional(),
+  trendingAudioSuggestion: z.string().optional(),
+  keyVisuals: z.string().optional(),
 })
 
 // Accept 15-25 ideas (AI doesn't always nail exactly 20) — we trim or keep as-is
@@ -60,7 +64,8 @@ export async function generateBrief(
     ? `\nAvoid repeating these previous ideas:\n${ideaHistory.slice(-50).join('\n')}`
     : ''
 
-  const systemPrompt = `You are ${niche.claudePersona}. Your goal is to provide 20 fresh, high-impact content ideas for ${niche.label} creators based on current trends.`
+  const systemPrompt = `You are ${niche.claudePersona}. Your goal is to provide 20 fresh, high-impact content ideas for ${niche.label} creators based on current trends. 
+You provide extremely detailed strategies for every idea to help creators execute immediately.`
   
   const userPrompt = `
 Analyze the following trends from the last 7 days:
@@ -73,11 +78,16 @@ Return a JSON array of exactly 20 content ideas. Each idea MUST follow this exac
   "hook": "An attention-grabbing first line/opening",
   "description": "2-3 sentences explaining the core content",
   "format": "Reel" | "Carousel" | "Thread" | "Newsletter",
-  "whyItWorks": "1 sentence explanation based on the trend"
+  "whyItWorks": "1 sentence explanation based on the trend",
+  "scriptDraft": "A brief script or bullet-point structure for the content",
+  "alternativeHooks": ["Alternative 1", "Alternative 2"],
+  "trendingAudioSuggestion": "Description of the type of music or specific trending sound style",
+  "keyVisuals": "Description of what should be shown on screen"
 }
 
 IMPORTANT:
 - The "format" field MUST be one of exactly: "Reel", "Carousel", "Thread", "Newsletter"
+- "scriptDraft" should be actionable and ready to record or write.
 - Respond ONLY with the JSON array. No markdown, no explanation, no wrapping object.
 - The response must be valid parseable JSON starting with [ and ending with ]
 `
@@ -95,32 +105,24 @@ IMPORTANT:
       ], { jsonMode: true, maxTokens: 8192 })
 
       console.log(`[Generator] Attempt ${attempt} — provider: ${response.provider}, model: ${response.model}, tokens: ${response.tokensUsed ?? 'n/a'}`)
-      console.log(`[Generator] Raw response (first 500 chars): ${response.text.substring(0, 500)}`)
-
-      // Clean AI response — strip markdown fences, BOM, extra whitespace
+      
       let text = response.text.trim()
-      // Remove BOM
       text = text.replace(/^\uFEFF/, '')
-      // Strip markdown code fences
       text = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/m, '').trim()
-      // If the response starts with a preamble before the array, extract the array
       const arrayStart = text.indexOf('[')
       const arrayEnd = text.lastIndexOf(']')
       if (arrayStart !== -1 && arrayEnd > arrayStart && !text.startsWith('[') && !text.startsWith('{')) {
         text = text.substring(arrayStart, arrayEnd + 1)
       }
-      // Fix common JSON issues: trailing commas before ] or }
       text = text.replace(/,\s*([}\]])/g, '$1')
 
       let rawJson: unknown
       try {
         rawJson = JSON.parse(text)
       } catch (parseErr) {
-        console.error(`[Generator] JSON parse failed. Cleaned text (first 500):\n${text.substring(0, 500)}`)
         throw new Error(`AI returned invalid JSON: ${text.substring(0, 300)}...`)
       }
 
-      // Unwrap: some providers wrap in { "ideas": [...] } or similar
       let ideasArray: unknown
       if (Array.isArray(rawJson)) {
         ideasArray = rawJson
@@ -128,27 +130,21 @@ IMPORTANT:
         const values = Object.values(rawJson as Record<string, unknown>)
         ideasArray = values.find(v => Array.isArray(v))
         if (!ideasArray) {
-          throw new Error(`AI returned an object but no array field found. Keys: ${Object.keys(rawJson as Record<string, unknown>).join(', ')}`)
+          throw new Error(`AI returned an object but no array field found.`)
         }
       } else {
         throw new Error(`AI returned unexpected type: ${typeof rawJson}`)
       }
 
       const validated = BriefSchema.parse(ideasArray)
-
-      // Trim to 20 if the AI gave more
       const final = validated.slice(0, 20)
 
-      console.log(`[Generator] ✅ Brief validated: ${final.length} ideas via ${response.provider} (${response.model})`)
+      console.log(`[Generator] ✅ Brief validated with full strategy: ${final.length} ideas`)
       return final
     } catch (err: any) {
       lastError = err
       console.error(`[Generator] Attempt ${attempt}/${maxAttempts} failed:`, err.message || err)
-
-      // If it's a config error, don't retry
-      if (err.message?.includes('API key') || err.message?.includes('env var')) {
-        throw err
-      }
+      if (err.message?.includes('API key') || err.message?.includes('env var')) throw err
     }
   }
 

@@ -14,12 +14,20 @@ export async function remixScriptAction(idea: IdeaObject, instruction: string) {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('brand_voice')
+    .select('current_team_id')
     .eq('id', user.id)
     .single()
 
-  const brandPersona = profile?.brand_voice
-    ? `\n\nUSER'S UNIQUE CONTENT PERSONA (Tone & Style):\n${profile.brand_voice}\nIMPORTANT: You MUST write the remixed hook and script strictly following this persona. If the persona is "ironic", make the remix ironic. If it's "minimalist", keep it short. Avoid generic corporate language.`
+  if (!profile?.current_team_id) return { success: false, error: 'No active workspace' }
+
+  const { data: team } = await supabase
+    .from('teams')
+    .select('brand_voice')
+    .eq('id', profile.current_team_id)
+    .single()
+
+  const brandPersona = team?.brand_voice
+    ? `\n\nUSER'S UNIQUE CONTENT PERSONA (Tone & Style):\n${team.brand_voice}\nIMPORTANT: You MUST write the remixed hook and script strictly following this persona. If the persona is "ironic", make the remix ironic. If it's "minimalist", keep it short. Avoid generic corporate language.`
     : ''
 
   const ai = getAIProvider()

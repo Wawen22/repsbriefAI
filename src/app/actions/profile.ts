@@ -4,6 +4,11 @@ import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { getAIProvider } from '@/lib/ai'
 
+async function getCurrentTeamId(supabase: any, userId: string) {
+  const { data } = await supabase.from('profiles').select('current_team_id').eq('id', userId).single()
+  return data?.current_team_id
+}
+
 export async function updateActiveNicheAction(nicheId: string) {
   if (!nicheId) return { error: 'Niche ID is required' }
 
@@ -33,6 +38,9 @@ export async function analyzeBrandVoiceAction(samples: string[]) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Unauthorized' }
 
+  const teamId = await getCurrentTeamId(supabase, user.id)
+  if (!teamId) return { error: 'No active workspace' }
+
   const ai = getAIProvider()
   
   const systemPrompt = `You are a world-class linguistic analyst and content strategist. 
@@ -60,13 +68,14 @@ Return ONLY the plain text analysis.
 
     const analysis = response.text.trim()
 
+    // UPDATE THE TEAM instead of the profile
     const { error } = await supabase
-      .from('profiles')
+      .from('teams')
       .update({ 
         writing_samples: samples,
         brand_voice: analysis 
       })
-      .eq('id', user.id)
+      .eq('id', teamId)
 
     if (error) throw error
 
@@ -97,13 +106,16 @@ export async function resetBrandPersonaAction() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Unauthorized' }
 
+  const teamId = await getCurrentTeamId(supabase, user.id)
+  if (!teamId) return { error: 'No active workspace' }
+
   const { error } = await supabase
-    .from('profiles')
+    .from('teams')
     .update({ 
       writing_samples: null,
       brand_voice: null 
     })
-    .eq('id', user.id)
+    .eq('id', teamId)
 
   if (error) {
     console.error('Failed to reset persona:', error)

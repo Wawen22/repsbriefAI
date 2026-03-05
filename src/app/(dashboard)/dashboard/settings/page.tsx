@@ -26,8 +26,15 @@ export default async function SettingsPage() {
 
   if (!profile) return null
 
+  // Fetch the active team to get the shared persona
+  const { data: team } = await supabase
+    .from('teams')
+    .select('brand_voice')
+    .eq('id', profile.current_team_id)
+    .single()
+
   return (
-    <div className="max-w-5xl mx-auto space-y-12 pb-20 text-left">
+    <div className="max-w-5xl mx-auto space-y-12 pb-20 text-left text-white">
       {/* Header */}
       <header className="space-y-4">
         <div className="flex items-center gap-3">
@@ -92,7 +99,7 @@ export default async function SettingsPage() {
 
         </div>
 
-        {/* Right Column: AI Persona (New Name) */}
+        {/* Right Column: AI Persona */}
         <div className="lg:col-span-7 space-y-8">
           
           <section className="p-1 rounded-[3rem] bg-gradient-to-b from-white/10 to-transparent">
@@ -103,12 +110,12 @@ export default async function SettingsPage() {
                   <h2 className="text-2xl font-bold text-white tracking-tight">AI Brand Persona</h2>
                 </div>
                 <p className="text-slate-400 text-sm leading-relaxed font-light">
-                  Define your unique content identity. Our AI will use this profile to write hooks, scripts, and remixes that sound exactly like you.
+                  Define the unique content identity for this workspace. Every member of the team will generate content following this persona.
                 </p>
               </div>
 
               <BrandVoiceSettings 
-                currentAnalysis={profile.brand_voice || null} 
+                currentAnalysis={team?.brand_voice || null} 
               />
             </div>
           </section>

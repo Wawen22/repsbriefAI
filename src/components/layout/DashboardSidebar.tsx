@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { LayoutGrid, Calendar, Crown, Zap, Settings, Star, Loader2, Sparkles, BarChart3 } from "lucide-react"
 import { LogoutButton } from "@/components/ui/LogoutButton"
 import { cn } from '@/lib/utils'
+import { TeamSwitcher } from './TeamSwitcher'
 
 export function DashboardSidebar({ 
   plan = 'starter', 
@@ -62,11 +63,16 @@ export function DashboardSidebar({
     )}>
       
       {/* Brand */}
-      <div className="flex items-center gap-3 px-2 py-4">
+      <div className="flex items-center gap-3 px-2 pt-4 pb-2">
         <div className="relative flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-700 shadow-lg shadow-blue-500/20">
           <Zap className="w-4 h-4 text-white fill-white" />
         </div>
         <span className="text-xl font-bold tracking-tight text-white font-sans">RepsBrief</span>
+      </div>
+
+      {/* Team Switcher */}
+      <div className="px-1">
+        <TeamSwitcher />
       </div>
       
       {/* Navigation */}
@@ -94,37 +100,37 @@ export function DashboardSidebar({
       </nav>
 
       {/* Subscription Card */}
-      <div className="mt-auto relative group overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-600/10 to-emerald-600/10 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      <div className="mt-auto relative group overflow-hidden text-left">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-600/10 to-emerald-600/10 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 text-left" />
         
         <div className="relative p-5 rounded-2xl bg-white/[0.03] border border-white/10 space-y-4 text-left">
-          <div className="flex items-center gap-2 text-sm font-bold text-white tracking-tight">
+          <div className="flex items-center gap-2 text-sm font-bold text-white tracking-tight text-left">
             {hasPaidPlan ? (
               <>
-                <div className="p-1 rounded-md bg-blue-500/10"><Crown className="w-3.5 h-3.5 text-blue-400" /></div>
+                <div className="p-1 rounded-md bg-blue-500/10 text-left"><Crown className="w-3.5 h-3.5 text-blue-400" /></div>
                 {plan === 'team' ? 'Team Member' : 'Pro Member'}
               </>
             ) : (
               <>
-                <div className="p-1 rounded-md bg-white/10"><Star className="w-3.5 h-3.5 text-slate-400" /></div>
+                <div className="p-1 rounded-md bg-white/10 text-left"><Star className="w-3.5 h-3.5 text-slate-400" /></div>
                 Free Plan
               </>
             )}
           </div>
           
           {hasPaidPlan ? (
-            <div className="space-y-3">
-              <p className="text-[11px] text-slate-500 leading-relaxed font-medium">Your next briefing is being prepared for Monday morning.</p>
-              <Link href="/dashboard/settings" className="w-full inline-block">
+            <div className="space-y-3 text-left">
+              <p className="text-[11px] text-slate-500 leading-relaxed font-medium text-left">Your next briefing is being prepared for Monday morning.</p>
+              <Link href="/dashboard/settings" className="w-full inline-block text-left">
                 <Button size="sm" variant="outline" className="w-full h-8 text-[11px] border-white/10 text-slate-300 hover:bg-white/5 rounded-lg transition-colors text-left">Manage Account</Button>
               </Link>
             </div>
           ) : (
-            <div className="space-y-3">
-              <p className="text-[11px] text-slate-400 leading-relaxed">Upgrade to Pro to automate your briefs and unlock history.</p>
+            <div className="space-y-3 text-left">
+              <p className="text-[11px] text-slate-400 leading-relaxed text-left">Upgrade to Pro to automate your briefs and unlock history.</p>
               <Button 
                 size="sm" 
-                className="w-full h-8 text-[11px] bg-white text-black hover:bg-slate-200 font-bold rounded-lg transition-all"
+                className="w-full h-8 text-[11px] bg-white text-black hover:bg-slate-200 font-bold rounded-lg transition-all text-left"
                 onClick={handleUpgrade}
                 disabled={isUpgrading}
               >

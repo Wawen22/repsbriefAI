@@ -35,7 +35,7 @@ export function SaveIdeaButton({
         setIsSaved(true)
         setAnimate(true)
         toast.success("Saved to My Ideas", {
-          icon: <Sparkles className="w-4 h-4 text-yellow-500" />,
+          icon: <Sparkles className="w-4 h-4 text-emerald-400" />,
         })
         setTimeout(() => setAnimate(false), 600)
       } else {
@@ -54,10 +54,10 @@ export function SaveIdeaButton({
         onClick={handleSave}
         disabled={isSaving || isSaved}
         className={cn(
-          "rounded-full px-6 font-bold transition-all h-12 gap-2 shadow-lg relative overflow-hidden",
+          "rounded-full px-6 font-bold transition-all h-14 gap-2 shadow-lg relative overflow-hidden",
           isSaved 
-            ? "bg-yellow-500/20 text-yellow-500 border border-yellow-500/30 cursor-default shadow-none" 
-            : "bg-blue-600 hover:bg-blue-500 text-white shadow-blue-500/25 hover:scale-105 active:scale-95"
+            ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 cursor-default shadow-none" 
+            : "bg-white text-black hover:bg-slate-200 hover:scale-105 active:scale-95"
         )}
       >
         {isSaving ? (
@@ -66,15 +66,12 @@ export function SaveIdeaButton({
           <div className="relative">
             <Star className={cn(
               "w-4 h-4 transition-all duration-500", 
-              isSaved && "fill-yellow-500 scale-110",
+              isSaved ? "fill-emerald-400 text-emerald-400" : "text-black",
               animate && "animate-sparkle"
             )} />
-            {animate && (
-              <Sparkles className="absolute -top-2 -right-2 w-3 h-3 text-yellow-400 animate-pulse" />
-            )}
           </div>
         )}
-        <span>{isSaved ? "Saved to Library" : "Save Strategy"}</span>
+        <span>{isSaved ? "In Library" : "Save Strategy"}</span>
       </Button>
     )
   }

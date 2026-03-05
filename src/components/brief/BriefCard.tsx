@@ -180,7 +180,34 @@ export function BriefCard({
           </div>
         </div>
       </div>
-      <div className="p-8 pb-12 bg-black border-t border-white/5 flex flex-col sm:flex-row justify-between items-center gap-8 relative z-[10020] shadow-2xl text-left text-white"><div className="hidden sm:block text-left max-w-md text-white"><p className="text-sm font-medium text-slate-400 text-left text-white">Finalized strategy for <span className="text-white font-bold">{currentIdea.title}</span>. Ready to deploy?</p></div><div className="flex items-center gap-4 w-full sm:w-auto text-left text-white"><Button variant="outline" className="hidden md:flex bg-white/5 border-white/10 text-white hover:bg-white/10 rounded-full px-8 h-14 font-black uppercase tracking-widest text-left" onClick={() => setIsExpanded(false)}>Close</Button><Button onClick={handleOpenTeleprompter} className="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-500 text-white rounded-full px-12 h-14 font-black shadow-2xl text-left group/rec"><Smartphone className="w-6 h-6 mr-3 group-hover/rec:rotate-12 transition-all" /> Record Now {!isPro && "(PRO)"}</Button>{!hideSaveButton && <SaveIdeaButton title={currentIdea.title} ideaData={currentIdea} initialSaved={isSaved} variant="prominent" />}</div></div>
+      <div className="p-8 pb-12 bg-black border-t border-white/5 flex flex-col sm:flex-row justify-between items-center gap-8 relative z-[10020] shadow-2xl text-left text-white">
+        <div className="hidden sm:block text-left max-w-md text-white">
+          <p className="text-sm font-medium text-slate-400 text-left text-white">
+            Finalized strategy for <span className="text-white font-bold">{currentIdea.title}</span>. Ready to deploy?
+          </p>
+        </div>
+        <div className="flex items-center gap-4 w-full sm:w-auto text-left text-white">
+          {!isPro ? (
+            <Button 
+              onClick={() => toast.info("Teleprompter is a PRO feature", { icon: <Crown className="w-4 h-4 text-yellow-500" /> })}
+              className="flex-1 sm:flex-none bg-white/5 border border-white/10 text-slate-500 rounded-full px-10 h-14 font-black uppercase tracking-widest transition-all group/lock overflow-hidden relative"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:animate-[shimmer_2s_infinite]" />
+              <Crown className="w-5 h-5 mr-3 text-yellow-500/50 group-hover:text-yellow-500 transition-colors" /> 
+              Unlock Prompter
+            </Button>
+          ) : (
+            <Button 
+              onClick={handleOpenTeleprompter} 
+              className="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-500 text-white rounded-full px-12 h-14 font-black shadow-2xl text-left group/rec transition-all hover:scale-105 active:scale-95"
+            >
+              <Smartphone className="w-6 h-6 mr-3 group-hover/rec:rotate-12 transition-all" /> 
+              Record Now
+            </Button>
+          )}
+          {!hideSaveButton && <SaveIdeaButton title={currentIdea.title} ideaData={currentIdea} initialSaved={isSaved} variant="prominent" />}
+        </div>
+      </div>
     </div>,
     document.body
   ) : null;

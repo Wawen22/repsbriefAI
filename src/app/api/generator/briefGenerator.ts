@@ -34,6 +34,11 @@ type GenerationProfile = {
   chunkMaxAttempts: number
   maxOutputTokensCap: number
 }
+type BatchResult = {
+  ideas: IdeaObject[]
+  attemptsUsed: number
+  elapsedMs: number
+}
 
 function sanitizeText(value: string, maxLength: number): string {
   return value
@@ -283,8 +288,9 @@ function getGenerationProfile(provider: string, model: string): GenerationProfil
 }
 
 function estimateMaxTokens(count: number, cap: number): number {
-  const estimated = 450 + count * 280
-  return Math.max(1400, Math.min(cap, estimated))
+  // Conservative token budget to reduce latency while preserving idea richness.
+  const estimated = 420 + count * 230
+  return Math.max(1100, Math.min(cap, estimated))
 }
 
 function buildSystemPrompt(niche: NicheConfig, brandVoice?: string | null, highPerformers: string[] = []): string {
@@ -357,7 +363,7 @@ async function generateBatch(params: {
   count: number
   maxAttempts?: number
   maxTokensCap?: number
-}): Promise<IdeaObject[]> {
+}): Promise<BatchResult> {
   const {
     ai,
     systemPrompt,
@@ -373,6 +379,7 @@ async function generateBatch(params: {
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
     try {
       console.log(`[Generator] Batch ${count} ideas - attempt ${attempt}/${maxAttempts}`)
+      const start = Date.now()
 
       const response = await ai.complete(
         [
@@ -397,7 +404,11 @@ async function generateBatch(params: {
         throw new Error('No unique ideas parsed from model response')
       }
 
-      return unique.slice(0, count)
+      return {
+        ideas: unique.slice(0, count),
+        attemptsUsed: attempt,
+        elapsedMs: Date.now() - start,
+      }
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown generation error'
       lastError = new Error(message)
@@ -470,7 +481,7 @@ export async function generateBrief(
       })
 
       const seen = new Set<string>()
-      for (const idea of singleShot) {
+      for (const idea of singleShot.ideas) {
         const key = titleKey(idea.title)
         if (!seen.has(key)) {
           collected.push(idea)
@@ -480,7 +491,9 @@ export async function generateBrief(
       }
 
       if (collected.length >= DEFAULT_TOTAL_IDEAS) {
-        console.log(`[Generator] ✅ Success (single-shot): ${collected.length} ideas`)
+        console.log(
+          `[Generator] ✅ Success (single-shot): ${collected.length} ideas in ${(singleShot.elapsedMs / 1000).toFixed(1)}s (attempt ${singleShot.attemptsUsed})`
+        )
         return collected.slice(0, DEFAULT_TOTAL_IDEAS)
       }
     } catch (error) {
@@ -493,6 +506,7 @@ export async function generateBrief(
 
   let safetyCounter = 0
   let rounds = 0
+  let adaptiveChunkAttempts = profile.chunkMaxAttempts
   while (collected.length < DEFAULT_TOTAL_IDEAS) {
     rounds += 1
     if (rounds > 12) {
@@ -508,13 +522,16 @@ export async function generateBrief(
       trendsSummary,
       excludedTitles: [...historicalTitles, ...collected.map((idea) => idea.title)],
       count: batchSize,
-      maxAttempts: profile.chunkMaxAttempts,
+      maxAttempts: adaptiveChunkAttempts,
       maxTokensCap: profile.maxOutputTokensCap,
     })
+    console.log(
+      `[Generator] Batch completed: requested=${batchSize}, received=${batch.ideas.length}, attempt=${batch.attemptsUsed}, elapsed=${(batch.elapsedMs / 1000).toFixed(1)}s`
+    )
 
     let added = 0
     const existingKeys = new Set(collected.map((idea) => titleKey(idea.title)))
-    for (const idea of batch) {
+    for (const idea of batch.ideas) {
       const key = titleKey(idea.title)
       if (!existingKeys.has(key)) {
         collected.push(idea)
@@ -522,6 +539,13 @@ export async function generateBrief(
         added += 1
       }
       if (collected.length >= DEFAULT_TOTAL_IDEAS) break
+    }
+
+    // Adaptive attempts: once stable on first try, reduce retries to cut tail latency.
+    if (batch.attemptsUsed === 1 && adaptiveChunkAttempts > 2) {
+      adaptiveChunkAttempts = 2
+    } else if (batch.attemptsUsed >= 2 && adaptiveChunkAttempts < profile.chunkMaxAttempts) {
+      adaptiveChunkAttempts = profile.chunkMaxAttempts
     }
 
     if (added === 0) {

@@ -50,6 +50,7 @@
   - [x] Generator performance profile: single-shot skip su Azure GPT-5 per evitare tentativi costosi inutili
   - [x] Generator batching: chunk da 10 + tentativi ridotti + token budget dinamico per latenza più bassa
   - [x] Smoke test reale: 20 idee completate con strategia ottimizzata
+  - [x] Generator tuning v2: retry adattivo per batch + logging tempi per round
 
 > **Use this file as context when working on any part of the project.**
 > It contains all decisions already made: stack, architecture, business logic, and roadmap.

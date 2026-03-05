@@ -17,6 +17,7 @@
     - [x] Brief Generator reliability hardening (JSON repair + chunked generation)
     - [x] Azure Foundry GPT integration (endpoint compatibility + model fallback)
     - [x] Generate-now speed optimization profile (Azure GPT-5 chunk-first)
+    - [x] Generate-now tuning v2 (adaptive retries + per-batch timing logs)
 - [x] **Phase 3: Automation & Delivery**
     - [x] Weekly Cron Job
     - [x] Resend Email Integration

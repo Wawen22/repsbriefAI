@@ -23,10 +23,10 @@ export async function POST() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // 2. Load user profile
+    // 2. Load user profile including brand voice
     const { data: profile, error: profileError } = await supabaseAdmin
       .from('profiles')
-      .select('active_niche, plan')
+      .select('active_niche, plan, brand_voice')
       .eq('id', user.id)
       .single()
 
@@ -78,7 +78,11 @@ export async function POST() {
     } else {
       // No cache — scrape fresh (slower path)
       console.log(`[GenerateNow] No cache found, running fresh scrape for ${nicheId}...`)
-      await scrapeNiche(niche)
+      try {
+        await scrapeNiche(niche)
+      } catch (scrapeErr) {
+        console.error('[GenerateNow] Scrape failed, but will try to generate with base knowledge:', scrapeErr)
+      }
 
       const { data: freshTrends } = await supabaseAdmin
         .from('trends_cache')
@@ -105,11 +109,11 @@ export async function POST() {
 
     let ideas
     try {
-      ideas = await generateBrief(allTrends, historyTitles, niche, user.id)
+      // Pass the brand_voice from profile directly to briefGenerator
+      ideas = await generateBrief(allTrends, historyTitles, niche, profile.brand_voice)
     } catch (genErr: any) {
       console.error('[GenerateNow] Generation failed:', genErr.message)
       console.error('[GenerateNow] Full error stack:', genErr.stack || genErr)
-      // Return the real error message so we can debug it
       const msg = genErr.message || 'Brief generation failed. Please try again.'
       return NextResponse.json({ error: msg }, { status: 500 })
     }
@@ -145,7 +149,7 @@ export async function POST() {
     console.log(`[GenerateNow] ✅ Done for user ${user.id}: ${ideas.length} ideas`)
     return NextResponse.json({ success: true, count: ideas.length })
   } catch (err: any) {
-    console.error('[GenerateNow] Error:', err)
+    console.error('[GenerateNow] Critical Error:', err)
     return NextResponse.json({ error: err.message || 'Generation failed' }, { status: 500 })
   }
 }

@@ -6,8 +6,19 @@ import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { LayoutGrid, Calendar, Inbox, Crown, Zap, Settings, Star, Loader2, Sparkles } from "lucide-react"
 import { LogoutButton } from "@/components/ui/LogoutButton"
+import { cn } from '@/lib/utils'
 
-export function DashboardSidebar({ plan = 'starter', userId, userEmail }: { plan?: string, userId?: string, userEmail?: string }) {
+export function DashboardSidebar({ 
+  plan = 'starter', 
+  userId, 
+  userEmail,
+  isMobile = false 
+}: { 
+  plan?: string, 
+  userId?: string, 
+  userEmail?: string,
+  isMobile?: boolean 
+}) {
   const pathname = usePathname()
   const [isUpgrading, setIsUpgrading] = useState(false)
 
@@ -43,7 +54,10 @@ export function DashboardSidebar({ plan = 'starter', userId, userEmail }: { plan
   ]
 
   return (
-    <aside className="w-64 border-r border-white/5 bg-black/40 backdrop-blur-xl p-6 hidden lg:flex flex-col gap-8 flex-shrink-0 overflow-y-auto relative z-20 shadow-2xl">
+    <aside className={cn(
+      "w-64 border-r border-white/5 bg-black/40 backdrop-blur-xl p-6 flex flex-col gap-8 flex-shrink-0 overflow-y-auto relative z-20 h-full",
+      !isMobile && "hidden lg:flex shadow-2xl"
+    )}>
       
       {/* Brand */}
       <div className="flex items-center gap-3 px-2 py-4">
@@ -62,14 +76,15 @@ export function DashboardSidebar({ plan = 'starter', userId, userEmail }: { plan
             <Link key={item.name} href={item.href} passHref>
               <Button 
                 variant="ghost" 
-                className={`w-full justify-start gap-3 h-10 px-4 rounded-xl transition-all duration-200 ${
+                className={cn(
+                  "w-full justify-start gap-3 h-10 px-4 rounded-xl transition-all duration-200",
                   isActive 
                     ? 'text-white bg-white/10 border border-white/5 shadow-inner' 
                     : 'text-slate-400 hover:text-white hover:bg-white/5'
-                }`}
+                )}
               >
-                <Icon className={`w-4 h-4 ${isActive ? 'text-blue-400' : ''}`} />
-                <span className={`text-sm font-medium ${isActive ? 'text-white' : ''}`}>{item.name}</span>
+                <Icon className={cn("w-4 h-4", isActive ? 'text-blue-400' : '')} />
+                <span className={cn("text-sm font-medium", isActive ? 'text-white' : '')}>{item.name}</span>
               </Button>
             </Link>
           )
@@ -80,7 +95,7 @@ export function DashboardSidebar({ plan = 'starter', userId, userEmail }: { plan
       <div className="mt-auto relative group overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-600/10 to-emerald-600/10 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
         
-        <div className="relative p-5 rounded-2xl bg-white/[0.03] border border-white/10 space-y-4">
+        <div className="relative p-5 rounded-2xl bg-white/[0.03] border border-white/10 space-y-4 text-left">
           <div className="flex items-center gap-2 text-sm font-bold text-white tracking-tight">
             {plan === 'pro' ? (
               <>

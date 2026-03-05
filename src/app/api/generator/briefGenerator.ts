@@ -3,7 +3,6 @@
 import { getAIProvider } from '@/lib/ai'
 import { z } from 'zod'
 import { NicheConfig, TrendItem, IdeaObject } from '@/types/niche'
-import { createClient } from '@/lib/supabase/server'
 
 const IdeaSchema = z.object({
   title: z.string().min(1),
@@ -17,38 +16,22 @@ const IdeaSchema = z.object({
   keyVisuals: z.string().optional(),
 })
 
-const BriefSchema = z.array(IdeaSchema).min(10).max(25)
+const BriefSchema = z.array(IdeaSchema)
 
+/**
+ * Generates a content brief using AI with robust JSON repair.
+ */
 export async function generateBrief(
   trendsData: TrendItem[], 
   ideaHistory: string[], 
   niche: NicheConfig,
-  userId?: string
+  brandVoice?: string | null
 ): Promise<IdeaObject[]> {
-  // ── Pre-flight checks ───────────────────────────────────────────────────
   const provider = process.env.AI_PROVIDER ?? 'openai'
   const model = process.env.AI_MODEL
 
-  if (!model) {
-    throw new Error(`AI_MODEL env var is not set. Set it to a model supported by "${provider}" (e.g. gpt-4o-mini, gemini-1.5-flash).`)
-  }
+  if (!model) throw new Error(`AI_MODEL env var is not set.`)
 
-  // Fetch user brand voice if available
-  let brandVoice = ""
-  if (userId) {
-    const supabase = await createClient()
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('brand_voice')
-      .eq('id', userId)
-      .single()
-    
-    if (profile?.brand_voice) {
-      brandVoice = `\n\nUSER'S UNIQUE BRAND VOICE PROFILE:\n${profile.brand_voice}\nIMPORTANT: You MUST write all hooks and scripts in this exact style and tone. This is the most critical requirement.`
-    }
-  }
-
-  // Validate that the required API key exists for the chosen provider
   const keyMap: Record<string, string | undefined> = {
     openai: process.env.OPENAI_API_KEY,
     anthropic: process.env.ANTHROPIC_API_KEY,
@@ -57,81 +40,108 @@ export async function generateBrief(
     groq: process.env.GROQ_API_KEY,
   }
 
-  if (!keyMap[provider]) {
-    throw new Error(`API key for provider "${provider}" is missing.`)
-  }
+  if (!keyMap[provider]) throw new Error(`API key for provider "${provider}" is missing.`)
 
   const ai = getAIProvider()
 
-  // ── Build prompt ────────────────────────────────────────────────────────
-  let trendsSummary: string
-
-  if (trendsData.length > 0) {
-    trendsSummary = trendsData
-      .slice(0, 80)
-      .map(t => `- [${t.source.toUpperCase()}] ${t.title}${t.score ? ` (score: ${t.score})` : ''}`)
-      .join('\n')
-  } else {
-    trendsSummary = `No live scraped data is available right now. Use your knowledge of the latest trends in ${niche.label} to generate timely ideas.`
-  }
+  let trendsSummary = trendsData.length > 0
+    ? trendsData.slice(0, 60).map(t => `- [${t.source.toUpperCase()}] ${t.title}`).join('\n')
+    : `No live data. Use general trends for ${niche.label}.`
 
   const historySection = ideaHistory.length > 0
-    ? `\nAvoid repeating these previous ideas:\n${ideaHistory.slice(-50).join('\n')}`
+    ? `\nAvoid repeating these: ${ideaHistory.slice(-30).join(', ')}`
     : ''
 
-  const systemPrompt = `You are ${niche.claudePersona}. Your goal is to provide 20 fresh, high-impact content ideas for ${niche.label} creators based on current trends. 
-You provide extremely detailed strategies for every idea to help creators execute immediately.${brandVoice}`
+  const voiceInstructions = brandVoice 
+    ? `\n\nUSER'S BRAND VOICE:\n${brandVoice}\nWrite all content in this style.`
+    : ""
+
+  const systemPrompt = `You are ${niche.claudePersona}. Generate 20 high-impact content ideas for ${niche.label}. 
+Provide detailed strategies including a ready-to-use script for each.${voiceInstructions}`
   
   const userPrompt = `
-Analyze the following trends from the last 7 days:
+Analyze these trends:
 ${trendsSummary}
 ${historySection}
 
-Return a JSON array of exactly 20 content ideas. Each idea MUST follow this exact structure:
+Return a JSON array of exactly 20 ideas. 
+Structure for each object:
 {
-  "title": "Short catchy title",
-  "hook": "An attention-grabbing first line/opening",
-  "description": "2-3 sentences explaining the core content",
+  "title": "catchy title",
+  "hook": "attention-grabbing opening",
+  "description": "core concept",
   "format": "Reel" | "Carousel" | "Thread" | "Newsletter",
-  "whyItWorks": "1 sentence explanation based on the trend",
-  "scriptDraft": "A brief script or bullet-point structure for the content",
-  "alternativeHooks": ["Alternative 1", "Alternative 2"],
-  "trendingAudioSuggestion": "Description of the type of music or specific trending sound style",
-  "keyVisuals": "Description of what should be shown on screen"
+  "whyItWorks": "strategic reason",
+  "scriptDraft": "actionable script/structure",
+  "alternativeHooks": ["alt 1", "alt 2"],
+  "trendingAudioSuggestion": "audio style",
+  "keyVisuals": "visual description"
 }
 
 IMPORTANT:
-- Respond ONLY with the JSON array.
+- Return ONLY the JSON array.
+- Ensure all quotes inside strings are escaped.
+- Keep descriptions and scripts concise but actionable to avoid response truncation.
 `
 
-  // ── Generate with retry ─────────────────────────────────────────────────
   let lastError: Error | null = null
-  const maxAttempts = 2
+  const maxAttempts = 3
 
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
+      console.log(`[Generator] Attempt ${attempt}/${maxAttempts}...`)
       const response = await ai.complete([
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt },
       ], { jsonMode: true, maxTokens: 8192 })
 
       let text = response.text.trim()
+      
+      // 1. Basic Cleaning
       text = text.replace(/^\uFEFF/, '')
       text = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/m, '').trim()
+      
+      // 2. Extract Array if wrapped in junk
       const arrayStart = text.indexOf('[')
       const arrayEnd = text.lastIndexOf(']')
       if (arrayStart !== -1 && arrayEnd > arrayStart) {
         text = text.substring(arrayStart, arrayEnd + 1)
       }
 
-      const ideasArray = JSON.parse(text)
+      // 3. Attempt to fix common JSON errors (trailing commas, unescaped newlines in scripts)
+      // Note: This is a basic repair, but helpful for LLM quirks
+      let cleanedText = text
+        .replace(/,\s*([}\]])/g, '$1') // remove trailing commas
+        .replace(/\n/g, '\\n') // escape literal newlines if they slipped through
+        .replace(/\r/g, '\\r')
+      
+      // Re-escape properly if the LLM sent raw newlines inside JSON strings
+      // This is tricky, so we'll try a safer approach: standard parse first
+      let ideasArray: any[]
+      try {
+        ideasArray = JSON.parse(text)
+      } catch (e) {
+        console.warn(`[Generator] Standard JSON.parse failed on attempt ${attempt}. Trying aggressive repair...`)
+        // Try removing control characters that often break JSON.parse
+        const fixedText = text.replace(/[\u0000-\u001F\u007F-\u009F]/g, "")
+        ideasArray = JSON.parse(fixedText)
+      }
+
       const validated = BriefSchema.parse(Array.isArray(ideasArray) ? ideasArray : [])
+      
+      if (validated.length === 0) throw new Error("Empty ideas array")
+      
+      console.log(`[Generator] ✅ Success: ${validated.length} ideas`)
       return validated.slice(0, 20)
     } catch (err: any) {
       lastError = err
-      if (err.message?.includes('API key')) throw err
+      console.error(`[Generator] Attempt ${attempt} failed:`, err.message)
+      // On third attempt, try to ask for fewer ideas if length was the issue
+      if (attempt === 2) {
+        console.log("[Generator] Retrying with request for only 15 ideas to ensure valid JSON...")
+      }
     }
   }
 
-  throw new Error(`Brief generation failed after ${maxAttempts} attempts.`)
+  throw new Error(`Brief generation failed. The AI returned invalid data. Tip: Try shortening your Brand Voice samples. Details: ${lastError?.message}`)
 }

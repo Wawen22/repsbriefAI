@@ -12,12 +12,14 @@ export function SaveIdeaButton({
   title, 
   ideaData, 
   initialSaved = false,
-  variant = 'icon' 
+  variant = 'icon',
+  className
 }: { 
   title: string, 
   ideaData?: IdeaObject, 
   initialSaved?: boolean,
-  variant?: 'icon' | 'prominent'
+  variant?: 'icon' | 'prominent',
+  className?: string
 }) {
   const [isSaving, setIsSaving] = useState(false)
   const [isSaved, setIsSaved] = useState(initialSaved)
@@ -57,21 +59,22 @@ export function SaveIdeaButton({
           "rounded-full px-6 font-bold transition-all h-14 gap-2 shadow-lg relative overflow-hidden",
           isSaved 
             ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 cursor-default shadow-none" 
-            : "bg-white text-black hover:bg-slate-200 hover:scale-105 active:scale-95"
+            : "bg-white text-black hover:bg-slate-200 hover:scale-105 active:scale-95",
+          className
         )}
       >
         {isSaving ? (
-          <Loader2 className="w-4 h-4 animate-spin" />
+          <Loader2 className="w-3.5 h-3.5 animate-spin" />
         ) : (
           <div className="relative">
             <Star className={cn(
-              "w-4 h-4 transition-all duration-500", 
+              "w-3.5 h-3.5 transition-all duration-500", 
               isSaved ? "fill-emerald-400 text-emerald-400" : "text-black",
               animate && "animate-sparkle"
             )} />
           </div>
         )}
-        <span>{isSaved ? "In Library" : "Save Strategy"}</span>
+        <span>{isSaved ? "Saved" : "Save Strategy"}</span>
       </Button>
     )
   }
@@ -86,7 +89,8 @@ export function SaveIdeaButton({
         "h-8 w-8 transition-all relative group/save",
         isSaved 
           ? "text-yellow-400 bg-yellow-400/10 hover:bg-yellow-400/20 hover:text-yellow-500 opacity-100" 
-          : "text-slate-500 hover:text-yellow-400 hover:bg-yellow-400/10 opacity-0 group-hover:opacity-100"
+          : "text-slate-500 hover:text-yellow-400 hover:bg-yellow-400/10 opacity-0 group-hover:opacity-100",
+        className
       )}
       title={isSaved ? "Saved to My Ideas" : "Save to My Ideas"}
     >

@@ -7,7 +7,7 @@ import { IdeaObject } from "@/types/niche"
 import { 
   Video, Layers, Hash, Mail, Lightbulb, Copy, Check, TrendingUp, Star, 
   ArrowUpRight, Music, FileText, Sparkles, Wand2, Zap, Loader2, RotateCcw, 
-  MessageSquarePlus, ArrowRight, Share2, Download, Box, Smartphone, Maximize2, ChevronRight, ArrowLeft, X, Orbit, Crown
+  MessageSquarePlus, ArrowRight, Share2, Download, Box, Smartphone, Maximize2, ChevronRight, ArrowLeft, X, Orbit, Crown, LayoutGrid, Settings2
 } from "lucide-react"
 import { SaveIdeaButton } from "@/components/ui/SaveIdeaButton"
 import { DeleteIdeaButton } from "@/components/ui/DeleteIdeaButton"
@@ -61,6 +61,7 @@ export function BriefCard({
   const [dbId, setDbId] = useState(initialDbId)
   const [isSaved, setIsSaved] = useState(initialIsSaved)
   const [isMounted, setIsMounted] = useState(false)
+  const [activeTab, setActiveTab] = useState<'content' | 'tools'>('content')
 
   const isPro = plan === 'pro' || plan === 'team'
 
@@ -130,84 +131,273 @@ export function BriefCard({
     return `### ${currentIdea.title}\n**Format:** ${currentIdea.format}\n\n**Hook:** _"${currentIdea.hook}"_\n\n**Concept:** ${currentIdea.description}\n\n**Script:**\n${currentIdea.scriptDraft || '...'}`
   }
 
-  const CopyBtn = ({ field, text, label, icon: CI }: any) => (
-    <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); copyToClipboard(text, field) }} className="h-7 px-2 text-[10px] text-slate-500 hover:text-white transition-all gap-1.5 font-medium">
+  const CopyBtn = ({ field, text, label, icon: CI, className }: any) => (
+    <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); copyToClipboard(text, field) }} className={cn("h-7 px-2 text-[10px] text-slate-500 hover:text-white transition-all gap-1.5 font-medium", className)}>
       {copied === field ? <><Check className="w-3 h-3 text-emerald-400" /><span>Copied</span></> : <>{CI ? <CI className="w-3 h-3" /> : <Copy className="w-3 h-3" />}{label}</>}
     </Button>
   )
 
   const StrategyDetailView = isMounted && isExpanded ? createPortal(
-    <div className="fixed inset-0 z-[10000] bg-black flex flex-col animate-in slide-in-from-bottom-4 duration-500 overflow-hidden text-left">
-      <div className="h-24 md:h-20 border-b border-white/5 bg-black/60 backdrop-blur-xl px-6 md:px-12 flex items-center justify-between shrink-0 relative z-[10010]">
-        <div className="flex items-center gap-4">
-           <Button variant="ghost" onClick={() => setIsExpanded(false)} className="h-11 pl-2 pr-5 rounded-full bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-all gap-3 group/back text-white"><div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center group-hover/back:bg-blue-600 transition-colors text-white"><ArrowLeft className="w-5 h-5 text-white" /></div><span className="text-xs font-black uppercase tracking-widest hidden sm:inline text-white">Dashboard</span></Button>
-           <div className="hidden lg:flex items-center gap-3 ml-4">{getIcon(currentIdea.format)}<Badge variant="outline" className="text-blue-300 text-[10px] border-blue-500/20 uppercase tracking-widest font-black">{currentIdea.format} Strategy</Badge></div>
-        </div>
-        <div className="flex items-center gap-4">
-           <div className="hidden md:flex items-center gap-2"><CopyBtn field="all" text={currentIdea.title} label="Copy Strategy" /><div className="h-4 w-px bg-white/10 mx-2" /></div>
-           <button onClick={() => setIsExpanded(false)} className="group relative flex items-center justify-center w-12 h-12 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 hover:bg-rose-500 hover:text-white transition-all shadow-lg text-rose-400"><X className="w-6 h-6 relative z-10" /><div className="absolute inset-0 rounded-full bg-rose-500/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity" /></button>
-        </div>
-      </div>
-      <div className="flex-1 overflow-y-auto custom-scrollbar relative">
-        <div className="absolute top-0 right-0 w-[40%] h-[40%] bg-blue-600/5 rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-[30%] h-[30%] bg-emerald-600/5 rounded-full blur-[120px] pointer-events-none" />
-        <div className="max-w-7xl mx-auto px-6 md:px-12 py-12 space-y-16 relative z-10">
-          <div className="flex flex-col lg:flex-row justify-between gap-12 text-left text-white">
-            <div className="space-y-6 flex-1">
-               <h1 className="text-4xl md:text-6xl font-black text-white tracking-tighter leading-tight text-balance text-left">{currentIdea.title}</h1>
-               <div className="flex flex-wrap gap-4 text-left text-white"><div className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-white/5 border border-white/10 text-slate-300 text-sm font-medium"><Orbit className="w-4 h-4 text-blue-400 animate-spin-slow" />{currentIdea.format} Distribution</div>{remixHistory.length > 1 && <Badge className="bg-purple-500/10 text-purple-400 border-purple-500/20 px-3 py-1.5 rounded-full text-[10px] font-black uppercase animate-pulse"><Wand2 className="w-3.5 h-3.5 mr-2" /> Personalized Remix</Badge>}</div>
-            </div>
-            <div className="bg-white/[0.03] border border-white/10 rounded-[2rem] p-6 md:p-8 w-full lg:w-96 space-y-6 shadow-2xl backdrop-blur-md relative overflow-hidden text-left">
-               {!isPro && (
-                 <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/60 backdrop-blur-[2px] p-6 text-center">
-                    <Crown className="w-8 h-8 text-yellow-500 mb-3" />
-                    <p className="text-xs font-bold text-white uppercase tracking-widest mb-1">PRO Feature</p>
-                    <p className="text-[10px] text-slate-400 mb-4">Upgrade to remix strategies with AI</p>
-                    <Button size="sm" className="bg-white text-black rounded-full text-[10px] h-8 px-4 font-black">Upgrade Now</Button>
-                 </div>
-               )}
-               <div className="flex items-center justify-between text-white"><div className="flex items-center gap-2 text-white"><Sparkles className="w-4 h-4 text-purple-400" /><span className="text-[10px] font-black text-white uppercase tracking-[0.2em]">AI Remix</span></div>{remixHistory.length > 1 && <button onClick={undoRemix} className="text-[10px] font-bold text-slate-500 hover:text-white flex items-center gap-1 transition-colors"><RotateCcw className="w-3 h-3" /> Undo</button>}</div>
-               <div className="grid grid-cols-2 gap-2">{REMIX_OPTIONS.map(o => <button key={o.label} onClick={() => handleRemix(o.label)} disabled={isRemixing || !isPro} className="text-[10px] font-bold bg-white/5 hover:bg-purple-500/20 border border-white/5 rounded-xl transition-all disabled:opacity-50 p-2.5 flex items-center gap-2 text-white text-left"><span>{o.icon}</span> {o.label.split(' ')[0]}</button>)}</div>
-               <div className="relative"><input type="text" placeholder="Custom..." disabled={!isPro} value={customInstruction} onChange={e => setCustomInstruction(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleRemix(customInstruction)} className="w-full bg-black/40 border border-white/10 rounded-2xl px-4 py-3 text-xs text-white" /><button onClick={() => handleRemix(customInstruction)} disabled={!isPro} className="absolute right-3 top-3 text-slate-500 hover:text-purple-400"><ArrowRight className="w-4 h-4" /></button></div>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 text-left text-white">
-            <div className="lg:col-span-8 space-y-12 text-left">
-              <div className="space-y-6 text-left text-white"><div className="flex justify-between items-center px-2 text-left text-white"><div className="flex items-center gap-2 text-left text-white"><Zap className="w-5 h-5 text-blue-400" /><h4 className="text-[11px] font-black text-slate-500 uppercase tracking-[0.3em]">The Hook</h4></div><CopyBtn field="hook" text={currentIdea.hook} label="Copy Hook" /></div><div className="p-8 md:p-12 rounded-[2.5rem] bg-white/[0.03] border border-white/5 relative min-h-[140px] flex items-center text-left text-white"><div className="absolute left-0 top-0 bottom-0 w-2 bg-gradient-to-b from-blue-500 to-blue-700 rounded-full" /><p className={cn("text-2xl md:text-4xl italic text-white font-light leading-tight transition-all duration-700 text-left", isRemixing && "blur-md opacity-30")}>&ldquo;{currentIdea.hook}&rdquo;</p>{isRemixing && <Loader2 className="absolute inset-0 m-auto animate-spin text-blue-500 w-10 h-10" />}</div></div>
-              <div className="space-y-6 text-left text-white"><div className="flex justify-between items-center px-2 text-left text-white"><div className="flex items-center gap-2 text-left text-white"><FileText className="w-5 h-5 text-purple-400" /><h4 className="text-[11px] font-black text-slate-500 uppercase tracking-[0.3em]">Production Script</h4></div><Button variant="ghost" size="sm" onClick={handleOpenTeleprompter} className="h-8 text-[10px] text-blue-400 font-black uppercase hover:bg-white/5"><Maximize2 className="w-3.5 h-3.5 mr-2" /> Focus View</Button></div><div className="p-8 md:p-10 rounded-[2.5rem] bg-white/[0.02] border border-white/5 min-h-[300px] relative text-left text-white"><div className={cn(isRemixing && "blur-md opacity-30 text-left text-white")}><p className="text-slate-300 text-lg mb-10 text-left leading-relaxed text-white">{currentIdea.description}</p><div className="pt-10 border-t border-white/5 text-left text-white"><div className="bg-black/40 p-8 rounded-3xl border border-white/5 relative group text-left text-white"><p className="text-base text-slate-400 font-mono leading-relaxed whitespace-pre-wrap text-left text-white">{currentIdea.scriptDraft || "Generating..."}</p><div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity"><CopyBtn field="script" text={currentIdea.scriptDraft || ""} label="Copy Script" /></div></div></div></div>{isRemixing && <Loader2 className="absolute inset-0 m-auto animate-spin text-purple-500 w-10 h-10" />}</div></div>
-            </div>
-            <div className="lg:col-span-4 space-y-12 text-left text-white"><div className="space-y-6 text-left text-white"><div className="flex items-center gap-2 px-2 text-left text-white"><TrendingUp className="w-5 h-5 text-emerald-400" /><h4 className="text-[11px] font-black text-slate-500 uppercase tracking-[0.3em]">Why it works</h4></div><div className="p-8 rounded-[2rem] bg-emerald-500/5 border border-emerald-500/10 text-lg italic text-emerald-100/80 leading-relaxed font-light text-left text-white">{currentIdea.whyItWorks}</div></div><div className="space-y-6 relative overflow-hidden text-left text-white">{!isPro && <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/60 backdrop-blur-[2px] rounded-[2rem] text-center p-4"><Crown className="w-6 h-6 text-yellow-500 mb-2" /><p className="text-[10px] font-black text-white uppercase tracking-widest text-left text-white">PRO Workspace</p></div>}<div className="flex items-center gap-2 px-2 text-left text-white"><Box className="w-5 h-5 text-blue-400" /><h4 className="text-[11px] font-black text-slate-500 uppercase tracking-[0.3em]">Workspace Sync</h4></div><div className="grid gap-4 text-left text-white"><div className="flex justify-between items-center p-6 bg-white/[0.02] rounded-[2rem] border border-white/5 hover:bg-white/[0.04] text-left text-white"><div className="flex items-center gap-4 text-left text-white"><div className="w-10 h-10 rounded-xl bg-black border border-white/10 flex items-center justify-center font-black text-sm text-white">N</div><div className="text-left text-white"><p className="text-sm font-bold text-white text-left text-white">Notion Sync</p><p className="text-[10px] text-slate-500 uppercase text-left text-white">Ready for blocks</p></div></div><CopyBtn field="notion" text={formatForNotion()} label="Sync" icon={Share2} /></div><Button variant="ghost" onClick={downloadMarkdown} className="w-full justify-between p-6 h-auto bg-white/[0.02] rounded-[2rem] border border-white/5 hover:bg-white/[0.04] text-white text-left text-white"><div className="flex items-center gap-4 text-left text-white text-white"><Download className="w-5 h-5 text-slate-500" /><div className="text-left text-white"><p className="text-sm font-bold text-white text-left">Markdown Export</p><p className="text-[10px] text-slate-500 uppercase text-left text-white">Standard format</p></div></div><ChevronRight className="w-5 h-5 text-slate-700" /></Button></div></div></div>
+    <div className="fixed inset-0 z-[10000] bg-[#050505] flex flex-col animate-in fade-in duration-300 overflow-hidden text-left font-sans text-white">
+      {/* Background Orbs */}
+      <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-blue-600/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-purple-600/5 rounded-full blur-[120px] pointer-events-none" />
+
+      {/* Header - PRIMARY ACTIONS HUB */}
+      <header className="h-14 border-b border-white/5 bg-black/40 backdrop-blur-2xl px-4 md:px-6 flex items-center justify-between shrink-0 relative z-[10010]">
+        <div className="flex items-center gap-4 text-left">
+          <Button 
+            variant="ghost" 
+            onClick={() => setIsExpanded(false)} 
+            className="h-8 w-8 rounded-full bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-all p-0"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+          </Button>
+          <div className="flex flex-col text-left">
+            <h2 className="text-[11px] font-bold text-white truncate max-w-[150px] md:max-w-xs text-left">{currentIdea.title}</h2>
           </div>
         </div>
-      </div>
-      <div className="p-8 pb-12 bg-black border-t border-white/5 flex flex-col sm:flex-row justify-between items-center gap-8 relative z-[10020] shadow-2xl text-left text-white">
-        <div className="hidden sm:block text-left max-w-md text-white">
-          <p className="text-sm font-medium text-slate-400 text-left text-white">
-            Finalized strategy for <span className="text-white font-bold">{currentIdea.title}</span>. Ready to deploy?
-          </p>
+        
+        <div className="flex items-center gap-2 text-left">
+          {/* HEADER PRIMARY BUTTONS */}
+          <div className="flex items-center gap-2 mr-2 border-r border-white/10 pr-4 text-left">
+            {!isPro ? (
+              <Button 
+                onClick={() => toast.info("Teleprompter is PRO", { icon: <Crown className="w-3 h-3 text-yellow-500" /> })}
+                className="bg-white/5 border border-white/10 text-slate-400 rounded-full px-4 h-8 text-[9px] font-bold hover:bg-white/10 transition-all gap-2"
+              >
+                <Crown className="w-3 h-3 text-yellow-500" /> Unlock Prompter
+              </Button>
+            ) : (
+              <Button 
+                onClick={handleOpenTeleprompter} 
+                className="bg-blue-600 hover:bg-blue-500 text-white rounded-full px-5 h-8 text-[9px] font-black transition-all hover:scale-105 active:scale-95 gap-2"
+              >
+                <Smartphone className="w-3.5 h-3.5" /> Record Now
+              </Button>
+            )}
+            {!hideSaveButton && (
+              <SaveIdeaButton 
+                title={currentIdea.title} 
+                ideaData={currentIdea} 
+                initialSaved={isSaved} 
+                variant="prominent" 
+                className="h-8 px-5 text-[9px] shadow-none bg-white text-black font-black uppercase tracking-tight" 
+              />
+            )}
+          </div>
+          
+          <button 
+            onClick={() => setIsExpanded(false)} 
+            className="flex items-center justify-center w-8 h-8 rounded-full bg-white/5 border border-white/10 text-slate-400 hover:bg-rose-500 hover:text-white transition-all"
+          >
+            <X className="w-4 h-4" />
+          </button>
         </div>
-        <div className="flex items-center gap-4 w-full sm:w-auto text-left text-white">
-          {!isPro ? (
-            <Button 
-              onClick={() => toast.info("Teleprompter is a PRO feature", { icon: <Crown className="w-4 h-4 text-yellow-500" /> })}
-              className="flex-1 sm:flex-none bg-white/5 border border-white/10 text-slate-500 rounded-full px-10 h-14 font-black uppercase tracking-widest transition-all group/lock overflow-hidden relative"
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:animate-[shimmer_2s_infinite]" />
-              <Crown className="w-5 h-5 mr-3 text-yellow-500/50 group-hover:text-yellow-500 transition-colors" /> 
-              Unlock Prompter
-            </Button>
-          ) : (
-            <Button 
-              onClick={handleOpenTeleprompter} 
-              className="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-500 text-white rounded-full px-12 h-14 font-black shadow-2xl text-left group/rec transition-all hover:scale-105 active:scale-95"
-            >
-              <Smartphone className="w-6 h-6 mr-3 group-hover/rec:rotate-12 transition-all" /> 
-              Record Now
-            </Button>
+      </header>
+
+      {/* Main Container */}
+      <div className="flex-1 flex overflow-hidden relative z-10">
+        
+        {/* Left Scrollable Content - CANVAS */}
+        <main className={cn(
+          "flex-1 overflow-y-auto custom-scrollbar px-4 md:px-12 py-8 space-y-12 transition-all duration-300 text-left",
+          activeTab === 'tools' ? 'hidden md:block' : 'block'
+        )}>
+          <div className="max-w-4xl mx-auto space-y-12 pb-32 text-left">
+            
+            {/* 1. THE HERO HOOK */}
+            <section className="space-y-4 text-left">
+              <div className="flex items-center gap-3 px-1 text-left">
+                <Zap className="w-4 h-4 text-blue-400" />
+                <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest text-left">The Hook</h4>
+              </div>
+              
+              <div className="p-8 md:p-14 rounded-[2rem] bg-gradient-to-br from-white/[0.03] to-transparent border border-white/5 relative overflow-hidden text-left shadow-2xl">
+                <div className="absolute top-0 left-0 w-1 h-20 bg-blue-500 rounded-full" />
+                
+                <div className="relative z-10 text-left">
+                  <p className={cn(
+                    "text-3xl md:text-5xl font-serif italic text-white leading-[1.2] transition-all duration-700 text-left",
+                    isRemixing && "blur-lg opacity-20"
+                  )}>
+                    &ldquo;{currentIdea.hook}&rdquo;
+                  </p>
+                  {isRemixing && <Loader2 className="absolute inset-0 m-auto animate-spin text-blue-500 w-12 h-12" />}
+                </div>
+
+                <div className="flex justify-end gap-2 mt-8 text-left">
+                  <CopyBtn field="hook" text={currentIdea.hook} label="Copy Hook" />
+                </div>
+              </div>
+            </section>
+
+            {/* 2. PRODUCTION SCRIPT */}
+            <section className="space-y-4 text-left">
+              <div className="flex items-center gap-3 px-1 text-left">
+                <FileText className="w-4 h-4 text-purple-400" />
+                <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest text-left">Production Script</h4>
+              </div>
+
+              <div className="rounded-[2.5rem] bg-white/[0.01] border border-white/5 overflow-hidden text-left shadow-inner">
+                <div className={cn("p-8 md:p-12 space-y-10 text-left", isRemixing && "blur-lg opacity-20")}>
+                  
+                  <div className="space-y-4 text-left">
+                    <span className="text-[9px] font-black text-slate-600 uppercase tracking-[0.2em] block text-left">Concept Strategy</span>
+                    <p className="text-slate-200 text-xl leading-relaxed text-left font-light">{currentIdea.description}</p>
+                  </div>
+
+                  <div className="h-px bg-gradient-to-r from-white/10 to-transparent" />
+
+                  <div className="space-y-6 text-left">
+                    <div className="flex items-center justify-between text-left">
+                      <span className="text-[9px] font-black text-slate-600 uppercase tracking-[0.2em] text-left">Full Script Draft</span>
+                      <CopyBtn field="script" text={currentIdea.scriptDraft || ""} label="Copy Script" />
+                    </div>
+                    <div className="bg-black/40 p-10 rounded-[2rem] border border-white/5 font-mono text-sm md:text-base text-slate-400 leading-relaxed whitespace-pre-wrap min-h-[350px] relative text-left shadow-2xl">
+                      {currentIdea.scriptDraft || "Finalizing the script details..."}
+                      {isRemixing && <Loader2 className="absolute inset-0 m-auto animate-spin text-purple-500 w-10 h-10" />}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+        </main>
+
+        {/* Right Fixed Sidebar (Desktop) / Tab Content (Mobile) */}
+        <aside className={cn(
+          "w-full md:w-[360px] lg:w-[400px] bg-black/20 backdrop-blur-md border-l border-white/5 transition-all duration-300 relative flex flex-col text-left",
+          activeTab === 'content' ? 'hidden md:flex' : 'flex'
+        )}>
+          <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6 text-left">
+            
+            {/* 1. AI REMIX PANEL */}
+            <section className="bg-white/[0.03] border border-white/10 rounded-[1.5rem] overflow-hidden shadow-2xl relative text-left">
+              {!isPro && (
+                <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-[#050505]/95 backdrop-blur-[6px] p-6 text-center">
+                  <Crown className="w-5 h-5 text-yellow-500 mb-3" />
+                  <p className="text-[10px] font-black text-white uppercase tracking-[0.2em] mb-3 text-center">PRO AI Remix</p>
+                  <Button size="sm" className="bg-white text-black hover:bg-slate-200 rounded-full font-black text-[9px] h-7 px-5">Upgrade</Button>
+                </div>
+              )}
+              
+              <div className="p-5 space-y-5 text-left">
+                <div className="flex items-center justify-between text-left">
+                  <div className="flex items-center gap-2 text-left">
+                    <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+                    <span className="text-[9px] font-black text-white uppercase tracking-widest text-left">AI Customization</span>
+                  </div>
+                  {remixHistory.length > 1 && (
+                    <button onClick={undoRemix} className="text-[8px] font-black text-slate-500 hover:text-white flex items-center gap-1.5 transition-colors uppercase text-left">
+                      <RotateCcw className="w-2.5 h-2.5" /> Undo
+                    </button>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-1 gap-1.5 text-left">
+                  {REMIX_OPTIONS.map(o => (
+                    <button 
+                      key={o.label} 
+                      onClick={() => handleRemix(o.label)} 
+                      disabled={isRemixing || !isPro}
+                      className="group flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-purple-500/10 hover:border-purple-500/30 transition-all text-left disabled:opacity-50"
+                    >
+                      <div className="flex items-center gap-3 text-left">
+                        <span className="text-sm">{o.icon}</span>
+                        <span className="text-[9px] font-bold text-slate-400 group-hover:text-white uppercase tracking-tight text-left">{o.label}</span>
+                      </div>
+                      <ChevronRight className="w-3 h-3 text-slate-700 group-hover:text-purple-400" />
+                    </button>
+                  ))}
+                </div>
+
+                <div className="relative pt-1 text-left">
+                  <input 
+                    type="text" 
+                    placeholder="Custom brief..." 
+                    disabled={!isPro} 
+                    value={customInstruction} 
+                    onChange={e => setCustomInstruction(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && handleRemix(customInstruction)}
+                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-[10px] text-white placeholder:text-slate-600 focus:outline-none focus:border-purple-500/50 transition-all text-left" 
+                  />
+                  <button 
+                    onClick={() => handleRemix(customInstruction)} 
+                    disabled={!isPro || !customInstruction} 
+                    className="absolute right-2 top-[calc(50%+2px)] -translate-y-1/2 w-7 h-7 rounded-lg bg-purple-600/20 text-purple-400 flex items-center justify-center hover:bg-purple-600 hover:text-white transition-all disabled:opacity-0"
+                  >
+                    <ArrowRight className="w-3 h-3" />
+                  </button>
+                </div>
+              </div>
+            </section>
+
+            {/* 2. THE STRATEGY - Why It Works */}
+            <section className="p-6 rounded-[1.5rem] bg-emerald-500/[0.03] border border-emerald-500/10 space-y-3 text-left">
+              <div className="flex items-center gap-2 text-left">
+                <TrendingUp className="w-3.5 h-3.5 text-emerald-400" />
+                <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest text-left">Strategy Analysis</span>
+              </div>
+              <p className="text-[11px] text-emerald-100/60 leading-relaxed italic font-light text-left">
+                &ldquo;{currentIdea.whyItWorks}&rdquo;
+              </p>
+            </section>
+
+          </div>
+        </aside>
+      </div>
+
+      {/* Mobile Tab Switcher */}
+      <div className="md:hidden fixed bottom-16 left-1/2 -translate-x-1/2 flex bg-black/80 backdrop-blur-3xl border border-white/10 rounded-full p-1 z-[10030] shadow-2xl text-left">
+        <button 
+          onClick={() => setActiveTab('content')}
+          className={cn(
+            "flex items-center gap-2 px-5 py-2 rounded-full text-[9px] font-black uppercase tracking-widest transition-all",
+            activeTab === 'content' ? "bg-white text-black" : "text-slate-500"
           )}
-          {!hideSaveButton && <SaveIdeaButton title={currentIdea.title} ideaData={currentIdea} initialSaved={isSaved} variant="prominent" />}
-        </div>
+        >
+          <LayoutGrid className="w-3 h-3" /> Brief
+        </button>
+        <button 
+          onClick={() => setActiveTab('tools')}
+          className={cn(
+            "flex items-center gap-2 px-5 py-2 rounded-full text-[9px] font-black uppercase tracking-widest transition-all",
+            activeTab === 'tools' ? "bg-purple-600 text-white" : "text-slate-500"
+          )}
+        >
+          <Settings2 className="w-3 h-3" /> Remix
+        </button>
       </div>
+
+      {/* Footer - TECHNICAL DISTRIBUTION BAR - CENTERED */}
+      <footer className="h-10 bg-black border-t border-white/5 flex items-center justify-center px-4 md:px-6 relative z-[10020] shrink-0 text-left">
+        <div className="absolute left-4 md:left-6 hidden sm:flex items-center gap-1.5">
+          <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Live Brief</span>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <span className="text-[8px] font-black text-slate-600 uppercase tracking-widest hidden xs:inline">Distribution:</span>
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 px-2 py-0.5 rounded bg-white/[0.03] border border-white/5 text-left h-[26px]">
+              <span className="text-[8px] font-bold text-white uppercase text-left">Notion</span>
+              <CopyBtn field="notion" text={formatForNotion()} label="Sync" icon={Share2} className="h-5 px-1.5 text-[8px]" />
+            </div>
+            <button 
+              onClick={downloadMarkdown}
+              className="flex items-center gap-2 px-2 py-0.5 rounded bg-blue-500/10 border border-blue-500/20 text-blue-400 hover:bg-blue-600 hover:text-white transition-all text-left h-[26px]"
+            >
+              <Download className="w-2.5 h-2.5" />
+              <span className="text-[8px] font-bold uppercase text-left">Brief.md</span>
+            </button>
+          </div>
+        </div>
+
+        <div className="absolute right-4 md:right-6 hidden lg:flex items-center gap-1.5">
+          <span className="text-[8px] font-black text-slate-700 uppercase tracking-[0.3em]">RepBrief Studio v1.0</span>
+        </div>
+      </footer>
     </div>,
     document.body
   ) : null;
@@ -218,12 +408,12 @@ export function BriefCard({
         <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500/0 via-blue-500/0 to-blue-500/0 group-hover:from-blue-500/10 group-hover:to-emerald-500/10 rounded-[22px] blur opacity-0 group-hover:opacity-100 transition duration-500" />
         {variant === 'compact' ? (
           <Card className="relative bg-white/[0.03] border-white/10 rounded-2xl cursor-pointer p-4 h-full flex flex-col hover:bg-white/[0.05] transition-all text-left" onClick={() => setIsExpanded(true)}>
-            <div className="flex gap-4 h-full"><div className="p-2 rounded-xl bg-white/5 shrink-0 text-white">{getIcon(currentIdea.format)}</div><div className="flex-1 flex flex-col h-full text-left text-white"><div className="flex justify-between text-left text-white"><Badge variant="outline" className="text-blue-400 text-[9px] border-blue-500/30 font-bold uppercase">{currentIdea.format}</Badge>{isSaved && <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />}</div><h3 className="text-sm font-bold text-white mt-1 flex-1 leading-snug text-left text-white">{currentIdea.title}</h3></div></div>
+            <div className="flex gap-4 h-full"><div className="p-2 rounded-xl bg-white/5 shrink-0 text-white">{getIcon(currentIdea.format)}</div><div className="flex-1 flex flex-col h-full text-left text-white"><div className="flex justify-between text-left text-white"><Badge variant="outline" className="text-blue-400 text-[9px] border-blue-500/30 font-bold uppercase">{currentIdea.format}</Badge>{isSaved && <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />}</div><h3 className="text-sm font-bold text-white mt-1 flex-1 leading-snug text-left text-white text-left">{currentIdea.title}</h3></div></div>
           </Card>
         ) : (
           <Card className="relative bg-white/[0.03] border-white/10 rounded-2xl shadow-2xl flex flex-col h-full cursor-pointer hover:bg-white/[0.05] transition-all text-left" onClick={() => setIsExpanded(true)}>
-            <CardHeader className="pb-4 pt-6 px-6 flex flex-row items-center justify-between shrink-0 text-left"><div className="flex items-center gap-3 text-white text-white">{getIcon(currentIdea.format)}<Badge variant="outline" className="text-blue-400 text-[10px] border-blue-500/30 font-bold uppercase">{currentIdea.format}</Badge></div><div onClick={e => e.stopPropagation()}>{!hideSaveButton ? <SaveIdeaButton title={currentIdea.title} ideaData={currentIdea} initialSaved={isSaved} /> : dbId ? <DeleteIdeaButton id={dbId} /> : null}</div></CardHeader>
-            <CardContent className="px-6 pb-6 flex-1 flex flex-col overflow-hidden text-left text-white"><h3 className="text-lg font-bold text-white mb-4 leading-tight text-left text-white">{currentIdea.title}</h3><div className="space-y-4 flex-1 overflow-hidden text-left text-white text-white"><div className="pl-4 border-l-2 border-blue-500/30 text-xs italic text-slate-200 line-clamp-3 leading-relaxed text-left text-white">&ldquo;{currentIdea.hook}&rdquo;</div><p className="text-xs text-slate-400 line-clamp-4 leading-relaxed font-light text-left text-white">{currentIdea.description}</p></div><div className="mt-auto pt-5 border-t border-white/5 flex flex-col gap-2 shrink-0 text-left text-white text-white"><div className="text-[10px] font-bold text-emerald-400 uppercase tracking-[0.2em] flex items-center gap-2"><Star className="w-3 h-3 fill-emerald-400/20" /> Why it works</div><p className="text-[11px] text-slate-500 italic line-clamp-2 leading-snug text-left text-white">{currentIdea.whyItWorks}</p></div></CardContent>
+            <CardHeader className="pb-4 pt-6 px-6 flex flex-row items-center justify-between shrink-0 text-left"><div className="flex items-center gap-3 text-white text-white">{getIcon(currentIdea.format)}<Badge variant="outline" className="text-blue-400 text-[10px] border-blue-500/30 font-bold uppercase">{currentIdea.format}</Badge></div><div onClick={e => e.stopPropagation()} className="text-left text-left">{!hideSaveButton ? <SaveIdeaButton title={currentIdea.title} ideaData={currentIdea} initialSaved={isSaved} /> : dbId ? <DeleteIdeaButton id={dbId} /> : null}</div></CardHeader>
+            <CardContent className="px-6 pb-6 flex-1 flex flex-col overflow-hidden text-left text-white"><h3 className="text-lg font-bold text-white mb-4 leading-tight text-left text-white text-left">{currentIdea.title}</h3><div className="space-y-4 flex-1 overflow-hidden text-left text-white text-white text-left text-left"><div className="pl-4 border-l-2 border-blue-500/30 text-xs italic text-slate-200 line-clamp-3 leading-relaxed text-left text-white text-left">&ldquo;{currentIdea.hook}&rdquo;</div><p className="text-xs text-slate-400 line-clamp-4 leading-relaxed font-light text-left text-white text-left">{currentIdea.description}</p></div><div className="mt-auto pt-5 border-t border-white/5 flex flex-col gap-2 shrink-0 text-left text-white text-white text-left text-left"><div className="text-[10px] font-bold text-emerald-400 uppercase tracking-[0.2em] flex items-center gap-2 text-left"><Star className="w-3 h-3 fill-emerald-400/20" /> Why it works</div><p className="text-[11px] text-slate-500 italic line-clamp-2 leading-snug text-left text-white text-left">{currentIdea.whyItWorks}</p></div></CardContent>
           </Card>
         )}
       </div>

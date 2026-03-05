@@ -31,7 +31,7 @@ export default async function AnalyticsPage() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('plan')
+    .select('plan, current_team_id')
     .eq('id', user.id)
     .single()
 
@@ -40,7 +40,7 @@ export default async function AnalyticsPage() {
   const { data: publishedIdeas } = await supabase
     .from('idea_history')
     .select('*')
-    .eq('user_id', user.id)
+    .eq('team_id', profile?.current_team_id)
     .eq('status', 'published')
     .order('published_at', { ascending: false })
 

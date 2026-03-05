@@ -52,23 +52,24 @@ export default async function HistoryPage() {
     redirect('/login')
   }
 
-  const [{ data: briefs }, { data: savedData }, { data: profile }] = await Promise.all([
+  const [{ data: briefs }, { data: profile }] = await Promise.all([
     supabase
       .from('briefs')
       .select('*')
       .eq('user_id', user.id)
       .order('week_date', { ascending: false }),
     supabase
-      .from('idea_history')
-      .select('idea_hash')
-      .eq('user_id', user.id)
-      .eq('saved', true),
-    supabase
       .from('profiles')
-      .select('plan')
+      .select('plan, current_team_id')
       .eq('id', user.id)
       .single()
   ])
+
+  const { data: savedData } = await supabase
+    .from('idea_history')
+    .select('idea_hash')
+    .eq('team_id', profile?.current_team_id)
+    .eq('saved', true)
 
   const savedHashes = new Set(savedData?.map(row => row.idea_hash) || [])
   const hasHistory = briefs && briefs.length > 0

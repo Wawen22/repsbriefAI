@@ -4,8 +4,9 @@ import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { NicheSwitcher } from "@/components/settings/NicheSwitcher"
 import { BrandVoiceSettings } from "@/components/settings/BrandVoiceSettings"
+import { TeamWorkspaceSettings } from "@/components/settings/TeamWorkspaceSettings"
 import { Badge } from "@/components/ui/badge"
-import { Settings, User, Zap, ShieldCheck, Sparkles, Fingerprint } from "lucide-react"
+import { Settings, User, Zap, ShieldCheck, Sparkles, Fingerprint, Users } from "lucide-react"
 import { LogoutButton } from "@/components/ui/LogoutButton"
 
 export const dynamic = 'force-dynamic'
@@ -49,6 +50,18 @@ export default async function SettingsPage() {
         {/* Left Column: Account & Niche */}
         <div className="lg:col-span-5 space-y-8">
           
+          {/* Team Workspace Settings */}
+          <section className="p-8 rounded-[2.5rem] bg-white/[0.02] border border-white/10 space-y-6">
+             <div className="flex items-center gap-3 px-2">
+              <Users className="w-5 h-5 text-blue-400" />
+              <div className="space-y-1">
+                <h3 className="text-xs font-black text-white uppercase tracking-[0.2em]">Workspaces</h3>
+                <p className="text-[10px] text-slate-500 font-medium">Switch or manage your teams</p>
+              </div>
+            </div>
+            <TeamWorkspaceSettings />
+          </section>
+
           {/* Profile Quick Look */}
           <section className="p-8 rounded-[2.5rem] bg-white/[0.02] border border-white/10 space-y-6">
             <div className="flex items-center gap-4">

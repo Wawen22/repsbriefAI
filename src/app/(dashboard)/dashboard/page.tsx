@@ -87,7 +87,7 @@ export default async function DashboardPage({
   const todayStart = new Date()
   todayStart.setHours(0, 0, 0, 0)
 
-  const [{ data: brief }, { data: savedHistory }, { data: generatedToday }, { data: profile }] = await Promise.all([
+  const [{ data: brief }, { data: generatedToday }, { data: profile }] = await Promise.all([
     supabase
       .from('briefs')
       .select('*')
@@ -95,10 +95,6 @@ export default async function DashboardPage({
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle(),
-    supabase
-      .from('idea_history')
-      .select('id, idea_hash, idea_data, saved')
-      .eq('user_id', user.id),
     supabase
       .from('briefs')
       .select('id')
@@ -108,10 +104,15 @@ export default async function DashboardPage({
       .maybeSingle(),
     supabase
       .from('profiles')
-      .select('active_niche, plan')
+      .select('active_niche, plan, current_team_id')
       .eq('id', user.id)
       .single()
   ])
+
+  const { data: savedHistory } = await supabase
+    .from('idea_history')
+    .select('id, idea_hash, idea_data, saved')
+    .eq('team_id', profile?.current_team_id)
 
   // Create a map of remixed/saved data by hash for merging
   const historyMap = new Map(

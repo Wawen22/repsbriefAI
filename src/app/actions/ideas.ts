@@ -4,6 +4,11 @@ import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { IdeaObject } from '@/types/niche'
 
+async function getCurrentTeamId(supabase: any, userId: string) {
+  const { data } = await supabase.from('profiles').select('current_team_id').eq('id', userId).single()
+  return data?.current_team_id
+}
+
 export async function saveIdeaAction(
   title: string, 
   niche: string = 'fitness', 
@@ -16,12 +21,15 @@ export async function saveIdeaAction(
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Unauthorized' }
 
+  const teamId = await getCurrentTeamId(supabase, user.id)
+  if (!teamId) return { error: 'No active workspace found' }
+
   const hash = Buffer.from(title.trim()).toString('base64').substring(0, 64)
 
   const { data: existing } = await supabase
     .from('idea_history')
     .select('id, status')
-    .eq('user_id', user.id)
+    .eq('team_id', teamId)
     .eq('idea_hash', hash)
     .maybeSingle()
 
@@ -39,7 +47,7 @@ export async function saveIdeaAction(
         status: existing.status || status 
       })
       .eq('id', existing.id)
-      .eq('user_id', user.id)
+      .eq('team_id', teamId)
       .select('id')
       .single()
     
@@ -49,7 +57,8 @@ export async function saveIdeaAction(
     const result = await supabase
       .from('idea_history')
       .insert({
-        user_id: user.id,
+        user_id: user.id, // Original creator
+        team_id: teamId,  // Owned by workspace
         niche: niche,
         idea_title: title.trim(),
         idea_hash: hash,
@@ -108,8 +117,9 @@ export async function updateIdeaStatusAction(ideaId: string, status: string) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Unauthorized' }
 
+  const teamId = await getCurrentTeamId(supabase, user.id)
+
   const updateData: any = { status }
-  
   if (status === 'published') {
     updateData.published_at = new Date().toISOString()
   }
@@ -117,7 +127,7 @@ export async function updateIdeaStatusAction(ideaId: string, status: string) {
   const { error } = await supabase
     .from('idea_history')
     .update(updateData)
-    .match({ id: ideaId, user_id: user.id })
+    .match({ id: ideaId, team_id: teamId })
 
   if (error) {
     console.error('Failed to update status:', error)
@@ -142,10 +152,12 @@ export async function updatePerformanceAction(
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Unauthorized' }
 
+  const teamId = await getCurrentTeamId(supabase, user.id)
+
   const { error } = await supabase
     .from('idea_history')
     .update(data)
-    .match({ id: ideaId, user_id: user.id })
+    .match({ id: ideaId, team_id: teamId })
 
   if (error) {
     console.error('Failed to update performance:', error)
@@ -163,10 +175,12 @@ export async function deleteIdeaAction(ideaId: string) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Unauthorized' }
 
+  const teamId = await getCurrentTeamId(supabase, user.id)
+
   const { error } = await supabase
     .from('idea_history')
     .delete()
-    .match({ id: ideaId, user_id: user.id })
+    .match({ id: ideaId, team_id: teamId })
 
   if (error) {
     console.error('Failed to delete idea:', error)

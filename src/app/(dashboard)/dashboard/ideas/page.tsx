@@ -15,19 +15,18 @@ export default async function MyIdeasPage() {
     redirect('/login')
   }
 
-  const [{ data: allIdeas }, { data: profile }] = await Promise.all([
-    supabase
-      .from('idea_history')
-      .select('*')
-      .eq('user_id', user.id)
-      .eq('saved', true)
-      .order('used_at', { ascending: false }),
-    supabase
-      .from('profiles')
-      .select('plan')
-      .eq('id', user.id)
-      .single()
-  ])
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('plan, current_team_id')
+    .eq('id', user.id)
+    .single()
+
+  const { data: allIdeas } = await supabase
+    .from('idea_history')
+    .select('*')
+    .eq('team_id', profile?.current_team_id)
+    .eq('saved', true)
+    .order('used_at', { ascending: false })
 
   const totalCount = allIdeas?.length || 0
   const hasIdeas = totalCount > 0

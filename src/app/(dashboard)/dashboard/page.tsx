@@ -46,7 +46,7 @@ export default async function DashboardPage() {
       .maybeSingle(),
     supabase
       .from('profiles')
-      .select('active_niche')
+      .select('active_niche, plan')
       .eq('id', user.id)
       .single()
   ])
@@ -76,6 +76,7 @@ export default async function DashboardPage() {
       .map(row => row.idea_hash)
   )
   const activeNiche = profile?.active_niche || 'fitness'
+  const userPlan = profile?.plan || 'starter'
 
   const briefDate = brief?.week_date
     ? new Date(brief.week_date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
@@ -174,19 +175,19 @@ export default async function DashboardPage() {
 
             <div className="min-h-[400px]">
               <TabsContent value="all" className="mt-0 focus-visible:outline-none animate-in fade-in slide-in-from-bottom-2 duration-500">
-                <BriefList ideas={ideas} savedHashes={savedHashes} />
+                <BriefList ideas={ideas} savedHashes={savedHashes} plan={userPlan} />
               </TabsContent>
               <TabsContent value="reel" className="mt-0 focus-visible:outline-none animate-in fade-in slide-in-from-bottom-2 duration-500">
-                <BriefList ideas={ideas.filter(i => i.format === 'Reel')} savedHashes={savedHashes} />
+                <BriefList ideas={ideas.filter(i => i.format === 'Reel')} savedHashes={savedHashes} plan={userPlan} />
               </TabsContent>
               <TabsContent value="carousel" className="mt-0 focus-visible:outline-none animate-in fade-in slide-in-from-bottom-2 duration-500">
-                <BriefList ideas={ideas.filter(i => i.format === 'Carousel')} savedHashes={savedHashes} />
+                <BriefList ideas={ideas.filter(i => i.format === 'Carousel')} savedHashes={savedHashes} plan={userPlan} />
               </TabsContent>
               <TabsContent value="thread" className="mt-0 focus-visible:outline-none animate-in fade-in slide-in-from-bottom-2 duration-500">
-                <BriefList ideas={ideas.filter(i => i.format === 'Thread')} savedHashes={savedHashes} />
+                <BriefList ideas={ideas.filter(i => i.format === 'Thread')} savedHashes={savedHashes} plan={userPlan} />
               </TabsContent>
               <TabsContent value="newsletter" className="mt-0 focus-visible:outline-none animate-in fade-in slide-in-from-bottom-2 duration-500">
-                <BriefList ideas={ideas.filter(i => i.format === 'Newsletter')} savedHashes={savedHashes} />
+                <BriefList ideas={ideas.filter(i => i.format === 'Newsletter')} savedHashes={savedHashes} plan={userPlan} />
               </TabsContent>
             </div>
           </Tabs>

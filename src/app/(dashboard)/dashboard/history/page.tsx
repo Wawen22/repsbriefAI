@@ -52,7 +52,7 @@ export default async function HistoryPage() {
     redirect('/login')
   }
 
-  const [{ data: briefs }, { data: savedData }] = await Promise.all([
+  const [{ data: briefs }, { data: savedData }, { data: profile }] = await Promise.all([
     supabase
       .from('briefs')
       .select('*')
@@ -63,11 +63,17 @@ export default async function HistoryPage() {
       .select('idea_hash')
       .eq('user_id', user.id)
       .eq('saved', true),
+    supabase
+      .from('profiles')
+      .select('plan')
+      .eq('id', user.id)
+      .single()
   ])
 
   const savedHashes = new Set(savedData?.map(row => row.idea_hash) || [])
   const hasHistory = briefs && briefs.length > 0
   const totalIdeas = briefs?.reduce((acc, b) => acc + (b.ideas?.length || 0), 0) || 0
+  const userPlan = profile?.plan || 'starter'
 
   return (
     <div className="space-y-12 pb-20">
@@ -148,7 +154,7 @@ export default async function HistoryPage() {
                   value={brief.id}
                   className="bg-white/[0.02] border border-white/10 rounded-[2.5rem] overflow-hidden transition-all hover:bg-white/[0.04] hover:border-white/20 px-2"
                 >
-                  <AccordionTrigger className="hover:no-underline p-8 lg:p-10 group outline-none">
+                  <AccordionTrigger className="hover:no-underline p-8 lg:p-10 group outline-none text-left">
                     <div className="flex flex-col lg:flex-row lg:items-center justify-between w-full gap-8 text-left">
                       {/* Left: Date & Niche */}
                       <div className="flex items-center gap-6">
@@ -164,7 +170,7 @@ export default async function HistoryPage() {
                                 <ChevronRight className="w-4 h-4 text-slate-400" />
                               </div>
                            </div>
-                           <div className="flex items-center gap-3">
+                           <div className="flex items-center gap-3 text-left">
                               <Badge variant="outline" className="bg-white/5 text-slate-400 border-none text-[10px] px-2 py-0.5 font-bold uppercase tracking-wider">
                                 {nicheIcon} {brief.niche.replace('_', ' ')}
                               </Badge>
@@ -193,7 +199,7 @@ export default async function HistoryPage() {
                   </AccordionTrigger>
                   
                   <AccordionContent className="p-8 lg:p-12 bg-black/40 border-t border-white/5 pt-12 animate-in fade-in slide-in-from-top-4 duration-500">
-                    <div className="space-y-10">
+                    <div className="space-y-10 text-left">
                        <div className="flex items-center gap-4 mb-8">
                           <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
                           <div className="flex items-center gap-2 text-slate-500">
@@ -202,7 +208,7 @@ export default async function HistoryPage() {
                           </div>
                           <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
                        </div>
-                       <BriefList ideas={brief.ideas || []} savedHashes={savedHashes} />
+                       <BriefList ideas={brief.ideas || []} savedHashes={savedHashes} plan={userPlan} />
                     </div>
                   </AccordionContent>
                 </AccordionItem>

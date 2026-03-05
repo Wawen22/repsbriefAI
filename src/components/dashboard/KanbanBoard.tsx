@@ -32,7 +32,7 @@ const COLUMNS = [
   { id: 'published', label: 'Published', icon: CheckCircle2, color: 'text-emerald-400', bg: 'bg-emerald-500/5' },
 ]
 
-export function KanbanBoard({ initialIdeas }: { initialIdeas: KanbanIdea[] }) {
+export function KanbanBoard({ initialIdeas, plan }: { initialIdeas: KanbanIdea[], plan?: string }) {
   const [ideas, setIdeas] = useState(initialIdeas)
   const [isMounted, setIsMounted] = useState(false)
   const [performanceIdea, setPerformanceIdea] = useState<{ id: string, title: string } | null>(null)
@@ -76,21 +76,25 @@ export function KanbanBoard({ initialIdeas }: { initialIdeas: KanbanIdea[] }) {
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <div className="flex flex-col lg:flex-row gap-6 h-full min-h-[70vh] overflow-x-auto pb-10 custom-scrollbar">
+      <div className="flex flex-col lg:flex-row gap-6 h-full min-h-[70vh] overflow-x-auto pb-10 custom-scrollbar text-left">
         {COLUMNS.map((col) => {
           const Icon = col.icon
           const colIdeas = ideas.filter(i => i.status === col.id)
 
           return (
-            <div key={col.id} className="flex-1 min-w-[320px] flex flex-col gap-4">
+            <div key={col.id} className="flex-1 min-w-[320px] flex flex-col gap-4 text-left">
               {/* Column Header */}
-              <div className="flex items-center justify-between px-4 py-2 bg-white/[0.03] border border-white/5 rounded-2xl">
-                <div className="flex items-center gap-3">
+              <div className="flex items-center justify-between px-4 py-2 bg-white/[0.03] border border-white/5 rounded-2xl text-left">
+                <div className="flex items-center gap-3 text-left">
                   <div className={cn("p-1.5 rounded-lg border border-white/5", col.bg)}>
                     <Icon className={cn("w-4 h-4", col.color)} />
                   </div>
-                  <span className="text-sm font-bold text-white tracking-tight uppercase tracking-widest">{col.label}</span>
-                  <span className="text-[10px] font-black text-slate-600 bg-white/5 px-2 py-0.5 rounded-full">{colIdeas.length}</span>
+                  <span className="text-sm font-bold text-white tracking-tight uppercase tracking-widest text-left">
+                    {col.label}
+                  </span>
+                  <span className="text-[10px] font-black text-slate-600 bg-white/5 px-2 py-0.5 rounded-full text-left">
+                    {colIdeas.length}
+                  </span>
                 </div>
                 <button className="text-slate-600 hover:text-white transition-colors">
                   <MoreHorizontal className="w-4 h-4" />
@@ -104,7 +108,7 @@ export function KanbanBoard({ initialIdeas }: { initialIdeas: KanbanIdea[] }) {
                     {...provided.droppableProps}
                     ref={provided.innerRef}
                     className={cn(
-                      "flex-1 rounded-3xl border border-dashed p-3 space-y-4 transition-all duration-300 min-h-[150px]",
+                      "flex-1 rounded-3xl border border-dashed p-3 space-y-4 transition-all duration-300 min-h-[150px] text-left",
                       snapshot.isDraggingOver ? "bg-white/[0.05] border-blue-500/30 border-solid" : "bg-transparent border-white/5",
                       colIdeas.length > 0 && !snapshot.isDraggingOver && "bg-white/[0.01]"
                     )}
@@ -117,7 +121,7 @@ export function KanbanBoard({ initialIdeas }: { initialIdeas: KanbanIdea[] }) {
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
                             className={cn(
-                              "relative group transition-transform duration-200",
+                              "relative group transition-transform duration-200 text-left",
                               snapshot.isDragging && "z-50 scale-105 rotate-2"
                             )}
                           >
@@ -126,10 +130,11 @@ export function KanbanBoard({ initialIdeas }: { initialIdeas: KanbanIdea[] }) {
                               hideSaveButton 
                               dbId={idea.id} 
                               variant="compact"
+                              plan={plan}
                             />
                             
                             {/* Drag Indicator */}
-                            <div className="absolute top-1/2 -left-1 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity p-1">
+                            <div className="absolute top-1/2 -left-1 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity p-1 text-left">
                                <GripVertical className="w-3 h-3 text-slate-600" />
                             </div>
                           </div>
@@ -139,8 +144,8 @@ export function KanbanBoard({ initialIdeas }: { initialIdeas: KanbanIdea[] }) {
                     {provided.placeholder}
 
                     {colIdeas.length === 0 && !snapshot.isDraggingOver && (
-                      <div className="h-32 flex flex-col items-center justify-center text-center p-6 border-2 border-dashed border-white/[0.02] rounded-3xl">
-                         <p className="text-[10px] font-bold text-slate-700 uppercase tracking-widest">Drop here</p>
+                      <div className="h-32 flex flex-col items-center justify-center text-center p-6 border-2 border-dashed border-white/[0.02] rounded-3xl text-left">
+                         <p className="text-[10px] font-bold text-slate-700 uppercase tracking-widest text-left">Drop here</p>
                       </div>
                     )}
                   </div>

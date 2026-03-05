@@ -12,13 +12,8 @@ export default async function DashboardLayout({
   const { data: { user } } = await supabase.auth.getUser()
   
   let plan = 'starter'
-  let userId = ''
-  let userEmail = ''
 
   if (user) {
-    userId = user.id
-    userEmail = user.email || ''
-
     const { data: profile } = await supabase
       .from('profiles')
       .select('plan')
@@ -35,7 +30,7 @@ export default async function DashboardLayout({
       <CommandPalette />
       
       {/* Mobile Top Bar */}
-      <MobileNav plan={plan} userId={userId} userEmail={userEmail} />
+      <MobileNav plan={plan} />
 
       {/* Background Gradients & Patterns */}
       <div className="fixed inset-0 z-0 pointer-events-none">
@@ -46,7 +41,7 @@ export default async function DashboardLayout({
 
       <div className="flex-1 flex overflow-hidden relative z-10">
         {/* Desktop Sidebar */}
-        <DashboardSidebar plan={plan} userId={userId} userEmail={userEmail} />
+        <DashboardSidebar plan={plan} />
         
         <main className="flex-1 overflow-y-auto p-6 md:p-10 lg:p-12 scroll-smooth custom-scrollbar">
           <div className="max-w-7xl mx-auto">

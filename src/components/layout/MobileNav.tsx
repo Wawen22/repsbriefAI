@@ -11,17 +11,10 @@ import {
 import { Menu, Zap } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DashboardSidebar } from "./DashboardSidebar"
-import { useState, useEffect } from "react"
-import { usePathname } from "next/navigation"
+import { useState } from "react"
 
-export function MobileNav({ plan, userId, userEmail }: { plan: string, userId: string, userEmail: string }) {
+export function MobileNav({ plan }: { plan: string }) {
   const [open, setOpen] = useState(false)
-  const pathname = usePathname()
-
-  // Close sheet on navigation
-  useEffect(() => {
-    setOpen(false)
-  }, [pathname])
 
   return (
     <div className="lg:hidden flex items-center justify-between px-6 h-16 border-b border-white/5 bg-black/40 backdrop-blur-xl sticky top-0 z-40">
@@ -45,7 +38,7 @@ export function MobileNav({ plan, userId, userEmail }: { plan: string, userId: s
         <SheetContent side="left" className="p-0 bg-black border-r border-white/5 w-72">
           {/* We reuse the sidebar but without the 'hidden lg:flex' classes */}
           <div className="h-full flex flex-col">
-             <DashboardSidebar plan={plan} userId={userId} userEmail={userEmail} isMobile />
+             <DashboardSidebar plan={plan} isMobile />
           </div>
         </SheetContent>
       </Sheet>

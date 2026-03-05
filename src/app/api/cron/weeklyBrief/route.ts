@@ -36,8 +36,8 @@ export async function POST(req: Request) {
     // 4. Get all users with active subscriptions
     const { data: users, error: usersError } = await supabaseAdmin
       .from('profiles')
-      .select('*')
-      .not('plan', 'eq', 'free') // Simplified filter — update later for actual subscription status
+      .select('*, id')
+      .not('plan', 'eq', 'free') 
 
     if (usersError) throw usersError
     results.totalUsers = users?.length || 0
@@ -92,15 +92,17 @@ export async function POST(req: Request) {
 
         if (briefError) throw briefError
 
-        // 6. Send email via Resend (optional if key is missing)
+        // 6. Send email via Resend
         if (process.env.RESEND_API_KEY) {
           const { sendBrief } = require('../../email/sendBrief')
-          await sendBrief(user.email, briefData, niche)
+          // Recuperiamo il nome utente se disponibile (metadata di auth o tabella profiles)
+          const userName = user.full_name || 'Creator'
+          await sendBrief(user.email, briefData, niche, userName)
         } else {
           console.warn(`[Cron] Skipping email for user ${user.id} - RESEND_API_KEY not configured`)
         }
 
-        // Record history for deduplication (saved=false, not visible in My Ideas)
+        // Record history for deduplication
         await supabaseAdmin.from('idea_history').insert(
           ideas.map(i => ({
             user_id: user.id,

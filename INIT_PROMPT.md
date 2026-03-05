@@ -18,6 +18,7 @@
     - [x] Weekly Cron Job
     - [x] Resend Email Integration
     - [x] Stripe Payment Integration
+    - [x] Stripe Checkout/Webhook hardening + Settings Upgrade CTA fix
 - [x] **Phase 4: UI/UX**
     - [x] Landing Page
     - [x] User Dashboard

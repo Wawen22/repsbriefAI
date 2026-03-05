@@ -1,10 +1,66 @@
-// src/app/api/stripe/webhook/route.ts
-
 import { NextResponse } from 'next/server'
 import { headers } from 'next/headers'
 import { stripe } from '@/lib/stripe'
 import { supabaseAdmin } from '@/lib/supabase'
+import { resolvePlanFromPriceId } from '@/lib/billing'
 import type Stripe from 'stripe'
+
+export const runtime = 'nodejs'
+
+const ACTIVE_SUBSCRIPTION_STATUSES: Stripe.Subscription.Status[] = [
+  'active',
+  'trialing',
+  'past_due',
+]
+
+async function updateProfileFromSubscription(
+  subscription: Stripe.Subscription,
+  userIdFromEvent?: string
+) {
+  if (!supabaseAdmin) {
+    throw new Error('SUPABASE_SERVICE_ROLE_KEY is not configured')
+  }
+
+  const priceId = subscription.items.data[0]?.price?.id
+  const metadataPlan = subscription.metadata?.plan
+  const planFromMetadata = metadataPlan === 'team' || metadataPlan === 'pro' ? metadataPlan : null
+  const planFromPrice = resolvePlanFromPriceId(priceId)
+  const resolvedPaidPlan =
+    planFromPrice !== 'starter' ? planFromPrice : planFromMetadata || 'pro'
+  const nextPlan = ACTIVE_SUBSCRIPTION_STATUSES.includes(subscription.status)
+    ? resolvedPaidPlan
+    : 'starter'
+  const customerId =
+    typeof subscription.customer === 'string' ? subscription.customer : subscription.customer?.id
+  const userId = userIdFromEvent || subscription.metadata?.userId
+
+  const updateData = {
+    stripe_customer_id: customerId || null,
+    stripe_subscription_id: subscription.id,
+    plan: nextPlan,
+  }
+
+  if (userId) {
+    const { error } = await supabaseAdmin.from('profiles').update(updateData).eq('id', userId)
+    if (error) throw error
+    return
+  }
+
+  if (customerId) {
+    const { error } = await supabaseAdmin
+      .from('profiles')
+      .update(updateData)
+      .eq('stripe_customer_id', customerId)
+    if (error) throw error
+    return
+  }
+
+  const { error } = await supabaseAdmin
+    .from('profiles')
+    .update(updateData)
+    .eq('stripe_subscription_id', subscription.id)
+  if (error) throw error
+}
 
 export async function POST(req: Request) {
   const body = await req.text()
@@ -18,54 +74,41 @@ export async function POST(req: Request) {
       return new Response('No signature or secret', { status: 400 })
     }
     event = stripe.webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET)
-  } catch (err: any) {
-    console.error(`[Webhook] Signature verification failed: ${err.message}`)
-    return new Response(`Webhook Error: ${err.message}`, { status: 400 })
+  } catch (err: unknown) {
+    const errorMessage = err instanceof Error ? err.message : 'Invalid webhook signature'
+    console.error(`[Webhook] Signature verification failed: ${errorMessage}`)
+    return new Response(`Webhook Error: ${errorMessage}`, { status: 400 })
   }
 
   try {
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session
-        const userId = session.metadata?.userId
+        const userId = session.metadata?.userId || session.client_reference_id || undefined
         const subscriptionId = session.subscription as string
-        const customerId = session.customer as string
+        if (!subscriptionId) throw new Error('No subscriptionId found in checkout session')
 
-        if (!userId) throw new Error('No userId in metadata')
-
-        // Update profile in Supabase
-        const { error } = await supabaseAdmin
-          .from('profiles')
-          .update({
-            stripe_customer_id: customerId,
-            stripe_subscription_id: subscriptionId,
-            plan: 'pro', // Simplified logic, update based on priceId if needed
-          })
-          .eq('id', userId)
-
-        if (error) throw error
+        const subscription = await stripe.subscriptions.retrieve(subscriptionId)
+        await updateProfileFromSubscription(subscription, userId)
         break
       }
 
+      case 'customer.subscription.created':
+      case 'customer.subscription.updated':
       case 'customer.subscription.deleted': {
         const subscription = event.data.object as Stripe.Subscription
-        
-        // Find profile by subscription ID and set plan back to starter/expired
-        const { error } = await supabaseAdmin
-          .from('profiles')
-          .update({ plan: 'starter' })
-          .eq('stripe_subscription_id', subscription.id)
-
-        if (error) throw error
+        await updateProfileFromSubscription(subscription)
         break
       }
 
-      // Add more events like subscription updated as needed
+      default:
+        break
     }
 
     return NextResponse.json({ received: true })
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const errorMessage = err instanceof Error ? err.message : 'Webhook processing failed'
     console.error(`[Webhook] Error processing event ${event.type}:`, err)
-    return new Response(`Webhook handler error: ${err.message}`, { status: 500 })
+    return new Response(`Webhook handler error: ${errorMessage}`, { status: 500 })
   }
 }

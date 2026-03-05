@@ -9,17 +9,79 @@ import { AddIdeaModal } from "@/components/ui/AddIdeaModal"
 import { GenerateNowButton } from "@/components/dashboard/GenerateNowButton"
 import { StrategicStats } from "@/components/dashboard/StrategicStats"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge"
-import { CalendarDays, LayoutGrid, Zap, Sparkles, Orbit, Plus } from "lucide-react"
+import { CalendarDays, Zap, Sparkles, Orbit } from "lucide-react"
+import { stripe } from "@/lib/stripe"
+import { resolvePlanFromPriceId } from "@/lib/billing"
 
 export const dynamic = 'force-dynamic'
 
-export default async function DashboardPage() {
+const ACTIVE_SUBSCRIPTION_STATUSES = ['active', 'trialing', 'past_due']
+
+async function syncProfileAfterCheckout(
+  checkoutSessionId: string,
+  userId: string,
+  userEmail: string | undefined,
+  supabase: Awaited<ReturnType<typeof createClient>>
+) {
+  const session = await stripe.checkout.sessions.retrieve(checkoutSessionId, {
+    expand: ['subscription'],
+  })
+
+  const sessionUserId = session.metadata?.userId || session.client_reference_id
+  if (sessionUserId && sessionUserId !== userId) return
+
+  const emailMatches = !session.customer_email || session.customer_email === userEmail
+  if (!sessionUserId && !emailMatches) return
+
+  const subscription =
+    typeof session.subscription === 'string'
+      ? await stripe.subscriptions.retrieve(session.subscription)
+      : session.subscription
+
+  if (!subscription) return
+
+  const priceId = subscription.items.data[0]?.price?.id
+  const metadataPlan = subscription.metadata?.plan
+  const planFromMetadata = metadataPlan === 'team' || metadataPlan === 'pro' ? metadataPlan : null
+  const planFromPrice = resolvePlanFromPriceId(priceId)
+  const resolvedPaidPlan =
+    planFromPrice !== 'starter' ? planFromPrice : planFromMetadata || 'pro'
+
+  const nextPlan = ACTIVE_SUBSCRIPTION_STATUSES.includes(subscription.status)
+    ? resolvedPaidPlan
+    : 'starter'
+  const customerId =
+    typeof subscription.customer === 'string' ? subscription.customer : subscription.customer?.id
+
+  await supabase
+    .from('profiles')
+    .update({
+      plan: nextPlan,
+      stripe_customer_id: customerId || null,
+      stripe_subscription_id: subscription.id,
+    })
+    .eq('id', userId)
+}
+
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ upgrade?: string; session_id?: string }>
+}) {
   const supabase = await createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
     redirect('/login')
+  }
+
+  const params = searchParams ? await searchParams : undefined
+  if (params?.upgrade === 'success' && params.session_id) {
+    try {
+      await syncProfileAfterCheckout(params.session_id, user.id, user.email, supabase)
+    } catch (error) {
+      console.error('[Dashboard] Checkout sync fallback failed:', error)
+    }
   }
 
   const todayStart = new Date()

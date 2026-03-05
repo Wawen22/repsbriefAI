@@ -1,12 +1,12 @@
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { CreditCard, User, Dumbbell, Crown, Check, Zap, Settings, ShieldCheck, Mail, ArrowRight, Sparkles, BrainCircuit } from "lucide-react"
+import { CreditCard, User, Dumbbell, Check, Zap, Settings, ShieldCheck, Mail, BrainCircuit } from "lucide-react"
 import { createCustomerPortalSession } from "@/app/actions/stripe"
 import { NicheSwitcher } from "@/components/settings/NicheSwitcher"
 import { BrandVoiceSettings } from "@/components/settings/BrandVoiceSettings"
+import { UpgradeToProButton } from "@/components/settings/UpgradeToProButton"
 
 export const dynamic = 'force-dynamic'
 
@@ -14,12 +14,6 @@ const PLAN_FEATURES: Record<string, string[]> = {
   starter: ['1 niche', 'Weekly email delivery', '20 ideas per week', 'No dashboard access'],
   pro: ['1 niche', 'Full dashboard', '3-month history', 'Format filters', 'Idea memory'],
   team: ['Up to 3 niches', 'Dashboard for 2 users', 'White-label email', 'Priority support'],
-}
-
-const PLAN_COLOR: Record<string, string> = {
-  starter: 'text-slate-400 border-white/5 bg-white/[0.02]',
-  pro: 'text-blue-400 border-blue-500/20 bg-blue-500/5',
-  team: 'text-purple-400 border-purple-500/20 bg-purple-500/5',
 }
 
 export default async function SettingsPage() {
@@ -44,7 +38,6 @@ export default async function SettingsPage() {
   const isPro = plan === 'pro' || plan === 'team'
   const hasStripeCustomer = !!profile.stripe_customer_id
   const features = PLAN_FEATURES[plan] || PLAN_FEATURES.starter
-  const planColor = PLAN_COLOR[plan] || PLAN_COLOR.starter
 
   return (
     <div className="space-y-12">
@@ -143,7 +136,7 @@ export default async function SettingsPage() {
         <div className="lg:col-span-4 space-y-8">
           
           {/* Subscription Status Card */}
-          <div className={`rounded-3xl border p-1 relative overflow-hidden flex flex-col ${plan === 'pro' ? 'bg-blue-600/10 border-blue-500/20' : 'bg-white/[0.02] border-white/10'}`}>
+          <div className={`rounded-3xl border p-1 relative overflow-hidden flex flex-col ${isPro ? 'bg-blue-600/10 border-blue-500/20' : 'bg-white/[0.02] border-white/10'}`}>
             <div className="p-7 space-y-6">
               <div className="flex items-center justify-between">
                 <Badge variant="outline" className="bg-white/5 text-slate-400 border-none text-[10px] px-2 py-0.5 font-bold uppercase tracking-widest leading-normal">
@@ -170,10 +163,7 @@ export default async function SettingsPage() {
 
               {!isPro && (
                 <div className="pt-4 border-t border-white/5">
-                   <Button className="w-full bg-blue-600 hover:bg-blue-500 text-white rounded-full font-bold h-12 group shadow-lg shadow-blue-500/20">
-                     Upgrade to Pro
-                     <Sparkles className="ml-2 w-4 h-4 group-hover:rotate-12 transition-transform" />
-                   </Button>
+                  <UpgradeToProButton />
                 </div>
               )}
 
@@ -188,7 +178,7 @@ export default async function SettingsPage() {
             </div>
 
             {/* Subtle Gradient Glow for Pro */}
-            {plan === 'pro' && (
+            {isPro && (
               <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
             )}
           </div>
@@ -200,7 +190,7 @@ export default async function SettingsPage() {
              </div>
              <div>
                 <h4 className="font-bold text-white mb-1">New Features Coming</h4>
-                <p className="text-[12px] text-slate-500 leading-relaxed font-light">We're building support for multiple niches and team collaboration. Stay tuned for our Q2 roadmap.</p>
+                <p className="text-[12px] text-slate-500 leading-relaxed font-light">We&apos;re building support for multiple niches and team collaboration. Stay tuned for our Q2 roadmap.</p>
              </div>
           </div>
 

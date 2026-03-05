@@ -11,7 +11,8 @@ const resend = resendApiKey ? new Resend(resendApiKey) : null
 export async function sendBrief(
   userEmail: string, 
   brief: BriefData, 
-  niche: NicheConfig
+  niche: NicheConfig,
+  userName?: string
 ): Promise<void> {
   if (!resend) {
     console.error('[Email] Cannot send email: RESEND_API_KEY is missing in environment variables.')
@@ -19,10 +20,14 @@ export async function sendBrief(
   }
   try {
     const { data, error } = await resend.emails.send({
-      from: 'RepsBrief <hello@repsbrief.com>',
+      from: 'RepsBrief Studio <onboarding@resend.dev>', // In produzione usa un dominio verificato
       to: [userEmail],
-      subject: `🏋️ Your RepsBrief is ready — 20 ideas for this week`,
-      react: WeeklyBriefEmail({ niche, ideas: brief.ideas }) as React.ReactElement,
+      subject: `Your Weekly Brief: ${brief.ideas.length} new strategies for ${niche.label}`,
+      react: WeeklyBriefEmail({ 
+        nicheLabel: niche.label, 
+        ideas: brief.ideas,
+        userName: userName 
+      }) as React.ReactElement,
     })
 
     if (error) {

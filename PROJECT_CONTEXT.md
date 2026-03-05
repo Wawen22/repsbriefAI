@@ -2,7 +2,7 @@
 
 ## 📋 Task Status Tracking
 
-- [x] **Current Task:** Copy Button sulle BriefCard + Fix CTA Landing Page ✅
+- [x] **Current Task:** Stripe Payments Hardening + Upgrade CTA Fix ✅
 - [ ] **Next Task:** Trend Source Badges + Onboarding Welcome Modal
 - [ ] **Completed Tasks:**
   - [x] Initial Context & Prompt Review
@@ -36,6 +36,9 @@
   - [x] idea_history: colonna `saved` (bool) per distinguere dedup vs salvataggio manuale
   - [x] saveIdeaAction: select+update/insert invece di upsert, RLS policy UPDATE aggiunta
   - [x] Dashboard/History: filtro savedHashes su `saved=true` per stelle accurate
+  - [x] Stripe hardening: checkout con auth server-side + price IDs da env
+  - [x] Webhook Stripe: sync robusta su `checkout.session.completed` + `customer.subscription.*`
+  - [x] Settings: bottone "Upgrade to Pro" ora attivo (client action) e redirect a Stripe Checkout
 
 > **Use this file as context when working on any part of the project.**
 > It contains all decisions already made: stack, architecture, business logic, and roadmap.

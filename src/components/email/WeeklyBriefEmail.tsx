@@ -17,203 +17,196 @@ import * as React from 'react'
 import { IdeaObject, NicheConfig } from '@/types/niche'
 
 interface WeeklyBriefEmailProps {
-  niche: NicheConfig
+  nicheLabel: string
   ideas: IdeaObject[]
+  userName?: string
 }
 
 export const WeeklyBriefEmail = ({
-  niche,
+  nicheLabel,
   ideas,
-}: WeeklyBriefEmailProps) => (
-  <Html>
-    <Head />
-    <Preview>🏋️ Your RepsBrief is ready — 20 ideas for this week</Preview>
-    <Body style={main}>
-      <Container style={container}>
-        {/* 1. Header */}
-        <Section style={headerSection}>
-          <Heading style={h1}>RepsBrief</Heading>
-          <Text style={subtitle}>Your Weekly ${niche.label} Strategy</Text>
-        </Section>
+  userName = 'Creator'
+}: WeeklyBriefEmailProps) => {
+  // Prendiamo solo le prime 5 idee per l'email per non renderla troppo lunga
+  const featuredIdeas = ideas.slice(0, 5);
 
-        <Hr style={hr} />
+  return (
+    <Html>
+      <Head />
+      <Preview>Your {nicheLabel} strategies for this week are ready 🚀</Preview>
+      <Body style={main}>
+        <Container style={container}>
+          {/* Header */}
+          <Section style={headerSection}>
+            <Text style={brandLabel}>REPSBRIEF STUDIO</Text>
+            <Heading style={h1}>The Weekly Brief</Heading>
+            <Text style={subtitle}>Hi {userName}, your strategic reps for <strong>{nicheLabel}</strong> are finalized and ready to deploy.</Text>
+          </Section>
 
-        {/* 2. Weekly Wins (Trends Summary) */}
-        <Section style={section}>
-          <Heading style={h2}>📈 Weekly Wins</Heading>
-          <Text style={text}>
-            We've analyzed the latest trends across Reddit, YouTube, and Google Trends for you. 
-            The noise is gone. The signal is here.
-          </Text>
-        </Section>
+          {/* Content */}
+          <Section style={contentSection}>
+            <Text style={sectionTitle}>FEATURED STRATEGIES</Text>
+            
+            {featuredIdeas.map((idea, index) => (
+              <Section key={index} style={ideaCard}>
+                <Text style={formatBadge}>{idea.format.toUpperCase()}</Text>
+                <Heading style={ideaTitle}>{idea.title}</Heading>
+                <Text style={ideaHook}>&ldquo;{idea.hook}&rdquo;</Text>
+                <Link href="https://repsbrief.com/dashboard" style={readMoreLink}>
+                  View Full Script & Remix with AI →
+                </Link>
+              </Section>
+            ))}
 
-        {/* 3. The 20 Reps (Ideas) */}
-        <Section style={section}>
-          <Heading style={h2}>💡 The 20 Reps</Heading>
-          {ideas.map((idea, index) => (
-            <div key={index} style={ideaCard}>
-              <Text style={ideaTitle}>
-                <strong>{index + 1}. {idea.title}</strong> [{idea.format}]
-              </Text>
-              <Text style={ideaHook}>🪝 {idea.hook}</Text>
-              <Text style={ideaDesc}>{idea.description}</Text>
-              <Text style={ideaWhy}>✨ Why it works: {idea.whyItWorks}</Text>
-            </div>
-          ))}
-        </Section>
+            <Section style={centerSection}>
+              <Link href="https://repsbrief.com/dashboard" style={button}>
+                Explore All 20 Ideas
+              </Link>
+            </Section>
+          </Section>
 
-        {/* 4. Pro Tip */}
-        <Section style={section}>
-          <Heading style={h2}>🔥 Pro Tip</Heading>
-          <Text style={text}>
-            Focus on high-velocity hooks this week. Audiences are leaning towards 
-            educational storytelling over pure aesthetics.
-          </Text>
-        </Section>
+          <Hr style={hr} />
 
-        {/* 5. Upgrade CTA */}
-        <Section style={ctaSection}>
-          <Heading style={h3}>Want more depth?</Heading>
-          <Text style={text}>
-            Pro users get access to the interactive dashboard, 3-month history, 
-            and advanced format filters.
-          </Text>
-          <Link href="https://repsbrief.com/dashboard" style={button}>
-            Access Dashboard
-          </Link>
-        </Section>
-
-        <Hr style={hr} />
-
-        {/* 6. Footer */}
-        <Section style={footer}>
-          <Text style={footerText}>
-            © 2026 RepsBrief. All rights reserved. <br />
-            You're receiving this because you subscribed to weekly briefs. <br />
-            <Link href="https://repsbrief.com/api/unsubscribe" style={footerLink}>
-              Unsubscribe
-            </Link>
-          </Text>
-        </Section>
-      </Container>
-    </Body>
-  </Html>
-)
+          {/* Footer */}
+          <Section style={footer}>
+            <Text style={footerText}>
+              Sent with ⚡️ from RepsBrief Studio <br />
+              © 2026 RepsBrief. All rights reserved. <br />
+              <Link href="https://repsbrief.com/dashboard/settings" style={footerLink}>
+                Manage email preferences
+              </Link>
+            </Text>
+          </Section>
+        </Container>
+      </Body>
+    </Html>
+  );
+}
 
 const main = {
-  backgroundColor: '#f6f9fc',
+  backgroundColor: '#050505',
+  color: '#ffffff',
   fontFamily:
-    '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Ubuntu,sans-serif',
+    '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif',
 }
 
 const container = {
-  backgroundColor: '#ffffff',
+  backgroundColor: '#050505',
   margin: '0 auto',
-  padding: '20px 0 48px',
-  marginBottom: '64px',
+  padding: '40px 20px',
+  maxWidth: '600px',
 }
 
 const headerSection = {
-  padding: '32px',
   textAlign: 'center' as const,
-  backgroundColor: '#0f172a',
-  color: '#ffffff',
+  paddingBottom: '40px',
+}
+
+const brandLabel = {
+  color: '#3b82f6',
+  fontSize: '10px',
+  fontWeight: '900',
+  letterSpacing: '0.2em',
+  margin: '0 0 10px 0',
 }
 
 const h1 = {
   color: '#ffffff',
   fontSize: '32px',
-  fontWeight: 'bold',
+  fontWeight: '900',
   margin: '0',
+  letterSpacing: '-0.02em',
 }
 
 const subtitle = {
+  color: '#94a3b8',
   fontSize: '16px',
-  margin: '8px 0 0',
+  lineHeight: '24px',
+  margin: '16px 0 0',
 }
 
-const section = {
-  padding: '0 32px 32px',
+const contentSection = {
+  padding: '0 0 40px',
 }
 
-const h2 = {
-  fontSize: '24px',
-  fontWeight: 'bold',
-  marginTop: '32px',
-  marginBottom: '16px',
-}
-
-const h3 = {
-  fontSize: '20px',
-  fontWeight: 'bold',
-}
-
-const text = {
-  fontSize: '16px',
-  lineHeight: '26px',
-  color: '#4b5563',
+const sectionTitle = {
+  color: '#475569',
+  fontSize: '10px',
+  fontWeight: '900',
+  letterSpacing: '0.3em',
+  marginBottom: '24px',
 }
 
 const ideaCard = {
-  padding: '16px',
-  border: '1px solid #e5e7eb',
-  borderRadius: '8px',
-  marginBottom: '16px',
+  backgroundColor: '#0f172a',
+  border: '1px solid #1e293b',
+  borderRadius: '16px',
+  padding: '24px',
+  marginBottom: '20px',
+}
+
+const formatBadge = {
+  color: '#3b82f6',
+  fontSize: '9px',
+  fontWeight: '900',
+  letterSpacing: '0.1em',
+  margin: '0 0 8px 0',
 }
 
 const ideaTitle = {
-  fontSize: '18px',
-  margin: '0 0 8px',
+  color: '#ffffff',
+  fontSize: '20px',
+  fontWeight: '700',
+  margin: '0 0 12px 0',
 }
 
 const ideaHook = {
+  color: '#e2e8f0',
   fontSize: '16px',
   fontStyle: 'italic',
+  lineHeight: '24px',
+  margin: '0 0 16px 0',
+}
+
+const readMoreLink = {
   color: '#3b82f6',
+  fontSize: '12px',
+  fontWeight: '700',
+  textDecoration: 'none',
 }
 
-const ideaDesc = {
-  fontSize: '14px',
-  lineHeight: '20px',
-  color: '#4b5563',
-}
-
-const ideaWhy = {
-  fontSize: '13px',
-  color: '#10b981',
-}
-
-const ctaSection = {
-  padding: '32px',
-  backgroundColor: '#f1f5f9',
+const centerSection = {
   textAlign: 'center' as const,
+  paddingTop: '20px',
 }
 
 const button = {
-  backgroundColor: '#3b82f6',
-  borderRadius: '4px',
-  color: '#fff',
-  fontSize: '16px',
+  backgroundColor: '#ffffff',
+  borderRadius: '9999px',
+  color: '#000000',
+  fontSize: '14px',
+  fontWeight: '900',
   textDecoration: 'none',
   textAlign: 'center' as const,
   display: 'inline-block',
-  padding: '12px 24px',
-  marginTop: '16px',
+  padding: '16px 32px',
+  letterSpacing: '0.05em',
+  textTransform: 'uppercase' as const,
 }
 
 const hr = {
-  borderColor: '#e5e7eb',
-  margin: '20px 0',
+  borderColor: '#1e293b',
+  margin: '40px 0',
 }
 
 const footer = {
-  padding: '0 32px',
   textAlign: 'center' as const,
 }
 
 const footerText = {
   fontSize: '12px',
-  color: '#9ca3af',
+  color: '#475569',
+  lineHeight: '20px',
 }
 
 const footerLink = {

@@ -4,23 +4,20 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import { Button } from "@/components/ui/button"
-import { LayoutGrid, Calendar, Inbox, Crown, Zap, Settings, Star, Loader2, Sparkles } from "lucide-react"
+import { LayoutGrid, Calendar, Crown, Zap, Settings, Star, Loader2, Sparkles } from "lucide-react"
 import { LogoutButton } from "@/components/ui/LogoutButton"
 import { cn } from '@/lib/utils'
 
 export function DashboardSidebar({ 
   plan = 'starter', 
-  userId, 
-  userEmail,
   isMobile = false 
 }: { 
   plan?: string, 
-  userId?: string, 
-  userEmail?: string,
   isMobile?: boolean 
 }) {
   const pathname = usePathname()
   const [isUpgrading, setIsUpgrading] = useState(false)
+  const hasPaidPlan = plan === 'pro' || plan === 'team'
 
   const handleUpgrade = async () => {
     try {
@@ -29,12 +26,15 @@ export function DashboardSidebar({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          priceId: 'price_1T3kiQQ8w32NjQAk6830MCV3',
-          userId,
-          userEmail
+          plan: 'pro',
         })
       })
-      
+
+      if (!res.ok) {
+        const errorBody = await res.json().catch(() => ({}))
+        throw new Error(errorBody?.error || 'Unable to start checkout')
+      }
+
       const session = await res.json()
       if (session?.url) {
         window.location.href = session.url
@@ -97,10 +97,10 @@ export function DashboardSidebar({
         
         <div className="relative p-5 rounded-2xl bg-white/[0.03] border border-white/10 space-y-4 text-left">
           <div className="flex items-center gap-2 text-sm font-bold text-white tracking-tight">
-            {plan === 'pro' ? (
+            {hasPaidPlan ? (
               <>
                 <div className="p-1 rounded-md bg-blue-500/10"><Crown className="w-3.5 h-3.5 text-blue-400" /></div>
-                Pro Member
+                {plan === 'team' ? 'Team Member' : 'Pro Member'}
               </>
             ) : (
               <>
@@ -110,7 +110,7 @@ export function DashboardSidebar({
             )}
           </div>
           
-          {plan === 'pro' ? (
+          {hasPaidPlan ? (
             <div className="space-y-3">
               <p className="text-[11px] text-slate-500 leading-relaxed font-medium">Your next briefing is being prepared for Monday morning.</p>
               <Link href="/dashboard/settings" className="w-full inline-block">

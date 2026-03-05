@@ -13,6 +13,14 @@ import { TrendItem } from '@/types/niche'
 export const maxDuration = 60
 export const dynamic = 'force-dynamic'
 
+interface HistoryRow {
+  idea_title: string | null
+  performance_score: number | null
+  idea_data: {
+    description?: string
+  } | null
+}
+
 export async function POST() {
   try {
     // 1. Auth — get current user via server client (respects RLS)
@@ -105,9 +113,9 @@ export async function POST() {
       .filter(Boolean) as string[]
 
     // Extract high-performers (score 4 or 5)
-    const highPerformers = (history || [])
-      .filter(h => h.performance_score && h.performance_score >= 4)
-      .map(h => `- [PERFORMER] ${h.idea_title}: ${h.idea_data?.description || ''}`)
+    const highPerformers = ((history || []) as HistoryRow[])
+      .filter((h) => typeof h.performance_score === 'number' && h.performance_score >= 4)
+      .map((h) => `- [PERFORMER] ${h.idea_title || 'Untitled'}: ${h.idea_data?.description || ''}`)
       .slice(0, 5) // Send top 5 to keep prompt clean
 
     // 6. Generate brief via AI abstraction layer
@@ -117,10 +125,12 @@ export async function POST() {
     try {
       // Pass the high-performers to enable the feedback loop
       ideas = await generateBrief(allTrends, historyTitles, niche, profile.brand_voice, highPerformers)
-    } catch (genErr: any) {
-      console.error('[GenerateNow] Generation failed:', genErr.message)
-      console.error('[GenerateNow] Full error stack:', genErr.stack || genErr)
-      const msg = genErr.message || 'Brief generation failed. Please try again.'
+    } catch (genErr: unknown) {
+      const message = genErr instanceof Error ? genErr.message : 'Brief generation failed. Please try again.'
+      const stack = genErr instanceof Error ? genErr.stack : String(genErr)
+      console.error('[GenerateNow] Generation failed:', message)
+      console.error('[GenerateNow] Full error stack:', stack)
+      const msg = message
       return NextResponse.json({ error: msg }, { status: 500 })
     }
 
@@ -143,7 +153,7 @@ export async function POST() {
 
     // 8. Save idea titles for future deduplication (saved=false, not visible in My Ideas)
     await supabaseAdmin.from('idea_history').insert(
-      ideas.map(i => ({
+      ideas.map((i) => ({
         user_id: user.id,
         niche: nicheId,
         idea_hash: Buffer.from(i.title).toString('base64').substring(0, 64),
@@ -154,8 +164,9 @@ export async function POST() {
 
     console.log(`[GenerateNow] ✅ Done for user ${user.id}: ${ideas.length} ideas`)
     return NextResponse.json({ success: true, count: ideas.length })
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Generation failed'
     console.error('[GenerateNow] Critical Error:', err)
-    return NextResponse.json({ error: err.message || 'Generation failed' }, { status: 500 })
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }

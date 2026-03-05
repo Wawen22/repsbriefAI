@@ -27,7 +27,19 @@ export function getAIProvider(): AIProvider {
     }
     case 'azure': {
       const { AzureProvider } = require('./providers/azure')
-      return new AzureProvider(process.env.AZURE_OPENAI_API_KEY!, process.env.AZURE_OPENAI_ENDPOINT!, model)
+      if (!process.env.AZURE_OPENAI_API_KEY) {
+        throw new Error('AZURE_OPENAI_API_KEY is not set')
+      }
+      if (!process.env.AZURE_OPENAI_ENDPOINT) {
+        throw new Error('AZURE_OPENAI_ENDPOINT is not set')
+      }
+      return new AzureProvider(
+        process.env.AZURE_OPENAI_API_KEY,
+        process.env.AZURE_OPENAI_ENDPOINT,
+        model,
+        process.env.AZURE_OPENAI_API_VERSION,
+        process.env.AZURE_OPENAI_FALLBACK_MODEL
+      )
     }
     case 'groq': {
       const { GroqProvider } = require('./providers/groq')

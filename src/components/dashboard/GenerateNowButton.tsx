@@ -1,10 +1,10 @@
 // src/components/dashboard/GenerateNowButton.tsx
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { Zap, Loader2, CheckCircle2, AlertCircle, Sparkles, Orbit, Search, BarChart3, Brain, Database, Check } from 'lucide-react'
+import { CheckCircle2, AlertCircle, Sparkles, Orbit, Search, BarChart3, Brain, Database, Check } from 'lucide-react'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 
@@ -77,8 +77,8 @@ export function GenerateNowButton({ alreadyGeneratedToday = false }: GenerateNow
       })
 
       setTimeout(() => router.refresh(), 1200)
-    } catch (err: any) {
-      const message = err.message || 'Something went wrong.'
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Something went wrong.'
       setErrorMsg(message)
       setState('error')
       toast.error(message)
@@ -189,7 +189,6 @@ export function GenerateNowButton({ alreadyGeneratedToday = false }: GenerateNow
       <Button
         size="lg"
         onClick={handleGenerate}
-        disabled={state === 'loading'}
         className="group bg-blue-600 hover:bg-blue-500 text-white h-14 px-10 rounded-full text-lg font-black shadow-lg shadow-blue-500/25 transition-all hover:scale-105 active:scale-95 gap-3 animate-float"
       >
         <Sparkles className="w-5 h-5 group-hover:rotate-12 transition-transform" />

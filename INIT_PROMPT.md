@@ -14,6 +14,8 @@
     - [x] Google Trends Scraper
     - [x] RSS Scraper
     - [x] Brief Generator (AI Layer Integration)
+    - [x] Brief Generator reliability hardening (JSON repair + chunked generation)
+    - [x] Azure Foundry GPT integration (endpoint compatibility + model fallback)
 - [x] **Phase 3: Automation & Delivery**
     - [x] Weekly Cron Job
     - [x] Resend Email Integration

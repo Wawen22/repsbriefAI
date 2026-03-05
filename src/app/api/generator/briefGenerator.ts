@@ -1,29 +1,375 @@
 // src/app/api/generator/briefGenerator.ts
 
 import { getAIProvider } from '@/lib/ai'
+import type { AIProvider } from '@/lib/ai/types'
+import { jsonrepair } from 'jsonrepair'
 import { z } from 'zod'
 import { NicheConfig, TrendItem, IdeaObject } from '@/types/niche'
 
+const VALID_FORMATS = ['Reel', 'Carousel', 'Thread', 'Newsletter'] as const
+
 const IdeaSchema = z.object({
-  title: z.string().min(1),
-  hook: z.string().min(1),
-  description: z.string().min(1),
-  format: z.enum(['Reel', 'Carousel', 'Thread', 'Newsletter']),
-  whyItWorks: z.string().min(1),
-  scriptDraft: z.string().optional(),
-  alternativeHooks: z.array(z.string()).optional(),
-  trendingAudioSuggestion: z.string().optional(),
-  keyVisuals: z.string().optional(),
+  title: z.string().min(1).max(140),
+  hook: z.string().min(1).max(220),
+  description: z.string().min(1).max(700),
+  format: z.enum(VALID_FORMATS),
+  whyItWorks: z.string().min(1).max(700),
+  scriptDraft: z.string().min(1).max(1200).optional(),
+  alternativeHooks: z.array(z.string().min(1).max(220)).max(5).optional(),
+  trendingAudioSuggestion: z.string().min(1).max(220).optional(),
+  keyVisuals: z.string().min(1).max(260).optional(),
 })
 
-const BriefSchema = z.array(IdeaSchema)
+const BriefSchema = z.array(IdeaSchema).min(1).max(30)
+
+const DEFAULT_TOTAL_IDEAS = 20
+const MAX_BATCH_ATTEMPTS = 4
+
+type IdeaRecord = Record<string, unknown>
+
+function sanitizeText(value: string, maxLength: number): string {
+  return value
+    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F]/g, '')
+    .replace(/\r/g, '')
+    .trim()
+    .slice(0, maxLength)
+}
+
+function readString(record: IdeaRecord, keys: string[], maxLength = 1200): string | undefined {
+  for (const key of keys) {
+    const value = record[key]
+    if (typeof value === 'string') {
+      const clean = sanitizeText(value, maxLength)
+      if (clean) return clean
+    }
+  }
+  return undefined
+}
+
+function normalizeFormat(raw: string | undefined): (typeof VALID_FORMATS)[number] | undefined {
+  if (!raw) return undefined
+  const value = raw.toLowerCase()
+  if (value.includes('reel') || value.includes('short')) return 'Reel'
+  if (value.includes('carou') || value.includes('slide')) return 'Carousel'
+  if (value.includes('thread') || value.includes('tweet') || value.includes('x ')) return 'Thread'
+  if (value.includes('news') || value.includes('email')) return 'Newsletter'
+  return undefined
+}
+
+function normalizeAltHooks(value: unknown): string[] | undefined {
+  if (Array.isArray(value)) {
+    const hooks = value
+      .filter((entry): entry is string => typeof entry === 'string')
+      .map((entry) => sanitizeText(entry, 220))
+      .filter(Boolean)
+      .slice(0, 5)
+    return hooks.length ? hooks : undefined
+  }
+
+  if (typeof value === 'string') {
+    const hooks = value
+      .split(/\n|;|\|/)
+      .map((entry) => sanitizeText(entry, 220))
+      .filter(Boolean)
+      .slice(0, 5)
+    return hooks.length ? hooks : undefined
+  }
+
+  return undefined
+}
+
+function normalizeIdeaCandidate(candidate: unknown): IdeaObject | null {
+  if (!candidate || typeof candidate !== 'object' || Array.isArray(candidate)) return null
+  const record = candidate as IdeaRecord
+
+  const title = readString(record, ['title', 'ideaTitle', 'headline'], 140)
+  const hook = readString(record, ['hook', 'openingHook', 'introHook'], 220)
+  const description = readString(record, ['description', 'angle', 'concept'], 700)
+  const whyItWorks = readString(record, ['whyItWorks', 'why_it_works', 'reason'], 700)
+  const formatRaw = readString(record, ['format', 'contentFormat', 'type'], 60)
+  const format = normalizeFormat(formatRaw)
+
+  if (!title || !hook || !description || !whyItWorks || !format) return null
+
+  const scriptDraft = readString(record, ['scriptDraft', 'script_draft', 'script', 'outline'], 1200)
+  const trendingAudioSuggestion = readString(
+    record,
+    ['trendingAudioSuggestion', 'audioSuggestion', 'audio_style'],
+    220
+  )
+  const keyVisuals = readString(record, ['keyVisuals', 'visuals', 'key_visuals'], 260)
+  const alternativeHooks = normalizeAltHooks(record.alternativeHooks ?? record.alternative_hooks)
+
+  return {
+    title,
+    hook,
+    description,
+    format,
+    whyItWorks,
+    scriptDraft,
+    alternativeHooks,
+    trendingAudioSuggestion,
+    keyVisuals,
+  }
+}
+
+function extractBalancedJson(source: string, openChar: '{' | '[', closeChar: '}' | ']'): string | null {
+  const start = source.indexOf(openChar)
+  if (start === -1) return null
+
+  let depth = 0
+  let quote: '"' | "'" | null = null
+  let escaped = false
+
+  for (let index = start; index < source.length; index += 1) {
+    const char = source[index]
+
+    if (quote) {
+      if (escaped) {
+        escaped = false
+      } else if (char === '\\') {
+        escaped = true
+      } else if (char === quote) {
+        quote = null
+      }
+      continue
+    }
+
+    if (char === '"' || char === "'") {
+      quote = char
+      continue
+    }
+
+    if (char === openChar) depth += 1
+    if (char === closeChar) depth -= 1
+
+    if (depth === 0) {
+      return source.slice(start, index + 1)
+    }
+  }
+
+  return null
+}
+
+function getCandidateJsonStrings(rawText: string): string[] {
+  const cleaned = rawText
+    .replace(/^\uFEFF/, '')
+    .replace(/^```(?:json)?\s*/i, '')
+    .replace(/\s*```$/i, '')
+    .trim()
+
+  const candidates = new Set<string>()
+  if (cleaned) candidates.add(cleaned)
+
+  const balancedArray = extractBalancedJson(cleaned, '[', ']')
+  if (balancedArray) candidates.add(balancedArray)
+
+  const balancedObject = extractBalancedJson(cleaned, '{', '}')
+  if (balancedObject) candidates.add(balancedObject)
+
+  const firstArray = cleaned.indexOf('[')
+  const lastArray = cleaned.lastIndexOf(']')
+  if (firstArray !== -1 && lastArray > firstArray) {
+    candidates.add(cleaned.slice(firstArray, lastArray + 1))
+  }
+
+  const firstObject = cleaned.indexOf('{')
+  const lastObject = cleaned.lastIndexOf('}')
+  if (firstObject !== -1 && lastObject > firstObject) {
+    candidates.add(cleaned.slice(firstObject, lastObject + 1))
+  }
+
+  return Array.from(candidates)
+}
+
+function extractIdeaArray(payload: unknown): unknown[] | null {
+  if (Array.isArray(payload)) return payload
+  if (!payload || typeof payload !== 'object') return null
+
+  const record = payload as Record<string, unknown>
+  const knownKeys = ['ideas', 'items', 'brief', 'results', 'data']
+  for (const key of knownKeys) {
+    const value = record[key]
+    if (Array.isArray(value)) return value
+  }
+
+  return null
+}
+
+function parseIdeasFromRawText(rawText: string): IdeaObject[] {
+  const candidates = getCandidateJsonStrings(rawText)
+  const parseErrors: string[] = []
+
+  for (const candidate of candidates) {
+    const parseVariants = [candidate]
+    try {
+      parseVariants.push(jsonrepair(candidate))
+    } catch {
+      // Ignore and continue with raw candidate.
+    }
+
+    for (const variant of parseVariants) {
+      try {
+        const parsed = JSON.parse(variant) as unknown
+        const ideaArray = extractIdeaArray(parsed)
+        if (!ideaArray) continue
+
+        const normalized = ideaArray
+          .map((entry) => normalizeIdeaCandidate(entry))
+          .filter((entry): entry is IdeaObject => entry !== null)
+
+        const validated = BriefSchema.parse(normalized)
+        if (validated.length > 0) return validated
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Unknown parse error'
+        parseErrors.push(message)
+      }
+    }
+  }
+
+  const reason = parseErrors[parseErrors.length - 1] || 'Unable to parse AI response'
+  throw new Error(reason)
+}
+
+function titleKey(title: string): string {
+  return title.toLowerCase().replace(/\s+/g, ' ').trim()
+}
+
+function getRetryDelayMs(errorMessage: string): number | null {
+  const match = errorMessage.match(/retry in ([\d.]+)s/i)
+  if (!match) return null
+  const seconds = Number(match[1])
+  if (!Number.isFinite(seconds) || seconds <= 0) return null
+  return Math.min(Math.ceil(seconds * 1000), 15000)
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+function buildSystemPrompt(niche: NicheConfig, brandVoice?: string | null, highPerformers: string[] = []): string {
+  const voiceInstructions = brandVoice
+    ? `\n\nBRAND VOICE TO MATCH:\n${sanitizeText(brandVoice, 2000)}`
+    : ''
+
+  const topPerformers = highPerformers
+    .slice(0, 4)
+    .map((item) => sanitizeText(item, 300))
+    .filter(Boolean)
+
+  const performerInstructions = topPerformers.length
+    ? `\n\nTOP PAST WINNERS TO LEARN FROM:\n${topPerformers.join('\n')}`
+    : ''
+
+  return `You are ${niche.claudePersona}. Create high-converting content ideas for ${niche.label}.${voiceInstructions}${performerInstructions}`
+}
+
+function buildUserPrompt(params: {
+  count: number
+  trendsSummary: string
+  excludedTitles: string[]
+  attempt: number
+}): string {
+  const { count, trendsSummary, excludedTitles, attempt } = params
+  const exclusionList = excludedTitles
+    .slice(-40)
+    .map((title) => `- ${sanitizeText(title, 110)}`)
+    .join('\n')
+
+  const strictMode = attempt >= 2
+    ? '\nSTRICT MODE: keep every text compact. Do not exceed the character limits.'
+    : ''
+
+  return `
+Trends to use:
+${trendsSummary}
+
+${exclusionList ? `Do not repeat these titles:\n${exclusionList}` : 'No exclusion list for this batch.'}
+
+Generate exactly ${count} unique ideas.
+Return ONLY valid JSON in this shape:
+{"ideas":[{...}]}
+
+Each idea object must contain:
+- "title" (max 90 chars)
+- "hook" (max 140 chars)
+- "description" (max 260 chars)
+- "format" ("Reel" | "Carousel" | "Thread" | "Newsletter")
+- "whyItWorks" (max 260 chars)
+- "scriptDraft" (max 500 chars)
+- "alternativeHooks" (array with max 2 hooks, each max 120 chars)
+- "trendingAudioSuggestion" (max 120 chars)
+- "keyVisuals" (max 140 chars)
+
+Rules:
+- JSON must be syntactically valid.
+- Use double quotes for keys and strings.
+- Escape internal double quotes in string values.
+- Do not include markdown fences or extra text.${strictMode}
+`
+}
+
+async function generateBatch(params: {
+  ai: AIProvider
+  systemPrompt: string
+  trendsSummary: string
+  excludedTitles: string[]
+  count: number
+  maxAttempts?: number
+}): Promise<IdeaObject[]> {
+  const { ai, systemPrompt, trendsSummary, excludedTitles, count, maxAttempts = MAX_BATCH_ATTEMPTS } = params
+
+  let lastError: Error | null = null
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    try {
+      console.log(`[Generator] Batch ${count} ideas - attempt ${attempt}/${maxAttempts}`)
+
+      const response = await ai.complete(
+        [
+          { role: 'system', content: systemPrompt },
+          {
+            role: 'user',
+            content: buildUserPrompt({ count, trendsSummary, excludedTitles, attempt }),
+          },
+        ],
+        {
+          jsonMode: true,
+          maxTokens: 4096,
+          temperature: attempt >= 3 ? 0.2 : 0.4,
+        }
+      )
+
+      const parsedIdeas = parseIdeasFromRawText(response.text)
+      const excludedSet = new Set(excludedTitles.map((title) => titleKey(title)))
+      const unique = parsedIdeas.filter((idea) => !excludedSet.has(titleKey(idea.title)))
+
+      if (unique.length === 0) {
+        throw new Error('No unique ideas parsed from model response')
+      }
+
+      return unique.slice(0, count)
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown generation error'
+      lastError = new Error(message)
+      console.error(`[Generator] Batch attempt ${attempt} failed: ${message}`)
+
+      const retryDelay = getRetryDelayMs(message)
+      if (retryDelay && attempt < maxAttempts) {
+        await sleep(retryDelay)
+      }
+    }
+  }
+
+  throw new Error(lastError?.message || 'Batch generation failed')
+}
 
 /**
- * Generates a content brief using AI with robust JSON repair and performance learning.
+ * Generates a content brief with resilient JSON handling and chunked generation.
  */
 export async function generateBrief(
-  trendsData: TrendItem[], 
-  ideaHistory: string[], 
+  trendsData: TrendItem[],
+  ideaHistory: string[],
   niche: NicheConfig,
   brandVoice?: string | null,
   highPerformers: string[] = []
@@ -31,7 +377,7 @@ export async function generateBrief(
   const provider = process.env.AI_PROVIDER ?? 'openai'
   const model = process.env.AI_MODEL
 
-  if (!model) throw new Error(`AI_MODEL env var is not set.`)
+  if (!model) throw new Error('AI_MODEL env var is not set.')
 
   const keyMap: Record<string, string | undefined> = {
     openai: process.env.OPENAI_API_KEY,
@@ -41,94 +387,94 @@ export async function generateBrief(
     groq: process.env.GROQ_API_KEY,
   }
 
-  if (!keyMap[provider]) throw new Error(`API key for provider "${provider}" is missing.`)
+  if (!keyMap[provider]) {
+    throw new Error(`API key for provider "${provider}" is missing.`)
+  }
 
   const ai = getAIProvider()
+  const systemPrompt = buildSystemPrompt(niche, brandVoice, highPerformers)
 
-  let trendsSummary = trendsData.length > 0
-    ? trendsData.slice(0, 60).map(t => `- [${t.source.toUpperCase()}] ${t.title}`).join('\n')
-    : `No live data. Use general trends for ${niche.label}.`
+  const trendsSummary = trendsData.length
+    ? trendsData
+        .slice(0, 35)
+        .map((item) => `- [${item.source.toUpperCase()}] ${sanitizeText(item.title, 130)}`)
+        .join('\n')
+    : `- No live trends available. Use broad, current patterns for ${niche.label}.`
 
-  const historySection = ideaHistory.length > 0
-    ? `\nAvoid repeating these: ${ideaHistory.slice(-30).join(', ')}`
-    : ''
+  const collected: IdeaObject[] = []
+  const historicalTitles = ideaHistory
+    .map((title) => sanitizeText(title, 140))
+    .filter(Boolean)
 
-  const voiceInstructions = brandVoice 
-    ? `\n\nUSER'S BRAND VOICE:\n${brandVoice}\nWrite all content in this style.`
-    : ""
+  // Fast path: try single-shot generation first to minimize requests and latency.
+  try {
+    const singleShot = await generateBatch({
+      ai,
+      systemPrompt,
+      trendsSummary,
+      excludedTitles: historicalTitles,
+      count: DEFAULT_TOTAL_IDEAS,
+      maxAttempts: 2,
+    })
 
-  const performanceSection = highPerformers.length > 0
-    ? `\n\nHIGH-PERFORMING PAST IDEAS (Learned from user feedback):\n${highPerformers.join('\n')}\nAnalyze why these worked and generate similar high-engagement concepts.`
-    : ""
-
-  const systemPrompt = `You are ${niche.claudePersona}. Generate 20 high-impact content ideas for ${niche.label}. 
-Provide detailed strategies including a ready-to-use script for each.${voiceInstructions}${performanceSection}`
-  
-  const userPrompt = `
-Analyze these trends:
-${trendsSummary}
-${historySection}
-
-Return a JSON array of exactly 20 ideas. 
-Structure for each object:
-{
-  "title": "catchy title",
-  "hook": "attention-grabbing opening",
-  "description": "core concept",
-  "format": "Reel" | "Carousel" | "Thread" | "Newsletter",
-  "whyItWorks": "strategic reason",
-  "scriptDraft": "actionable script/structure",
-  "alternativeHooks": ["alt 1", "alt 2"],
-  "trendingAudioSuggestion": "audio style",
-  "keyVisuals": "visual description"
-}
-
-IMPORTANT:
-- Return ONLY the JSON array.
-- Ensure all quotes inside strings are escaped.
-- Keep descriptions and scripts concise but actionable to avoid response truncation.
-`
-
-  let lastError: Error | null = null
-  const maxAttempts = 3
-
-  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-    try {
-      console.log(`[Generator] Attempt ${attempt}/${maxAttempts}...`)
-      const response = await ai.complete([
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt },
-      ], { jsonMode: true, maxTokens: 8192 })
-
-      let text = response.text.trim()
-      text = text.replace(/^\uFEFF/, '')
-      text = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/m, '').trim()
-      
-      const arrayStart = text.indexOf('[')
-      const arrayEnd = text.lastIndexOf(']')
-      if (arrayStart !== -1 && arrayEnd > arrayStart) {
-        text = text.substring(arrayStart, arrayEnd + 1)
+    const seen = new Set<string>()
+    for (const idea of singleShot) {
+      const key = titleKey(idea.title)
+      if (!seen.has(key)) {
+        collected.push(idea)
+        seen.add(key)
       }
+      if (collected.length >= DEFAULT_TOTAL_IDEAS) break
+    }
 
-      let ideasArray: any[]
-      try {
-        ideasArray = JSON.parse(text)
-      } catch (e) {
-        const fixedText = text.replace(/[\u0000-\u001F\u007F-\u009F]/g, "")
-        ideasArray = JSON.parse(fixedText)
+    if (collected.length >= DEFAULT_TOTAL_IDEAS) {
+      console.log(`[Generator] ✅ Success (single-shot): ${collected.length} ideas`)
+      return collected.slice(0, DEFAULT_TOTAL_IDEAS)
+    }
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown single-shot error'
+    console.warn(`[Generator] Single-shot generation failed, switching to chunk mode: ${message}`)
+  }
+
+  let safetyCounter = 0
+  let rounds = 0
+  while (collected.length < DEFAULT_TOTAL_IDEAS) {
+    rounds += 1
+    if (rounds > 14) {
+      throw new Error(`Generation incomplete: collected ${collected.length}/${DEFAULT_TOTAL_IDEAS} ideas`)
+    }
+
+    const remaining = DEFAULT_TOTAL_IDEAS - collected.length
+    const batchSize = remaining > 8 ? 8 : remaining
+
+    const batch = await generateBatch({
+      ai,
+      systemPrompt,
+      trendsSummary,
+      excludedTitles: [...historicalTitles, ...collected.map((idea) => idea.title)],
+      count: batchSize,
+    })
+
+    let added = 0
+    const existingKeys = new Set(collected.map((idea) => titleKey(idea.title)))
+    for (const idea of batch) {
+      const key = titleKey(idea.title)
+      if (!existingKeys.has(key)) {
+        collected.push(idea)
+        existingKeys.add(key)
+        added += 1
       }
+      if (collected.length >= DEFAULT_TOTAL_IDEAS) break
+    }
 
-      const validated = BriefSchema.parse(Array.isArray(ideasArray) ? ideasArray : [])
-      
-      if (validated.length === 0) throw new Error("Empty ideas array")
-      
-      console.log(`[Generator] ✅ Success: ${validated.length} ideas`)
-      return validated.slice(0, 20)
-    } catch (err: any) {
-      lastError = err
-      console.error(`[Generator] Attempt ${attempt} failed:`, err.message)
+    if (added === 0) {
+      safetyCounter += 1
+      if (safetyCounter >= 4) {
+        throw new Error('Generation produced duplicate ideas repeatedly. Please retry.')
+      }
     }
   }
 
-  throw new Error(`Brief generation failed. The AI returned invalid data. Details: ${lastError?.message}`)
+  console.log(`[Generator] ✅ Success: ${collected.length} ideas`)
+  return collected.slice(0, DEFAULT_TOTAL_IDEAS)
 }

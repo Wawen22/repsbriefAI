@@ -2,7 +2,7 @@
 
 ## 📋 Task Status Tracking
 
-- [x] **Current Task:** Stripe Payments Hardening + Upgrade CTA Fix ✅
+- [x] **Current Task:** Azure Foundry GPT Integration + Provider Switching ✅
 - [ ] **Next Task:** Trend Source Badges + Onboarding Welcome Modal
 - [ ] **Completed Tasks:**
   - [x] Initial Context & Prompt Review
@@ -39,6 +39,13 @@
   - [x] Stripe hardening: checkout con auth server-side + price IDs da env
   - [x] Webhook Stripe: sync robusta su `checkout.session.completed` + `customer.subscription.*`
   - [x] Settings: bottone "Upgrade to Pro" ora attivo (client action) e redirect a Stripe Checkout
+  - [x] Generator hardening: parsing JSON multi-layer (extract + repair + normalize)
+  - [x] Generator hardening: generazione a batch con retry per evitare output troncati
+  - [x] Generate-now route: tipizzazione robusta + error handling non-`any`
+  - [x] Azure provider: supporto endpoint Foundry (`/openai/v1/`) + legacy (`cognitiveservices`)
+  - [x] Azure provider: compatibilità GPT-5 (`max_completion_tokens`) + JSON mode fallback
+  - [x] Azure provider: fallback automatico modello (`AI_MODEL` -> `AZURE_OPENAI_FALLBACK_MODEL`)
+  - [x] .env aggiornato: switch attivo su Azure con credenziali Foundry
 
 > **Use this file as context when working on any part of the project.**
 > It contains all decisions already made: stack, architecture, business logic, and roadmap.

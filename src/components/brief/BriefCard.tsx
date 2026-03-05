@@ -145,7 +145,7 @@ export function BriefCard({
 
       {/* Header - PRIMARY ACTIONS HUB */}
       <header className="h-14 border-b border-white/5 bg-black/40 backdrop-blur-2xl px-4 md:px-6 flex items-center justify-between shrink-0 relative z-[10010]">
-        <div className="flex items-center gap-4 text-left">
+        <div className="flex items-center gap-4">
           <Button 
             variant="ghost" 
             onClick={() => setIsExpanded(false)} 
@@ -154,13 +154,14 @@ export function BriefCard({
             <ArrowLeft className="w-3.5 h-3.5" />
           </Button>
           <div className="flex flex-col text-left">
-            <h2 className="text-[11px] font-bold text-white truncate max-w-[150px] md:max-w-xs text-left">{currentIdea.title}</h2>
+            <h2 className="text-[10px] font-bold text-slate-400 truncate max-w-[120px] sm:max-w-[200px] md:max-w-md uppercase tracking-tight">
+              {currentIdea.title}
+            </h2>
           </div>
         </div>
         
-        <div className="flex items-center gap-2 text-left">
-          {/* HEADER PRIMARY BUTTONS */}
-          <div className="flex items-center gap-2 mr-2 border-r border-white/10 pr-4 text-left">
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 mr-2 border-r border-white/10 pr-4">
             {!isPro ? (
               <Button 
                 onClick={() => toast.info("Teleprompter is PRO", { icon: <Crown className="w-3 h-3 text-yellow-500" /> })}
@@ -206,11 +207,28 @@ export function BriefCard({
         )}>
           <div className="max-w-4xl mx-auto space-y-12 pb-32 text-left">
             
+            {/* 0. HERO TITLE (The fix for truncated title) */}
+            <div className="space-y-2 mb-8">
+              <div className="flex items-center gap-2">
+                <Badge variant="outline" className="text-blue-500 border-blue-500/20 text-[9px] uppercase tracking-widest font-black h-5 px-2">
+                  {currentIdea.format} Strategy
+                </Badge>
+                {remixHistory.length > 1 && (
+                  <Badge className="bg-purple-500/10 text-purple-400 border-purple-500/20 text-[9px] uppercase font-black h-5 px-2">
+                    <Wand2 className="w-2.5 h-2.5 mr-1" /> Custom Remix
+                  </Badge>
+                )}
+              </div>
+              <h1 className="text-3xl md:text-5xl font-black text-white leading-tight tracking-tighter">
+                {currentIdea.title}
+              </h1>
+            </div>
+
             {/* 1. THE HERO HOOK */}
             <section className="space-y-4 text-left">
-              <div className="flex items-center gap-3 px-1 text-left">
+              <div className="flex items-center gap-3 px-1">
                 <Zap className="w-4 h-4 text-blue-400" />
-                <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest text-left">The Hook</h4>
+                <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">The Hook</h4>
               </div>
               
               <div className="p-8 md:p-14 rounded-[2rem] bg-gradient-to-br from-white/[0.03] to-transparent border border-white/5 relative overflow-hidden text-left shadow-2xl">
@@ -226,7 +244,7 @@ export function BriefCard({
                   {isRemixing && <Loader2 className="absolute inset-0 m-auto animate-spin text-blue-500 w-12 h-12" />}
                 </div>
 
-                <div className="flex justify-end gap-2 mt-8 text-left">
+                <div className="flex justify-end gap-2 mt-8">
                   <CopyBtn field="hook" text={currentIdea.hook} label="Copy Hook" />
                 </div>
               </div>
@@ -234,24 +252,24 @@ export function BriefCard({
 
             {/* 2. PRODUCTION SCRIPT */}
             <section className="space-y-4 text-left">
-              <div className="flex items-center gap-3 px-1 text-left">
+              <div className="flex items-center gap-3 px-1">
                 <FileText className="w-4 h-4 text-purple-400" />
-                <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest text-left">Production Script</h4>
+                <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Production Script</h4>
               </div>
 
               <div className="rounded-[2.5rem] bg-white/[0.01] border border-white/5 overflow-hidden text-left shadow-inner">
                 <div className={cn("p-8 md:p-12 space-y-10 text-left", isRemixing && "blur-lg opacity-20")}>
                   
                   <div className="space-y-4 text-left">
-                    <span className="text-[9px] font-black text-slate-600 uppercase tracking-[0.2em] block text-left">Concept Strategy</span>
-                    <p className="text-slate-200 text-xl leading-relaxed text-left font-light">{currentIdea.description}</p>
+                    <span className="text-[9px] font-black text-slate-600 uppercase tracking-[0.2em] block">Concept Strategy</span>
+                    <p className="text-slate-200 text-xl leading-relaxed font-light">{currentIdea.description}</p>
                   </div>
 
                   <div className="h-px bg-gradient-to-r from-white/10 to-transparent" />
 
                   <div className="space-y-6 text-left">
-                    <div className="flex items-center justify-between text-left">
-                      <span className="text-[9px] font-black text-slate-600 uppercase tracking-[0.2em] text-left">Full Script Draft</span>
+                    <div className="flex items-center justify-between">
+                      <span className="text-[9px] font-black text-slate-600 uppercase tracking-[0.2em]">Full Script Draft</span>
                       <CopyBtn field="script" text={currentIdea.scriptDraft || ""} label="Copy Script" />
                     </div>
                     <div className="bg-black/40 p-10 rounded-[2rem] border border-white/5 font-mono text-sm md:text-base text-slate-400 leading-relaxed whitespace-pre-wrap min-h-[350px] relative text-left shadow-2xl">
@@ -270,32 +288,32 @@ export function BriefCard({
           "w-full md:w-[360px] lg:w-[400px] bg-black/20 backdrop-blur-md border-l border-white/5 transition-all duration-300 relative flex flex-col text-left",
           activeTab === 'content' ? 'hidden md:flex' : 'flex'
         )}>
-          <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6 text-left">
+          <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6">
             
             {/* 1. AI REMIX PANEL */}
             <section className="bg-white/[0.03] border border-white/10 rounded-[1.5rem] overflow-hidden shadow-2xl relative text-left">
               {!isPro && (
                 <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-[#050505]/95 backdrop-blur-[6px] p-6 text-center">
                   <Crown className="w-5 h-5 text-yellow-500 mb-3" />
-                  <p className="text-[10px] font-black text-white uppercase tracking-[0.2em] mb-3 text-center">PRO AI Remix</p>
+                  <p className="text-[10px] font-black text-white uppercase tracking-[0.2em] mb-3">PRO AI Remix</p>
                   <Button size="sm" className="bg-white text-black hover:bg-slate-200 rounded-full font-black text-[9px] h-7 px-5">Upgrade</Button>
                 </div>
               )}
               
               <div className="p-5 space-y-5 text-left">
-                <div className="flex items-center justify-between text-left">
+                <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-left">
                     <Sparkles className="w-3.5 h-3.5 text-purple-400" />
-                    <span className="text-[9px] font-black text-white uppercase tracking-widest text-left">AI Customization</span>
+                    <span className="text-[9px] font-black text-white uppercase tracking-widest">AI Customization</span>
                   </div>
                   {remixHistory.length > 1 && (
-                    <button onClick={undoRemix} className="text-[8px] font-black text-slate-500 hover:text-white flex items-center gap-1.5 transition-colors uppercase text-left">
+                    <button onClick={undoRemix} className="text-[8px] font-black text-slate-500 hover:text-white flex items-center gap-1.5 transition-colors uppercase">
                       <RotateCcw className="w-2.5 h-2.5" /> Undo
                     </button>
                   )}
                 </div>
 
-                <div className="grid grid-cols-1 gap-1.5 text-left">
+                <div className="grid grid-cols-1 gap-1.5">
                   {REMIX_OPTIONS.map(o => (
                     <button 
                       key={o.label} 
@@ -303,9 +321,9 @@ export function BriefCard({
                       disabled={isRemixing || !isPro}
                       className="group flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-purple-500/10 hover:border-purple-500/30 transition-all text-left disabled:opacity-50"
                     >
-                      <div className="flex items-center gap-3 text-left">
+                      <div className="flex items-center gap-3">
                         <span className="text-sm">{o.icon}</span>
-                        <span className="text-[9px] font-bold text-slate-400 group-hover:text-white uppercase tracking-tight text-left">{o.label}</span>
+                        <span className="text-[9px] font-bold text-slate-400 group-hover:text-white uppercase tracking-tight">{o.label}</span>
                       </div>
                       <ChevronRight className="w-3 h-3 text-slate-700 group-hover:text-purple-400" />
                     </button>
@@ -335,11 +353,11 @@ export function BriefCard({
 
             {/* 2. THE STRATEGY - Why It Works */}
             <section className="p-6 rounded-[1.5rem] bg-emerald-500/[0.03] border border-emerald-500/10 space-y-3 text-left">
-              <div className="flex items-center gap-2 text-left">
+              <div className="flex items-center gap-2">
                 <TrendingUp className="w-3.5 h-3.5 text-emerald-400" />
-                <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest text-left">Strategy Analysis</span>
+                <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Strategy Analysis</span>
               </div>
-              <p className="text-[11px] text-emerald-100/60 leading-relaxed italic font-light text-left">
+              <p className="text-[11px] text-emerald-100/60 leading-relaxed italic font-light">
                 &ldquo;{currentIdea.whyItWorks}&rdquo;
               </p>
             </section>
@@ -380,16 +398,16 @@ export function BriefCard({
         <div className="flex items-center gap-3">
           <span className="text-[8px] font-black text-slate-600 uppercase tracking-widest hidden xs:inline">Distribution:</span>
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-2 px-2 py-0.5 rounded bg-white/[0.03] border border-white/5 text-left h-[26px]">
-              <span className="text-[8px] font-bold text-white uppercase text-left">Notion</span>
+            <div className="flex items-center gap-2 px-2 py-0.5 rounded bg-white/[0.03] border border-white/5 h-[26px]">
+              <span className="text-[8px] font-bold text-white uppercase">Notion</span>
               <CopyBtn field="notion" text={formatForNotion()} label="Sync" icon={Share2} className="h-5 px-1.5 text-[8px]" />
             </div>
             <button 
               onClick={downloadMarkdown}
-              className="flex items-center gap-2 px-2 py-0.5 rounded bg-blue-500/10 border border-blue-500/20 text-blue-400 hover:bg-blue-600 hover:text-white transition-all text-left h-[26px]"
+              className="flex items-center gap-2 px-2 py-0.5 rounded bg-blue-500/10 border border-blue-500/20 text-blue-400 hover:bg-blue-600 hover:text-white transition-all h-[26px]"
             >
               <Download className="w-2.5 h-2.5" />
-              <span className="text-[8px] font-bold uppercase text-left">Brief.md</span>
+              <span className="text-[8px] font-bold uppercase">Brief.md</span>
             </button>
           </div>
         </div>
@@ -408,12 +426,12 @@ export function BriefCard({
         <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500/0 via-blue-500/0 to-blue-500/0 group-hover:from-blue-500/10 group-hover:to-emerald-500/10 rounded-[22px] blur opacity-0 group-hover:opacity-100 transition duration-500" />
         {variant === 'compact' ? (
           <Card className="relative bg-white/[0.03] border-white/10 rounded-2xl cursor-pointer p-4 h-full flex flex-col hover:bg-white/[0.05] transition-all text-left" onClick={() => setIsExpanded(true)}>
-            <div className="flex gap-4 h-full"><div className="p-2 rounded-xl bg-white/5 shrink-0 text-white">{getIcon(currentIdea.format)}</div><div className="flex-1 flex flex-col h-full text-left text-white"><div className="flex justify-between text-left text-white"><Badge variant="outline" className="text-blue-400 text-[9px] border-blue-500/30 font-bold uppercase">{currentIdea.format}</Badge>{isSaved && <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />}</div><h3 className="text-sm font-bold text-white mt-1 flex-1 leading-snug text-left text-white text-left">{currentIdea.title}</h3></div></div>
+            <div className="flex gap-4 h-full"><div className="p-2 rounded-xl bg-white/5 shrink-0 text-white">{getIcon(currentIdea.format)}</div><div className="flex-1 flex flex-col h-full text-left text-white"><div className="flex justify-between text-left text-white"><Badge variant="outline" className="text-blue-400 text-[9px] border-blue-500/30 font-bold uppercase">{currentIdea.format}</Badge>{isSaved && <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />}</div><h3 className="text-sm font-bold text-white mt-1 flex-1 leading-snug">{currentIdea.title}</h3></div></div>
           </Card>
         ) : (
           <Card className="relative bg-white/[0.03] border-white/10 rounded-2xl shadow-2xl flex flex-col h-full cursor-pointer hover:bg-white/[0.05] transition-all text-left" onClick={() => setIsExpanded(true)}>
-            <CardHeader className="pb-4 pt-6 px-6 flex flex-row items-center justify-between shrink-0 text-left"><div className="flex items-center gap-3 text-white text-white">{getIcon(currentIdea.format)}<Badge variant="outline" className="text-blue-400 text-[10px] border-blue-500/30 font-bold uppercase">{currentIdea.format}</Badge></div><div onClick={e => e.stopPropagation()} className="text-left text-left">{!hideSaveButton ? <SaveIdeaButton title={currentIdea.title} ideaData={currentIdea} initialSaved={isSaved} /> : dbId ? <DeleteIdeaButton id={dbId} /> : null}</div></CardHeader>
-            <CardContent className="px-6 pb-6 flex-1 flex flex-col overflow-hidden text-left text-white"><h3 className="text-lg font-bold text-white mb-4 leading-tight text-left text-white text-left">{currentIdea.title}</h3><div className="space-y-4 flex-1 overflow-hidden text-left text-white text-white text-left text-left"><div className="pl-4 border-l-2 border-blue-500/30 text-xs italic text-slate-200 line-clamp-3 leading-relaxed text-left text-white text-left">&ldquo;{currentIdea.hook}&rdquo;</div><p className="text-xs text-slate-400 line-clamp-4 leading-relaxed font-light text-left text-white text-left">{currentIdea.description}</p></div><div className="mt-auto pt-5 border-t border-white/5 flex flex-col gap-2 shrink-0 text-left text-white text-white text-left text-left"><div className="text-[10px] font-bold text-emerald-400 uppercase tracking-[0.2em] flex items-center gap-2 text-left"><Star className="w-3 h-3 fill-emerald-400/20" /> Why it works</div><p className="text-[11px] text-slate-500 italic line-clamp-2 leading-snug text-left text-white text-left">{currentIdea.whyItWorks}</p></div></CardContent>
+            <CardHeader className="pb-4 pt-6 px-6 flex flex-row items-center justify-between shrink-0"><div className="flex items-center gap-3 text-white">{getIcon(currentIdea.format)}<Badge variant="outline" className="text-blue-400 text-[10px] border-blue-500/30 font-bold uppercase">{currentIdea.format}</Badge></div><div onClick={e => e.stopPropagation()}>{!hideSaveButton ? <SaveIdeaButton title={currentIdea.title} ideaData={currentIdea} initialSaved={isSaved} /> : dbId ? <DeleteIdeaButton id={dbId} /> : null}</div></CardHeader>
+            <CardContent className="px-6 pb-6 flex-1 flex flex-col overflow-hidden"><h3 className="text-lg font-bold text-white mb-4 leading-tight">{currentIdea.title}</h3><div className="space-y-4 flex-1 overflow-hidden"><div className="pl-4 border-l-2 border-blue-500/30 text-xs italic text-slate-200 line-clamp-3 leading-relaxed">&ldquo;{currentIdea.hook}&rdquo;</div><p className="text-xs text-slate-400 line-clamp-4 leading-relaxed font-light">{currentIdea.description}</p></div><div className="mt-auto pt-5 border-t border-white/5 flex flex-col gap-2 shrink-0"><div className="text-[10px] font-bold text-emerald-400 uppercase tracking-[0.2em] flex items-center gap-2"><Star className="w-3 h-3 fill-emerald-400/20" /> Why it works</div><p className="text-[11px] text-slate-500 italic line-clamp-2 leading-snug">{currentIdea.whyItWorks}</p></div></CardContent>
           </Card>
         )}
       </div>

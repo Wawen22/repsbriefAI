@@ -1,10 +1,11 @@
+// src/components/layout/DashboardSidebar.tsx
 'use client'
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import { Button } from "@/components/ui/button"
-import { LayoutGrid, Calendar, Crown, Zap, Settings, Star, Loader2, Sparkles } from "lucide-react"
+import { LayoutGrid, Calendar, Crown, Zap, Settings, Star, Loader2, Sparkles, BarChart3 } from "lucide-react"
 import { LogoutButton } from "@/components/ui/LogoutButton"
 import { cn } from '@/lib/utils'
 
@@ -50,6 +51,7 @@ export function DashboardSidebar({
     { name: 'This Week', href: '/dashboard', icon: LayoutGrid },
     { name: 'History', href: '/dashboard/history', icon: Calendar },
     { name: 'Saved Ideas', href: '/dashboard/ideas', icon: Star },
+    { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
     { name: 'Settings', href: '/dashboard/settings', icon: Settings },
   ]
 
@@ -64,7 +66,7 @@ export function DashboardSidebar({
         <div className="relative flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-700 shadow-lg shadow-blue-500/20">
           <Zap className="w-4 h-4 text-white fill-white" />
         </div>
-        <span className="text-xl font-bold tracking-tight text-white">RepsBrief</span>
+        <span className="text-xl font-bold tracking-tight text-white font-sans">RepsBrief</span>
       </div>
       
       {/* Navigation */}
@@ -114,7 +116,7 @@ export function DashboardSidebar({
             <div className="space-y-3">
               <p className="text-[11px] text-slate-500 leading-relaxed font-medium">Your next briefing is being prepared for Monday morning.</p>
               <Link href="/dashboard/settings" className="w-full inline-block">
-                <Button size="sm" variant="outline" className="w-full h-8 text-[11px] border-white/10 text-slate-300 hover:bg-white/5 rounded-lg transition-colors">Manage Account</Button>
+                <Button size="sm" variant="outline" className="w-full h-8 text-[11px] border-white/10 text-slate-300 hover:bg-white/5 rounded-lg transition-colors text-left">Manage Account</Button>
               </Link>
             </div>
           ) : (

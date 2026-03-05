@@ -20,6 +20,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
 import { cn } from '@/lib/utils'
+import { createPortal } from 'react-dom'
 
 interface TeleprompterProps {
   title: string
@@ -35,22 +36,11 @@ export function Teleprompter({ title, script, onClose }: TeleprompterProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const requestRef = useRef<number>(null)
   const lastTimeRef = useRef<number>(null)
-  const scrollPosRef = useRef<number>(0) // Float-based scroll position
-
-  const animate = (time: number) => {
-    if (lastTimeRef.current !== undefined && isPlaying && scrollRef.current) {
-      const deltaTime = time - lastTimeRef.current
-      // Calculate scroll increment based on speed - multiplier adjusted for smoothness
-      const increment = (speed / 40) * (deltaTime / 16.67) 
-      
-      scrollPosRef.current += increment
-      scrollRef.current.scrollTop = scrollPosRef.current
-    }
-    lastTimeRef.current = time
-    requestRef.current = requestAnimationFrame(animate)
-  }
+  const scrollPosRef = useRef<number>(0)
+  const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
+    setIsMounted(true)
     // Hide Command Palette indicator when prompter is active
     const cmdPill = document.getElementById('command-palette-indicator')
     if (cmdPill) cmdPill.style.display = 'none'
@@ -62,6 +52,17 @@ export function Teleprompter({ title, script, onClose }: TeleprompterProps) {
       if (cmdPill) cmdPill.style.display = 'block'
     }
   }, [isPlaying, speed])
+
+  const animate = (time: number) => {
+    if (lastTimeRef.current !== undefined && isPlaying && scrollRef.current) {
+      const deltaTime = time - lastTimeRef.current
+      const increment = (speed / 40) * (deltaTime / 16.67) 
+      scrollPosRef.current += increment
+      scrollRef.current.scrollTop = scrollPosRef.current
+    }
+    lastTimeRef.current = time
+    requestRef.current = requestAnimationFrame(animate)
+  }
 
   const startWithCountdown = () => {
     if (isPlaying) {
@@ -91,52 +92,53 @@ export function Teleprompter({ title, script, onClose }: TeleprompterProps) {
     setCountdown(null)
   }
 
-  // Handle manual scrolls to sync float position
   const handleScroll = () => {
     if (scrollRef.current && !isPlaying) {
       scrollPosRef.current = scrollRef.current.scrollTop
     }
   }
 
-  return (
-    <div className="fixed inset-0 z-[200] bg-black flex flex-col animate-in slide-in-from-right duration-500 overflow-hidden">
+  if (!isMounted) return null
+
+  return createPortal(
+    <div className="fixed inset-0 z-[20000] bg-black flex flex-col animate-in slide-in-from-right duration-500 overflow-hidden">
       
-      {/* Top Navigation & Info */}
-      <div className="h-20 border-b border-white/5 bg-black/60 backdrop-blur-xl px-6 md:px-12 flex items-center justify-between relative z-50">
+      {/* Consistent Header Architecture */}
+      <div className="h-24 md:h-20 border-b border-white/5 bg-black/60 backdrop-blur-xl px-6 md:px-12 flex items-center justify-between relative z-[20010]">
         <div className="flex items-center gap-4">
            <Button 
              variant="ghost" 
-             size="icon" 
              onClick={onClose}
-             className="w-10 h-10 rounded-full hover:bg-white/10 text-white mr-2"
+             className="h-11 pl-2 pr-5 rounded-full bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-all gap-3 group/back"
            >
-              <ArrowLeft className="w-6 h-6" />
+              <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center group-hover/back:bg-blue-600 transition-colors">
+                <ArrowLeft className="w-5 h-5" />
+              </div>
+              <span className="text-xs font-black uppercase tracking-widest hidden sm:inline">Back to Strategy</span>
            </Button>
-           <div className="hidden sm:flex w-10 h-10 rounded-2xl bg-blue-600 items-center justify-center shadow-lg shadow-blue-500/20">
-              <Smartphone className="w-5 h-5 text-white" />
-           </div>
-           <div>
-              <h3 className="text-sm font-bold text-white tracking-tight truncate max-w-[150px] sm:max-w-md">{title}</h3>
+           <div className="hidden lg:flex items-center gap-3 ml-4">
+              <div className="p-2 rounded-xl bg-blue-600/20 border border-blue-500/30 text-blue-400">
+                <Smartphone className="w-5 h-5" />
+              </div>
               <div className="flex items-center gap-2">
-                 <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/20">
-                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    <span className="text-[9px] font-black text-emerald-400 uppercase tracking-widest">Recording Mode</span>
-                 </div>
+                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                 <span className="text-[10px] font-black text-emerald-400 uppercase tracking-[0.2em]">Live Recording Mode</span>
               </div>
            </div>
         </div>
         
+        {/* Stylized Close Button matching Strategy view */}
         <button 
           onClick={onClose}
-          className="group flex items-center gap-3 px-4 py-2 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 hover:bg-rose-500 hover:text-white transition-all font-bold text-xs"
+          className="group relative flex items-center justify-center w-12 h-12 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 hover:bg-rose-500 hover:text-white transition-all shadow-2xl active:scale-95"
         >
-          <span>Exit Prompter</span>
-          <X className="w-4 h-4" />
+          <X className="w-6 h-6 relative z-10" />
+          <div className="absolute inset-0 rounded-full bg-rose-500/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity" />
         </button>
       </div>
 
       {/* Main Experience */}
-      <div className="flex-1 relative flex flex-col overflow-hidden">
+      <div className="flex-1 relative flex flex-col overflow-hidden bg-black">
         
         {/* Mirror Line (Where to read) */}
         <div className="absolute top-1/3 left-0 right-0 h-40 pointer-events-none z-20 flex items-center justify-center">
@@ -153,7 +155,7 @@ export function Teleprompter({ title, script, onClose }: TeleprompterProps) {
 
         {/* Countdown Overlay */}
         {countdown !== null && (
-          <div className="absolute inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-md animate-in zoom-in duration-300">
+          <div className="absolute inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-md animate-in zoom-in duration-300">
              <div className="text-[15rem] font-black text-white italic animate-bounce drop-shadow-[0_0_50px_rgba(59,130,246,0.6)]">
                 {countdown}
              </div>
@@ -179,13 +181,13 @@ export function Teleprompter({ title, script, onClose }: TeleprompterProps) {
           </div>
         </div>
 
-        {/* Darkening Gradients for Focus */}
+        {/* Focus Gradients */}
         <div className="absolute top-0 left-0 right-0 h-48 bg-gradient-to-b from-black via-black/80 to-transparent z-10 pointer-events-none" />
         <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-black via-black/80 to-transparent z-10 pointer-events-none" />
       </div>
 
       {/* Control Center */}
-      <div className="bg-black/90 border-t border-white/10 p-8 pb-14 md:pb-10 backdrop-blur-3xl relative z-50 shadow-[0_-30px_60px_rgba(0,0,0,0.8)]">
+      <div className="bg-black/90 border-t border-white/10 p-8 pb-14 md:pb-10 backdrop-blur-3xl relative z-[20020] shadow-[0_-30px_60px_rgba(0,0,0,0.8)]">
         <div className="max-w-6xl mx-auto flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
           
           {/* Action Group */}
@@ -215,7 +217,7 @@ export function Teleprompter({ title, script, onClose }: TeleprompterProps) {
                 {isPlaying ? <Pause className="w-12 h-12 fill-current" /> : <Play className="w-12 h-12 fill-current ml-1.5" />}
              </button>
 
-             <div className="flex flex-col items-center gap-2 group cursor-not-allowed opacity-30">
+             <div className="flex flex-col items-center gap-2 group cursor-not-allowed opacity-30 text-white">
                 <div className="w-14 h-14 rounded-full border border-white/10 bg-white/5 flex items-center justify-center">
                    <Camera className="w-6 h-6 text-slate-500" />
                 </div>
@@ -224,7 +226,7 @@ export function Teleprompter({ title, script, onClose }: TeleprompterProps) {
           </div>
 
           {/* Settings Group */}
-          <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-12 w-full">
+          <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-12 w-full text-white">
             {/* Speed */}
             <div className="space-y-5">
                <div className="flex justify-between items-end">
@@ -235,8 +237,8 @@ export function Teleprompter({ title, script, onClose }: TeleprompterProps) {
                   <span className="text-xs font-mono font-black text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20">{speed}%</span>
                </div>
                <div className="flex items-center gap-5">
-                  <Button variant="outline" size="icon" className="h-9 w-9 rounded-xl border-white/10 bg-white/5 shrink-0" onClick={() => setSpeed(Math.max(0, speed - 5))}>
-                    <Minus className="w-4 h-4 text-white" />
+                  <Button variant="outline" size="icon" className="h-9 w-9 rounded-xl border-white/10 bg-white/5 shrink-0 text-white" onClick={() => setSpeed(Math.max(0, speed - 5))}>
+                    <Minus className="w-4 h-4" />
                   </Button>
                   <Slider 
                     value={[speed]} 
@@ -245,12 +247,13 @@ export function Teleprompter({ title, script, onClose }: TeleprompterProps) {
                     step={1}
                     className="flex-1 cursor-pointer"
                   />
-                  <Button variant="outline" size="icon" className="h-9 w-9 rounded-xl border-white/10 bg-white/5 shrink-0" onClick={() => setSpeed(Math.min(100, speed + 5))}>
-                    <Plus className="w-4 h-4 text-white" />
+                  <Button variant="outline" size="icon" className="h-9 w-9 rounded-xl border-white/10 bg-white/5 shrink-0 text-white" onClick={() => setSpeed(Math.min(100, speed + 5))}>
+                    <Plus className="w-4 h-4" />
                   </Button>
                </div>
             </div>
 
+            {/* Font */}
             <div className="space-y-5">
                <div className="flex justify-between items-end">
                   <div className="flex items-center gap-2">
@@ -260,8 +263,8 @@ export function Teleprompter({ title, script, onClose }: TeleprompterProps) {
                   <span className="text-xs font-mono font-black text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded border border-purple-500/20">{fontSize}px</span>
                </div>
                <div className="flex items-center gap-5">
-                  <Button variant="outline" size="icon" className="h-9 w-9 rounded-xl border-white/10 bg-white/5 shrink-0" onClick={() => setFontSize(Math.max(16, fontSize - 4))}>
-                    <Minus className="w-4 h-4 text-white" />
+                  <Button variant="outline" size="icon" className="h-9 w-9 rounded-xl border-white/10 bg-white/5 shrink-0 text-white" onClick={() => setFontSize(Math.max(16, fontSize - 4))}>
+                    <Minus className="w-4 h-4" />
                   </Button>
                   <Slider 
                     value={[fontSize]} 
@@ -271,8 +274,8 @@ export function Teleprompter({ title, script, onClose }: TeleprompterProps) {
                     step={2}
                     className="flex-1 cursor-pointer"
                   />
-                  <Button variant="outline" size="icon" className="h-9 w-9 rounded-xl border-white/10 bg-white/5 shrink-0" onClick={() => setFontSize(Math.min(100, fontSize + 4))}>
-                    <Plus className="w-4 h-4 text-white" />
+                  <Button variant="outline" size="icon" className="h-9 w-9 rounded-xl border-white/10 bg-white/5 shrink-0 text-white" onClick={() => setFontSize(Math.min(100, fontSize + 4))}>
+                    <Plus className="w-4 h-4" />
                   </Button>
                </div>
             </div>
@@ -280,7 +283,8 @@ export function Teleprompter({ title, script, onClose }: TeleprompterProps) {
 
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
 

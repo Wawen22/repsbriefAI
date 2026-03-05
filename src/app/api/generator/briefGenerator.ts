@@ -268,7 +268,6 @@ function getGenerationProfile(provider: string, model: string): GenerationProfil
   const gpt5OnAzure = provider === 'azure' && isGpt5Model(model)
 
   if (gpt5OnAzure) {
-    // Azure GPT-5 is reliable with chunking, while 20-idea single-shot often wastes time on parse failures.
     return {
       skipSingleShot: true,
       singleShotAttempts: 0,
@@ -288,14 +287,13 @@ function getGenerationProfile(provider: string, model: string): GenerationProfil
 }
 
 function estimateMaxTokens(count: number, cap: number): number {
-  // Conservative token budget to reduce latency while preserving idea richness.
   const estimated = 420 + count * 230
   return Math.max(1100, Math.min(cap, estimated))
 }
 
-function buildSystemPrompt(niche: NicheConfig, brandVoice?: string | null, highPerformers: string[] = []): string {
-  const voiceInstructions = brandVoice
-    ? `\n\nBRAND VOICE TO MATCH:\n${sanitizeText(brandVoice, 2000)}`
+function buildSystemPrompt(niche: NicheConfig, brandPersona?: string | null, highPerformers: string[] = []): string {
+  const personaInstructions = brandPersona
+    ? `\n\nUSER'S UNIQUE CONTENT PERSONA (Tone & Style):\n${sanitizeText(brandPersona, 2000)}\nIMPORTANT: Every Hook, Script, and Description MUST be written in this exact style. If the persona is technical, use technical language. If it is informal and ironic, use that tone. Avoid generic AI corporate speech.`
     : ''
 
   const topPerformers = highPerformers
@@ -307,7 +305,7 @@ function buildSystemPrompt(niche: NicheConfig, brandVoice?: string | null, highP
     ? `\n\nTOP PAST WINNERS TO LEARN FROM:\n${topPerformers.join('\n')}`
     : ''
 
-  return `You are ${niche.claudePersona}. Create high-converting content ideas for ${niche.label}.${voiceInstructions}${performerInstructions}`
+  return `You are ${niche.claudePersona}. Create high-converting content ideas for ${niche.label}.${personaInstructions}${performerInstructions}`
 }
 
 function buildUserPrompt(params: {
@@ -424,14 +422,11 @@ async function generateBatch(params: {
   throw new Error(lastError?.message || 'Batch generation failed')
 }
 
-/**
- * Generates a content brief with resilient JSON handling and chunked generation.
- */
 export async function generateBrief(
   trendsData: TrendItem[],
   ideaHistory: string[],
   niche: NicheConfig,
-  brandVoice?: string | null,
+  brandPersona?: string | null,
   highPerformers: string[] = []
 ): Promise<IdeaObject[]> {
   const provider = process.env.AI_PROVIDER ?? 'openai'
@@ -439,21 +434,9 @@ export async function generateBrief(
 
   if (!model) throw new Error('AI_MODEL env var is not set.')
 
-  const keyMap: Record<string, string | undefined> = {
-    openai: process.env.OPENAI_API_KEY,
-    anthropic: process.env.ANTHROPIC_API_KEY,
-    gemini: process.env.GEMINI_API_KEY,
-    azure: process.env.AZURE_OPENAI_API_KEY,
-    groq: process.env.GROQ_API_KEY,
-  }
-
-  if (!keyMap[provider]) {
-    throw new Error(`API key for provider "${provider}" is missing.`)
-  }
-
   const ai = getAIProvider()
   const profile = getGenerationProfile(provider, model)
-  const systemPrompt = buildSystemPrompt(niche, brandVoice, highPerformers)
+  const systemPrompt = buildSystemPrompt(niche, brandPersona, highPerformers)
 
   const trendsSummary = trendsData.length
     ? trendsData
@@ -467,7 +450,6 @@ export async function generateBrief(
     .map((title) => sanitizeText(title, 140))
     .filter(Boolean)
 
-  // Fast path: single-shot where it is reliable. On Azure GPT-5 we skip it to avoid repeated parse failures.
   if (!profile.skipSingleShot) {
     try {
       const singleShot = await generateBatch({
@@ -500,8 +482,6 @@ export async function generateBrief(
       const message = error instanceof Error ? error.message : 'Unknown single-shot error'
       console.warn(`[Generator] Single-shot generation failed, switching to chunk mode: ${message}`)
     }
-  } else {
-    console.log('[Generator] Skipping single-shot optimization for Azure GPT-5 profile')
   }
 
   let safetyCounter = 0
@@ -525,9 +505,6 @@ export async function generateBrief(
       maxAttempts: adaptiveChunkAttempts,
       maxTokensCap: profile.maxOutputTokensCap,
     })
-    console.log(
-      `[Generator] Batch completed: requested=${batchSize}, received=${batch.ideas.length}, attempt=${batch.attemptsUsed}, elapsed=${(batch.elapsedMs / 1000).toFixed(1)}s`
-    )
 
     let added = 0
     const existingKeys = new Set(collected.map((idea) => titleKey(idea.title)))
@@ -541,7 +518,6 @@ export async function generateBrief(
       if (collected.length >= DEFAULT_TOTAL_IDEAS) break
     }
 
-    // Adaptive attempts: once stable on first try, reduce retries to cut tail latency.
     if (batch.attemptsUsed === 1 && adaptiveChunkAttempts > 2) {
       adaptiveChunkAttempts = 2
     } else if (batch.attemptsUsed >= 2 && adaptiveChunkAttempts < profile.chunkMaxAttempts) {

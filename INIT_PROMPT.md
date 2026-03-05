@@ -29,6 +29,7 @@
     - [x] User Dashboard
     - [x] Niche Picker
     - [x] Settings Page (NicheSwitcher, Plan, Stripe Portal)
+    - [x] Settings Brand Voice fix (server action export contract + response shape compatibility)
     - [x] History Page (Accordion, savedHashes, badges)
     - [x] Ideas Page (NicheFilterBar, count, empty states)
     - [x] Generate Now Button (on-demand brief generation, rate limited)

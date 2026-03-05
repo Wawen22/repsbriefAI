@@ -51,6 +51,7 @@
   - [x] Generator batching: chunk da 10 + tentativi ridotti + token budget dinamico per latenza più bassa
   - [x] Smoke test reale: 20 idee completate con strategia ottimizzata
   - [x] Generator tuning v2: retry adattivo per batch + logging tempi per round
+  - [x] Settings Brand Voice: ripristinato export server action (`updateBrandVoiceAction`) con adapter compatibile (`success` + `data`)
 
 > **Use this file as context when working on any part of the project.**
 > It contains all decisions already made: stack, architecture, business logic, and roadmap.

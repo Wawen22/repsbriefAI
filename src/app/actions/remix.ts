@@ -1,66 +1,64 @@
+// src/app/actions/remix.ts
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
-import { getAIProvider } from '@/lib/ai'
-import { IdeaObject } from '@/types/niche'
+import { createClient } from "@/lib/supabase/server"
+import { getAIProvider } from "@/lib/ai"
+import { IdeaObject } from "@/types/niche"
+import { jsonrepair } from "jsonrepair"
 
-export async function remixScriptAction(
-  idea: IdeaObject, 
-  instruction: string,
-  niche: string = 'fitness'
-) {
+export async function remixScriptAction(idea: IdeaObject, instruction: string) {
   const supabase = await createClient()
+  
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'Unauthorized' }
+  if (!user) return { success: false, error: 'Unauthorized' }
 
-  // Fetch user brand voice if available
   const { data: profile } = await supabase
     .from('profiles')
     .select('brand_voice')
     .eq('id', user.id)
     .single()
 
-  const brandVoice = profile?.brand_voice 
-    ? `\n\nUSER'S UNIQUE BRAND VOICE PROFILE:\n${profile.brand_voice}\nIMPORTANT: You MUST write the remixed hook and script in this exact style and tone.`
-    : ""
+  const brandPersona = profile?.brand_voice
+    ? `\n\nUSER'S UNIQUE CONTENT PERSONA (Tone & Style):\n${profile.brand_voice}\nIMPORTANT: You MUST write the remixed hook and script strictly following this persona. If the persona is "ironic", make the remix ironic. If it's "minimalist", keep it short. Avoid generic corporate language.`
+    : ''
 
   const ai = getAIProvider()
   
-  const systemPrompt = `You are a professional content strategist and world-class copywriter for ${niche} creators. 
-Your goal is to refine and remix an existing content brief based on specific user instructions while maintaining high-engagement standards.${brandVoice}`
-
-  const userPrompt = `
-ORIGINAL BRIEF:
+  try {
+    const prompt = `
+Original Strategy:
 Title: ${idea.title}
-Current Hook: ${idea.hook}
-Current Script: ${idea.scriptDraft || idea.description}
+Hook: ${idea.hook}
+Script: ${idea.scriptDraft || idea.description}
 
-REMIX INSTRUCTION: 
-"${instruction}"
+Remix Instruction: ${instruction}
+${brandPersona}
 
-Please return a JSON object with the remixed content:
+Task: Rewrite the Hook and the Script Draft based on the instruction while maintaining the core concept but adapting it to the User Persona provided above.
+
+Return ONLY a JSON object:
 {
-  "newHook": "The new attention-grabbing opening",
-  "newScript": "The full refined script or structure",
-  "explanation": "1 short sentence on what was changed"
+  "newHook": "...",
+  "newScript": "...",
+  "explanation": "Short reason why this remix works"
 }
-
-IMPORTANT: Respond ONLY with valid JSON.
 `
 
-  try {
-    const response = await ai.complete([
-      { role: 'system', content: systemPrompt },
-      { role: 'user', content: userPrompt },
+    const res = await ai.complete([
+      { role: 'system', content: 'You are an expert content strategist and copywriter. Return ONLY pure JSON.' },
+      { role: 'user', content: prompt }
     ], { jsonMode: true })
 
-    let text = response.text.trim()
-    text = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/m, '').trim()
-    
-    const result = JSON.parse(text)
-    return { success: true, data: result }
-  } catch (err: any) {
+    let cleanText = res.text.replace(/```json|```/gi, '').trim()
+    try {
+      const data = JSON.parse(jsonrepair(cleanText))
+      return { success: true, data }
+    } catch (parseErr) {
+      console.error('[Remix Action] JSON Parse Error:', parseErr, 'Raw text:', res.text)
+      return { success: false, error: 'AI returned invalid format. Please try again.' }
+    }
+  } catch (err) {
     console.error('[Remix Action] Error:', err)
-    return { error: 'AI failed to remix the script. Please try again.' }
+    return { success: false, error: 'Failed to connect to AI engine.' }
   }
 }

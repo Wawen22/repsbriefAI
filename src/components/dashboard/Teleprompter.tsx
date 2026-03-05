@@ -210,6 +210,7 @@ export function Teleprompter({ title, script, onClose }: TeleprompterProps) {
 
           {/* Settings Group */}
           <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-12 w-full">
+            {/* Speed */}
             <div className="space-y-5">
                <div className="flex justify-between items-end">
                   <div className="flex items-center gap-2">
@@ -218,15 +219,22 @@ export function Teleprompter({ title, script, onClose }: TeleprompterProps) {
                   </div>
                   <span className="text-xs font-mono font-black text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20">{speed}%</span>
                </div>
-               <Slider 
-                  value={[speed]} 
-                  onValueChange={(v) => setSpeed(v[0])} 
-                  max={100} 
-                  step={1}
-                  className="cursor-pointer"
-                />
+               <div className="flex items-center gap-5">
+                  <Button variant="outline" size="icon" className="h-9 w-9 rounded-xl border-white/10 bg-white/5 shrink-0" onClick={() => setSpeed(Math.max(0, speed - 5))}>
+                    <Minus className="w-4 h-4 text-white" />
+                  </Button>
+                  <Slider 
+                    value={[speed]} 
+                    onValueChange={(v) => setSpeed(v[0])} 
+                    max={100} 
+                    step={1}
+                    className="flex-1 cursor-pointer"
+                  />
+                  <Button variant="outline" size="icon" className="h-9 w-9 rounded-xl border-white/10 bg-white/5 shrink-0" onClick={() => setSpeed(Math.min(100, speed + 5))}>
+                    <Plus className="w-4 h-4 text-white" />
+                  </Button>
+               </div>
             </div>
-
             <div className="space-y-5">
                <div className="flex justify-between items-end">
                   <div className="flex items-center gap-2">

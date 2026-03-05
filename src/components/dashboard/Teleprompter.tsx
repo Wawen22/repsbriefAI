@@ -35,12 +35,16 @@ export function Teleprompter({ title, script, onClose }: TeleprompterProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const requestRef = useRef<number>(null)
   const lastTimeRef = useRef<number>(null)
+  const scrollPosRef = useRef<number>(0) // Float-based scroll position
 
   const animate = (time: number) => {
     if (lastTimeRef.current !== undefined && isPlaying && scrollRef.current) {
       const deltaTime = time - lastTimeRef.current
-      const increment = (speed / 60) * (deltaTime / 16.67) 
-      scrollRef.current.scrollTop += increment
+      // Calculate scroll increment based on speed - multiplier adjusted for smoothness
+      const increment = (speed / 40) * (deltaTime / 16.67) 
+      
+      scrollPosRef.current += increment
+      scrollRef.current.scrollTop = scrollPosRef.current
     }
     lastTimeRef.current = time
     requestRef.current = requestAnimationFrame(animate)
@@ -79,9 +83,19 @@ export function Teleprompter({ title, script, onClose }: TeleprompterProps) {
   }
 
   const handleReset = () => {
-    if (scrollRef.current) scrollRef.current.scrollTop = 0
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = 0
+      scrollPosRef.current = 0
+    }
     setIsPlaying(false)
     setCountdown(null)
+  }
+
+  // Handle manual scrolls to sync float position
+  const handleScroll = () => {
+    if (scrollRef.current && !isPlaying) {
+      scrollPosRef.current = scrollRef.current.scrollTop
+    }
   }
 
   return (
@@ -139,7 +153,7 @@ export function Teleprompter({ title, script, onClose }: TeleprompterProps) {
 
         {/* Countdown Overlay */}
         {countdown !== null && (
-          <div className="absolute inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-md animate-in zoom-in duration-300">
+          <div className="absolute inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-md animate-in zoom-in duration-300">
              <div className="text-[15rem] font-black text-white italic animate-bounce drop-shadow-[0_0_50px_rgba(59,130,246,0.6)]">
                 {countdown}
              </div>
@@ -149,6 +163,7 @@ export function Teleprompter({ title, script, onClose }: TeleprompterProps) {
         {/* Script Content */}
         <div 
           ref={scrollRef}
+          onScroll={handleScroll}
           className="flex-1 overflow-y-auto px-6 sm:px-24 md:px-48 lg:px-80 py-[45vh] custom-scrollbar selection:bg-blue-500/30"
           style={{ scrollBehavior: 'auto' }}
         >
@@ -225,7 +240,7 @@ export function Teleprompter({ title, script, onClose }: TeleprompterProps) {
                   </Button>
                   <Slider 
                     value={[speed]} 
-                    onValueChange={(v) => setSpeed(v[0])} 
+                    onValueChange={(v) => { setSpeed(v[0]) }} 
                     max={100} 
                     step={1}
                     className="flex-1 cursor-pointer"
@@ -235,13 +250,14 @@ export function Teleprompter({ title, script, onClose }: TeleprompterProps) {
                   </Button>
                </div>
             </div>
+
             <div className="space-y-5">
                <div className="flex justify-between items-end">
                   <div className="flex items-center gap-2">
                      <Type className="w-4 h-4 text-purple-400" />
                      <span className="text-[11px] font-black text-slate-500 uppercase tracking-widest">Text Density</span>
                   </div>
-                  <span className="text-xs font-mono font-black text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded border border-blue-500/20">{fontSize}px</span>
+                  <span className="text-xs font-mono font-black text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded border border-purple-500/20">{fontSize}px</span>
                </div>
                <div className="flex items-center gap-5">
                   <Button variant="outline" size="icon" className="h-9 w-9 rounded-xl border-white/10 bg-white/5 shrink-0" onClick={() => setFontSize(Math.max(16, fontSize - 4))}>
@@ -265,5 +281,13 @@ export function Teleprompter({ title, script, onClose }: TeleprompterProps) {
         </div>
       </div>
     </div>
+  )
+}
+
+function Badge({ children, className }: { children: React.ReactNode, className?: string }) {
+  return (
+    <span className={cn("inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset", className)}>
+      {children}
+    </span>
   )
 }

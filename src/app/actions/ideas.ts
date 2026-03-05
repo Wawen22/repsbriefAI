@@ -36,7 +36,6 @@ export async function saveIdeaAction(
         idea_data: ideaData || null,
         idea_title: title.trim(),
         used_at: new Date().toISOString(),
-        // Keep existing status if already saved, otherwise use provided status
         status: existing.status || status 
       })
       .eq('id', existing.id)
@@ -78,6 +77,30 @@ export async function saveIdeaAction(
   return { success: true, id: newId }
 }
 
+export async function shareIdeaAction(idea: IdeaObject, niche: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Unauthorized' }
+
+  const { data, error } = await supabase
+    .from('shared_strategies')
+    .insert({
+      user_id: user.id,
+      idea_data: idea,
+      niche: niche,
+      creator_name: user.user_metadata?.full_name || user.email?.split('@')[0]
+    })
+    .select('id')
+    .single()
+
+  if (error) {
+    console.error('Failed to share idea:', error)
+    return { error: 'Failed to generate share link' }
+  }
+
+  return { success: true, shareId: data.id }
+}
+
 export async function updateIdeaStatusAction(ideaId: string, status: string) {
   if (!ideaId) return { error: 'Idea ID is required' }
   
@@ -87,7 +110,6 @@ export async function updateIdeaStatusAction(ideaId: string, status: string) {
 
   const updateData: any = { status }
   
-  // If moving to published, set published_at
   if (status === 'published') {
     updateData.published_at = new Date().toISOString()
   }

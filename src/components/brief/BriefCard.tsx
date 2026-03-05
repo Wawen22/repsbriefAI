@@ -7,7 +7,7 @@ import { IdeaObject } from "@/types/niche"
 import { 
   Video, Layers, Hash, Mail, Lightbulb, Copy, Check, TrendingUp, Star, 
   ArrowUpRight, Music, FileText, Sparkles, Wand2, Zap, Loader2, RotateCcw, 
-  MessageSquarePlus, ArrowRight, Share2, Download, Box, Smartphone, Maximize2, ChevronRight, ArrowLeft, X, Orbit, Crown, LayoutGrid, Settings2
+  MessageSquarePlus, ArrowRight, Share2, Download, Box, Smartphone, Maximize2, ChevronRight, ArrowLeft, X, Orbit, Crown, LayoutGrid, Settings2, Link as LinkIcon
 } from "lucide-react"
 import { SaveIdeaButton } from "@/components/ui/SaveIdeaButton"
 import { DeleteIdeaButton } from "@/components/ui/DeleteIdeaButton"
@@ -16,7 +16,7 @@ import { useState, useCallback, useEffect } from "react"
 import { createPortal } from "react-dom"
 import { cn } from "@/lib/utils"
 import { remixScriptAction } from "@/app/actions/remix"
-import { saveIdeaAction } from "@/app/actions/ideas"
+import { saveIdeaAction, shareIdeaAction } from "@/app/actions/ideas"
 import { toast } from "sonner"
 import { Teleprompter } from "@/components/dashboard/Teleprompter"
 import { PerformanceModal } from "@/components/dashboard/PerformanceModal"
@@ -31,7 +31,7 @@ interface BriefCardProps {
   plan?: string
 }
 
-type CopyField = 'title' | 'hook' | 'all' | 'script' | 'notion' | null
+type CopyField = 'title' | 'hook' | 'all' | 'script' | 'notion' | 'share' | null
 
 const REMIX_OPTIONS = [
   { label: "Make it Funnier", icon: "😂" },
@@ -53,6 +53,7 @@ export function BriefCard({
   const [copied, setCopied] = useState<CopyField>(null)
   const [isExpanded, setIsExpanded] = useState(false)
   const [isRemixing, setIsRemixing] = useState(false)
+  const [isSharing, setIsSharing] = useState(false)
   const [showTeleprompter, setShowTeleprompter] = useState(false)
   const [showPerformanceModal, setShowPerformanceModal] = useState(false)
   const [currentIdea, setCurrentIdea] = useState(idea)
@@ -81,6 +82,25 @@ export function BriefCard({
       setCopied(field); setTimeout(() => setCopied(null), 2000);
     }
   }, [])
+
+  const handleShare = async () => {
+    setIsSharing(true)
+    const tid = toast.loading("Generating public link...")
+    try {
+      const res = await shareIdeaAction(currentIdea, 'fitness')
+      if (res.success && res.shareId) {
+        const shareUrl = `${window.location.origin}/share/${res.shareId}`
+        await copyToClipboard(shareUrl, 'share')
+        toast.success("Public link copied to clipboard!", { id: tid })
+      } else {
+        toast.error("Failed to generate link", { id: tid })
+      }
+    } catch (e) {
+      toast.error("Error sharing strategy", { id: tid })
+    } finally {
+      setIsSharing(false)
+    }
+  }
 
   const downloadMarkdown = () => {
     if (!isPro) { toast.error("PRO Feature"); return }
@@ -227,7 +247,7 @@ export function BriefCard({
                 <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest text-left">The Hook</h4>
               </div>
               
-              <div className="p-8 md:p-14 rounded-[2rem] bg-gradient-to-br from-white/[0.03] to-transparent border border-white/5 relative overflow-hidden text-left shadow-2xl">
+              <div className="p-8 md:p-14 rounded-[2rem] bg-gradient-to-br from-white/[0.03] to-transparent border border-white/5 relative overflow-hidden text-left shadow-2xl text-left">
                 <div className="absolute top-0 left-0 w-1 h-20 bg-blue-500 rounded-full text-left" />
                 <div className="relative z-10 text-left">
                   <p className={cn(
@@ -247,21 +267,21 @@ export function BriefCard({
             <section className="space-y-4 text-left text-left">
               <div className="flex items-center gap-3 px-1 text-left text-left">
                 <FileText className="w-4 h-4 text-purple-400 text-left" />
-                <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest text-left text-left">Production Script</h4>
+                <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest text-left text-left text-left">Production Script</h4>
               </div>
               <div className="rounded-[2.5rem] bg-white/[0.01] border border-white/5 overflow-hidden text-left shadow-inner">
-                <div className={cn("p-8 md:p-12 space-y-10 text-left", isRemixing && "blur-lg opacity-20")}>
-                  <div className="space-y-4 text-left">
-                    <span className="text-[9px] font-black text-slate-600 uppercase tracking-[0.2em] block text-left">Concept Strategy</span>
-                    <p className="text-slate-200 text-xl leading-relaxed font-light text-left">{currentIdea.description}</p>
+                <div className={cn("p-8 md:p-12 space-y-10 text-left text-left", isRemixing && "blur-lg opacity-20")}>
+                  <div className="space-y-4 text-left text-left">
+                    <span className="text-[9px] font-black text-slate-600 uppercase tracking-[0.2em] block text-left text-left">Concept Strategy</span>
+                    <p className="text-slate-200 text-xl leading-relaxed font-light text-left text-left">{currentIdea.description}</p>
                   </div>
                   <div className="h-px bg-gradient-to-r from-white/10 to-transparent text-left" />
-                  <div className="space-y-6 text-left">
-                    <div className="flex items-center justify-between text-left">
+                  <div className="space-y-6 text-left text-left text-left">
+                    <div className="flex items-center justify-between text-left text-left">
                       <span className="text-[9px] font-black text-slate-600 uppercase tracking-[0.2em] text-left">Full Script Draft</span>
                       <CopyBtn field="script" text={currentIdea.scriptDraft || ""} label="Copy Script" />
                     </div>
-                    <div className="bg-black/40 p-10 rounded-[2rem] border border-white/5 font-mono text-sm md:text-base text-slate-400 leading-relaxed whitespace-pre-wrap min-h-[350px] relative text-left shadow-2xl text-left">
+                    <div className="bg-black/40 p-10 rounded-[2rem] border border-white/5 font-mono text-sm md:text-base text-slate-400 leading-relaxed whitespace-pre-wrap min-h-[350px] relative text-left shadow-2xl text-left text-left">
                       {currentIdea.scriptDraft || "Finalizing the script details..."}
                       {isRemixing && <Loader2 className="absolute inset-0 m-auto animate-spin text-purple-500 w-10 h-10" />}
                     </div>
@@ -277,8 +297,6 @@ export function BriefCard({
           activeTab === 'content' ? 'hidden md:flex' : 'flex'
         )}>
           <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6 text-left">
-            
-            {/* AI STRATEGY REMIX */}
             <section className="bg-white/[0.03] border border-white/10 rounded-[1.5rem] overflow-hidden shadow-2xl relative text-left">
               {!isPro && (
                 <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-[#050505]/95 backdrop-blur-[6px] p-6 text-center">
@@ -287,12 +305,12 @@ export function BriefCard({
                   <Button size="sm" className="bg-white text-black hover:bg-slate-200 rounded-full font-black text-[9px] h-7 px-5">Upgrade</Button>
                 </div>
               )}
-              <div className="p-5 space-y-5 text-left">
+              <div className="p-5 space-y-5 text-left text-left">
                 <div className="flex flex-col gap-1 text-left">
                   <div className="flex items-center justify-between text-left">
                     <div className="flex items-center gap-2 text-left">
                       <Sparkles className="w-3.5 h-3.5 text-purple-400 text-left" />
-                      <span className="text-[9px] font-black text-white uppercase tracking-widest text-left">AI Strategy Remix</span>
+                      <span className="text-[9px] font-black text-white uppercase tracking-widest text-left text-left">AI Strategy Remix</span>
                     </div>
                     {remixHistory.length > 1 && (
                       <button onClick={undoRemix} className="text-[8px] font-black text-slate-500 hover:text-white flex items-center gap-1.5 transition-colors uppercase text-left">
@@ -304,16 +322,15 @@ export function BriefCard({
                     Tailor this strategy to your specific needs or tone using our AI engine.
                   </p>
                 </div>
-
                 <div className="grid grid-cols-1 gap-1.5 text-left">
                   {REMIX_OPTIONS.map(o => (
                     <button 
                       key={o.label} 
                       onClick={() => handleRemix(o.label)} 
                       disabled={isRemixing || !isPro}
-                      className="group flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-purple-500/10 hover:border-purple-500/30 transition-all text-left disabled:opacity-50"
+                      className="group flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-purple-500/10 hover:border-purple-500/30 transition-all text-left disabled:opacity-50 text-left"
                     >
-                      <div className="flex items-center gap-3 text-left text-left">
+                      <div className="flex items-center gap-3 text-left">
                         <span className="text-sm">{o.icon}</span>
                         <span className="text-[9px] font-bold text-slate-400 group-hover:text-white uppercase tracking-tight text-left">{o.label}</span>
                       </div>
@@ -321,7 +338,6 @@ export function BriefCard({
                     </button>
                   ))}
                 </div>
-
                 <div className="relative pt-1 text-left text-left">
                   <input 
                     type="text" 
@@ -330,7 +346,7 @@ export function BriefCard({
                     value={customInstruction} 
                     onChange={e => setCustomInstruction(e.target.value)}
                     onKeyDown={e => e.key === 'Enter' && handleRemix(customInstruction)}
-                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-[10px] text-white placeholder:text-slate-600 focus:outline-none focus:border-purple-500/50 transition-all text-left" 
+                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-[10px] text-white placeholder:text-slate-600 focus:outline-none focus:border-purple-500/50 transition-all text-left text-left" 
                   />
                   <button 
                     onClick={() => handleRemix(customInstruction)} 
@@ -342,14 +358,12 @@ export function BriefCard({
                 </div>
               </div>
             </section>
-
-            {/* STRATEGY ANALYSIS */}
-            <section className="p-6 rounded-[1.5rem] bg-emerald-500/[0.03] border border-emerald-500/10 space-y-3 text-left">
-              <div className="flex items-center gap-2 text-left">
-                <TrendingUp className="w-3.5 h-3.5 text-emerald-400" />
-                <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest text-left">Strategy Analysis</span>
+            <section className="p-6 rounded-[1.5rem] bg-emerald-500/[0.03] border border-emerald-500/10 space-y-3 text-left text-left text-left">
+              <div className="flex items-center gap-2 text-left text-left">
+                <TrendingUp className="w-3.5 h-3.5 text-emerald-400 text-left" />
+                <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest text-left text-left text-left">Strategy Analysis</span>
               </div>
-              <p className="text-[11px] text-emerald-100/60 leading-relaxed italic font-light text-left">
+              <p className="text-[11px] text-emerald-100/60 leading-relaxed italic font-light text-left text-left text-left">
                 &ldquo;{currentIdea.whyItWorks}&rdquo;
               </p>
             </section>
@@ -378,29 +392,38 @@ export function BriefCard({
         </button>
       </div>
 
-      <footer className="h-10 bg-black border-t border-white/5 flex items-center justify-center px-4 md:px-6 relative z-[10020] shrink-0 text-left">
-        <div className="absolute left-4 md:left-6 hidden sm:flex items-center gap-1.5 text-left">
-          <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest text-left">Live Brief</span>
+      <footer className="h-10 bg-black border-t border-white/5 flex items-center justify-center px-4 md:px-6 relative z-[10020] shrink-0 text-left text-left text-left">
+        <div className="absolute left-4 md:left-6 hidden sm:flex items-center gap-1.5 text-left text-left">
+          <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse text-left" />
+          <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest text-left text-left">Live Brief</span>
         </div>
-        <div className="flex items-center gap-3 text-left">
-          <span className="text-[8px] font-black text-slate-600 uppercase tracking-widest hidden xs:inline text-left">Distribution:</span>
-          <div className="flex items-center gap-2 text-left">
-            <div className="flex items-center gap-2 px-2 py-0.5 rounded bg-white/[0.03] border border-white/5 h-[26px] text-left">
-              <span className="text-[8px] font-bold text-white uppercase text-left">Notion</span>
-              <CopyBtn field="notion" text={formatForNotion()} label="Sync" icon={Share2} className="h-5 px-1.5 text-[8px] text-left" />
+        <div className="flex items-center gap-3 text-left text-left">
+          <span className="text-[8px] font-black text-slate-600 uppercase tracking-widest hidden xs:inline text-left text-left">Distribution:</span>
+          <div className="flex items-center gap-2 text-left text-left">
+            <div className="flex items-center gap-2 px-2 py-0.5 rounded bg-white/[0.03] border border-white/5 h-[26px] text-left text-left">
+              <span className="text-[8px] font-bold text-white uppercase text-left text-left">Notion</span>
+              <CopyBtn field="notion" text={formatForNotion()} label="Sync" icon={Share2} className="h-5 px-1.5 text-[8px] text-left text-left" />
             </div>
             <button 
               onClick={downloadMarkdown}
-              className="flex items-center gap-2 px-2 py-0.5 rounded bg-blue-500/10 border border-blue-500/20 text-blue-400 hover:bg-blue-600 hover:text-white transition-all h-[26px] text-left"
+              className="flex items-center gap-2 px-2 py-0.5 rounded bg-blue-500/10 border border-blue-500/20 text-blue-400 hover:bg-blue-600 hover:text-white transition-all h-[26px] text-left text-left"
             >
-              <Download className="w-2.5 h-2.5" />
-              <span className="text-[8px] font-bold uppercase text-left">Brief.md</span>
+              <Download className="w-2.5 h-2.5 text-left" />
+              <span className="text-[8px] font-bold uppercase text-left text-left">Brief.md</span>
+            </button>
+            <div className="h-4 w-px bg-white/10 mx-1" />
+            <button 
+              onClick={handleShare}
+              disabled={isSharing}
+              className="flex items-center gap-2 px-3 py-0.5 rounded bg-purple-500/10 border border-purple-500/20 text-purple-400 hover:bg-purple-600 hover:text-white transition-all h-[26px] text-left text-left"
+            >
+              {isSharing ? <Loader2 className="w-2.5 h-2.5 animate-spin" /> : <Share2 className="w-2.5 h-2.5" />}
+              <span className="text-[8px] font-bold uppercase text-left text-left">{copied === 'share' ? 'Copied!' : 'Share Page'}</span>
             </button>
           </div>
         </div>
-        <div className="absolute right-4 md:right-6 hidden lg:flex items-center gap-1.5 text-left">
-          <span className="text-[8px] font-black text-slate-700 uppercase tracking-[0.3em] text-left">RepBrief Studio v1.0</span>
+        <div className="absolute right-4 md:right-6 hidden lg:flex items-center gap-1.5 text-left text-left">
+          <span className="text-[8px] font-black text-slate-700 uppercase tracking-[0.3em] text-left text-left text-left">RepBrief Studio v1.0</span>
         </div>
       </footer>
     </div>,
@@ -410,15 +433,15 @@ export function BriefCard({
   return (
     <>
       <div className="group relative h-full text-left">
-        <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500/0 via-blue-500/0 to-blue-500/0 group-hover:from-blue-500/10 group-hover:to-emerald-500/10 rounded-[22px] blur opacity-0 group-hover:opacity-100 transition duration-500 text-left" />
+        <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500/0 via-blue-500/0 to-blue-500/0 group-hover:from-blue-500/10 group-hover:to-emerald-500/10 rounded-[22px] blur opacity-0 group-hover:opacity-100 transition duration-500 text-left text-left" />
         {variant === 'compact' ? (
-          <Card className="relative bg-white/[0.03] border-white/10 rounded-2xl cursor-pointer p-4 h-full flex flex-col hover:bg-white/[0.05] transition-all text-left" onClick={() => setIsExpanded(true)}>
-            <div className="flex gap-4 h-full text-left text-left"><div className="p-2 rounded-xl bg-white/5 shrink-0 text-white">{getIcon(currentIdea.format)}</div><div className="flex-1 flex flex-col h-full text-left text-white"><div className="flex justify-between text-left text-white"><Badge variant="outline" className="text-blue-400 text-[9px] border-blue-500/30 font-bold uppercase text-left">{currentIdea.format}</Badge>{isSaved && <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />}</div><h3 className="text-sm font-bold text-slate-200 mt-1 flex-1 leading-snug text-left">{currentIdea.title}</h3></div></div>
+          <Card className="relative bg-white/[0.03] border-white/10 rounded-2xl cursor-pointer p-4 h-full flex flex-col hover:bg-white/[0.05] transition-all text-left text-left" onClick={() => setIsExpanded(true)}>
+            <div className="flex gap-4 h-full text-left text-left text-left"><div className="p-2 rounded-xl bg-white/5 shrink-0 text-white text-left">{getIcon(currentIdea.format)}</div><div className="flex-1 flex flex-col h-full text-left text-white text-left"><div className="flex justify-between text-left text-white text-left"><Badge variant="outline" className="text-blue-400 text-[9px] border-blue-500/30 font-bold uppercase text-left text-left">{currentIdea.format}</Badge>{isSaved && <Star className="w-3 h-3 text-yellow-500 fill-yellow-500 text-left" />}</div><h3 className="text-sm font-bold text-slate-200 mt-1 flex-1 leading-snug text-left text-left text-left">{currentIdea.title}</h3></div></div>
           </Card>
         ) : (
-          <Card className="relative bg-white/[0.03] border-white/10 rounded-2xl shadow-2xl flex flex-col h-full cursor-pointer hover:bg-white/[0.05] transition-all text-left" onClick={() => setIsExpanded(true)}>
-            <CardHeader className="pb-4 pt-6 px-6 flex flex-row items-center justify-between shrink-0 text-left"><div className="flex items-center gap-3 text-white">{getIcon(currentIdea.format)}<Badge variant="outline" className="text-blue-400 text-[10px] border-blue-500/30 font-bold uppercase text-left">{currentIdea.format}</Badge></div><div onClick={e => e.stopPropagation()} className="text-left">{!hideSaveButton ? <SaveIdeaButton title={currentIdea.title} ideaData={currentIdea} initialSaved={isSaved} /> : dbId ? <DeleteIdeaButton id={dbId} /> : null}</div></CardHeader>
-            <CardContent className="px-6 pb-6 flex-1 flex flex-col overflow-hidden text-left"><h3 className="text-lg font-bold text-slate-200 mb-4 leading-tight text-left">{currentIdea.title}</h3><div className="space-y-4 flex-1 overflow-hidden text-left text-left text-left"><div className="pl-4 border-l-2 border-blue-500/30 text-xs italic text-slate-200 line-clamp-3 leading-relaxed text-left">&ldquo;{currentIdea.hook}&rdquo;</div><p className="text-xs text-slate-400 line-clamp-4 leading-relaxed font-light text-left">{currentIdea.description}</p></div><div className="mt-auto pt-5 border-t border-white/5 flex flex-col gap-2 shrink-0 text-left"><div className="text-[10px] font-bold text-emerald-400 uppercase tracking-[0.2em] flex items-center gap-2 text-left"><Star className="w-3 h-3 fill-emerald-400/20 text-left" /> Why it works</div><p className="text-[11px] text-slate-500 italic line-clamp-2 leading-snug text-left">{currentIdea.whyItWorks}</p></div></CardContent>
+          <Card className="relative bg-white/[0.03] border-white/10 rounded-2xl shadow-2xl flex flex-col h-full cursor-pointer hover:bg-white/[0.05] transition-all text-left text-left" onClick={() => setIsExpanded(true)}>
+            <CardHeader className="pb-4 pt-6 px-6 flex flex-row items-center justify-between shrink-0 text-left text-left"><div className="flex items-center gap-3 text-white text-left text-left">{getIcon(currentIdea.format)}<Badge variant="outline" className="text-blue-400 text-[10px] border-blue-500/30 font-bold uppercase text-left text-left">{currentIdea.format}</Badge></div><div onClick={e => e.stopPropagation()} className="text-left text-left">{!hideSaveButton ? <SaveIdeaButton title={currentIdea.title} ideaData={currentIdea} initialSaved={isSaved} /> : dbId ? <DeleteIdeaButton id={dbId} /> : null}</div></CardHeader>
+            <CardContent className="px-6 pb-6 flex-1 flex flex-col overflow-hidden text-left text-left"><h3 className="text-lg font-bold text-slate-200 mb-4 leading-tight text-left text-left text-left">{currentIdea.title}</h3><div className="space-y-4 flex-1 overflow-hidden text-left text-left text-left text-left"><div className="pl-4 border-l-2 border-blue-500/30 text-xs italic text-slate-200 line-clamp-3 leading-relaxed text-left text-left">&ldquo;{currentIdea.hook}&rdquo;</div><p className="text-xs text-slate-400 line-clamp-4 leading-relaxed font-light text-left text-left">{currentIdea.description}</p></div><div className="mt-auto pt-5 border-t border-white/5 flex flex-col gap-2 shrink-0 text-left text-left text-left"><div className="text-[10px] font-bold text-emerald-400 uppercase tracking-[0.2em] flex items-center gap-2 text-left text-left"><Star className="w-3 h-3 fill-emerald-400/20 text-left text-left" /> Why it works</div><p className="text-[11px] text-slate-500 italic line-clamp-2 leading-snug text-left text-left">{currentIdea.whyItWorks}</p></div></CardContent>
           </Card>
         )}
       </div>

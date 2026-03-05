@@ -85,14 +85,49 @@ export async function updateIdeaStatusAction(ideaId: string, status: string) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Unauthorized' }
 
+  const updateData: any = { status }
+  
+  // If moving to published, set published_at
+  if (status === 'published') {
+    updateData.published_at = new Date().toISOString()
+  }
+
   const { error } = await supabase
     .from('idea_history')
-    .update({ status })
+    .update(updateData)
     .match({ id: ideaId, user_id: user.id })
 
   if (error) {
     console.error('Failed to update status:', error)
     return { error: 'Failed to update status' }
+  }
+
+  revalidatePath('/dashboard/ideas')
+  return { success: true }
+}
+
+export async function updatePerformanceAction(
+  ideaId: string, 
+  data: { 
+    performance_score?: number, 
+    views_count?: number, 
+    performance_notes?: string 
+  }
+) {
+  if (!ideaId) return { error: 'Idea ID is required' }
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Unauthorized' }
+
+  const { error } = await supabase
+    .from('idea_history')
+    .update(data)
+    .match({ id: ideaId, user_id: user.id })
+
+  if (error) {
+    console.error('Failed to update performance:', error)
+    return { error: 'Failed to update performance' }
   }
 
   revalidatePath('/dashboard/ideas')

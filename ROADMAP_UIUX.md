@@ -16,8 +16,8 @@ This document tracks the strategic UI/UX improvements to elevate RepsBrief into 
 | 8 | **AI Remix & Refine** | 🔴 High | ✅ Done | Interactive "Magic Wand" tools to instantly change tone, length, or format with full persistence. |
 | 9 | **Brand Voice Tuning** | 🟡 Medium | ✅ Done | Analyze user's past successful posts to clone their exact writing style for future briefs. |
 | 10 | **Notion/Ecosystem Sync** | 🟢 Low | ✅ Done | 1-click export of strategies to Notion, Trello, or Markdown files. |
-| 11 | **Mobile Teleprompter Mode**| 🔴 High | 🚧 In Progress | A dedicated recording mode for mobile that scrolls scripts like a professional teleprompter. |
-| 12 | **Performance Feedback Loop**| 🟡 Medium | ⬜ Todo | Track view/like counts for published ideas to refine the AI's understanding of what works for you. |
+| 11 | **Mobile Teleprompter Mode**| 🔴 High | ✅ Done | A dedicated recording mode for mobile that scrolls scripts like a professional teleprompter. |
+| 12 | **Performance Feedback Loop**| 🟡 Medium | 🚧 In Progress | Track view/like counts for published ideas to refine the AI's understanding of what works for you. |
 | 13 | **Guided Onboarding Tour** | 🔴 High | ⬜ Todo | Interactive walkthrough for new users: Voice training -> First brief -> Kanban move. |
 | 14 | **Multi-Workspace Projects**| 🟡 Medium | ⬜ Todo | Manage multiple brands/channels with separate niches and brand voices under one account. |
 
@@ -32,3 +32,4 @@ This document tracks the strategic UI/UX improvements to elevate RepsBrief into 
 - [x] **Growth History Timeline:** Redesigned vault experience with master cards and strategic summaries.
 - [x] **Command Palette (⌘K):** Professional navigation and quick action tool.
 - [x] **Workspace Sync:** Notion formatting and Markdown export functionality.
+- [x] **Teleprompter Mode:** Professional mobile-first script scroller with precision controls and countdown.

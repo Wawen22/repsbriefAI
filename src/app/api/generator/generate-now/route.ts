@@ -93,10 +93,10 @@ export async function POST() {
       allTrends = freshTrends?.flatMap((t: { data: TrendItem[] }) => t.data) || []
     }
 
-    // 5. Load user's idea history for deduplication
+    // 5. Load user's idea history for deduplication and performance learning
     const { data: history } = await supabaseAdmin
       .from('idea_history')
-      .select('idea_title')
+      .select('idea_title, performance_score, idea_data')
       .eq('user_id', user.id)
       .eq('niche', nicheId)
 
@@ -104,13 +104,19 @@ export async function POST() {
       .map((h: { idea_title: string | null }) => h.idea_title)
       .filter(Boolean) as string[]
 
+    // Extract high-performers (score 4 or 5)
+    const highPerformers = (history || [])
+      .filter(h => h.performance_score && h.performance_score >= 4)
+      .map(h => `- [PERFORMER] ${h.idea_title}: ${h.idea_data?.description || ''}`)
+      .slice(0, 5) // Send top 5 to keep prompt clean
+
     // 6. Generate brief via AI abstraction layer
-    console.log(`[GenerateNow] Generating brief for user ${user.id} (${nicheId}), trends: ${allTrends.length}...`)
+    console.log(`[GenerateNow] Generating brief for user ${user.id} (${nicheId}), trends: ${allTrends.length}, performers: ${highPerformers.length}...`)
 
     let ideas
     try {
-      // Pass the brand_voice from profile directly to briefGenerator
-      ideas = await generateBrief(allTrends, historyTitles, niche, profile.brand_voice)
+      // Pass the high-performers to enable the feedback loop
+      ideas = await generateBrief(allTrends, historyTitles, niche, profile.brand_voice, highPerformers)
     } catch (genErr: any) {
       console.error('[GenerateNow] Generation failed:', genErr.message)
       console.error('[GenerateNow] Full error stack:', genErr.stack || genErr)

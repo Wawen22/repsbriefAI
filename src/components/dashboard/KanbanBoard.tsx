@@ -15,6 +15,7 @@ import { updateIdeaStatusAction } from '@/app/actions/ideas'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd'
+import { PerformanceModal } from './PerformanceModal'
 
 interface KanbanIdea {
   id: string
@@ -34,6 +35,7 @@ const COLUMNS = [
 export function KanbanBoard({ initialIdeas }: { initialIdeas: KanbanIdea[] }) {
   const [ideas, setIdeas] = useState(initialIdeas)
   const [isMounted, setIsMounted] = useState(false)
+  const [performanceIdea, setPerformanceIdea] = useState<{ id: string, title: string } | null>(null)
 
   // Prevent hydration issues with DND
   useEffect(() => {
@@ -51,6 +53,14 @@ export function KanbanBoard({ initialIdeas }: { initialIdeas: KanbanIdea[] }) {
     
     // Optimistic UI update
     setIdeas(ideas.map(i => i.id === draggableId ? { ...i, status: newStatus } : i))
+
+    // Trigger performance modal if moved to published
+    if (newStatus === 'published') {
+      const idea = ideas.find(i => i.id === draggableId)
+      if (idea) {
+        setPerformanceIdea({ id: idea.id, title: idea.idea_title })
+      }
+    }
 
     try {
       const res = await updateIdeaStatusAction(draggableId, newStatus)
@@ -140,6 +150,15 @@ export function KanbanBoard({ initialIdeas }: { initialIdeas: KanbanIdea[] }) {
           )
         })}
       </div>
+
+      {performanceIdea && (
+        <PerformanceModal 
+          ideaId={performanceIdea.id} 
+          title={performanceIdea.title} 
+          isOpen={!!performanceIdea} 
+          onClose={() => setPerformanceIdea(null)} 
+        />
+      )}
     </DragDropContext>
   )
 }

@@ -19,13 +19,14 @@ const IdeaSchema = z.object({
 const BriefSchema = z.array(IdeaSchema)
 
 /**
- * Generates a content brief using AI with robust JSON repair.
+ * Generates a content brief using AI with robust JSON repair and performance learning.
  */
 export async function generateBrief(
   trendsData: TrendItem[], 
   ideaHistory: string[], 
   niche: NicheConfig,
-  brandVoice?: string | null
+  brandVoice?: string | null,
+  highPerformers: string[] = []
 ): Promise<IdeaObject[]> {
   const provider = process.env.AI_PROVIDER ?? 'openai'
   const model = process.env.AI_MODEL
@@ -56,8 +57,12 @@ export async function generateBrief(
     ? `\n\nUSER'S BRAND VOICE:\n${brandVoice}\nWrite all content in this style.`
     : ""
 
+  const performanceSection = highPerformers.length > 0
+    ? `\n\nHIGH-PERFORMING PAST IDEAS (Learned from user feedback):\n${highPerformers.join('\n')}\nAnalyze why these worked and generate similar high-engagement concepts.`
+    : ""
+
   const systemPrompt = `You are ${niche.claudePersona}. Generate 20 high-impact content ideas for ${niche.label}. 
-Provide detailed strategies including a ready-to-use script for each.${voiceInstructions}`
+Provide detailed strategies including a ready-to-use script for each.${voiceInstructions}${performanceSection}`
   
   const userPrompt = `
 Analyze these trends:
@@ -96,33 +101,19 @@ IMPORTANT:
       ], { jsonMode: true, maxTokens: 8192 })
 
       let text = response.text.trim()
-      
-      // 1. Basic Cleaning
       text = text.replace(/^\uFEFF/, '')
       text = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/m, '').trim()
       
-      // 2. Extract Array if wrapped in junk
       const arrayStart = text.indexOf('[')
       const arrayEnd = text.lastIndexOf(']')
       if (arrayStart !== -1 && arrayEnd > arrayStart) {
         text = text.substring(arrayStart, arrayEnd + 1)
       }
 
-      // 3. Attempt to fix common JSON errors (trailing commas, unescaped newlines in scripts)
-      // Note: This is a basic repair, but helpful for LLM quirks
-      let cleanedText = text
-        .replace(/,\s*([}\]])/g, '$1') // remove trailing commas
-        .replace(/\n/g, '\\n') // escape literal newlines if they slipped through
-        .replace(/\r/g, '\\r')
-      
-      // Re-escape properly if the LLM sent raw newlines inside JSON strings
-      // This is tricky, so we'll try a safer approach: standard parse first
       let ideasArray: any[]
       try {
         ideasArray = JSON.parse(text)
       } catch (e) {
-        console.warn(`[Generator] Standard JSON.parse failed on attempt ${attempt}. Trying aggressive repair...`)
-        // Try removing control characters that often break JSON.parse
         const fixedText = text.replace(/[\u0000-\u001F\u007F-\u009F]/g, "")
         ideasArray = JSON.parse(fixedText)
       }
@@ -136,12 +127,8 @@ IMPORTANT:
     } catch (err: any) {
       lastError = err
       console.error(`[Generator] Attempt ${attempt} failed:`, err.message)
-      // On third attempt, try to ask for fewer ideas if length was the issue
-      if (attempt === 2) {
-        console.log("[Generator] Retrying with request for only 15 ideas to ensure valid JSON...")
-      }
     }
   }
 
-  throw new Error(`Brief generation failed. The AI returned invalid data. Tip: Try shortening your Brand Voice samples. Details: ${lastError?.message}`)
+  throw new Error(`Brief generation failed. The AI returned invalid data. Details: ${lastError?.message}`)
 }

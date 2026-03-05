@@ -25,6 +25,7 @@ import { remixScriptAction } from "@/app/actions/remix"
 import { saveIdeaAction } from "@/app/actions/ideas"
 import { toast } from "sonner"
 import { Teleprompter } from "@/components/dashboard/Teleprompter"
+import { PerformanceModal } from "@/components/dashboard/PerformanceModal"
 
 interface BriefCardProps {
   idea: IdeaObject
@@ -32,6 +33,7 @@ interface BriefCardProps {
   hideSaveButton?: boolean
   dbId?: string
   variant?: 'default' | 'compact'
+  status?: string
 }
 
 type CopyField = 'title' | 'hook' | 'all' | 'script' | 'notion' | null
@@ -49,12 +51,14 @@ export function BriefCard({
   isSaved: initialIsSaved = false, 
   hideSaveButton = false, 
   dbId: initialDbId,
-  variant = 'default'
+  variant = 'default',
+  status: initialStatus = 'backlog'
 }: BriefCardProps) {
   const [copied, setCopied] = useState<CopyField>(null)
   const [isExpanded, setIsExpanded] = useState(false)
   const [isRemixing, setIsRemixing] = useState(false)
   const [showTeleprompter, setShowTeleprompter] = useState(false)
+  const [showPerformanceModal, setShowPerformanceModal] = useState(false)
   const [currentIdea, setCurrentIdea] = useState(idea)
   const [remixHistory, setRemixHistory] = useState<IdeaObject[]>([idea])
   const [customInstruction, setCustomInstruction] = useState("")
@@ -78,7 +82,7 @@ export function BriefCard({
   }, [])
 
   const downloadMarkdown = () => {
-    const content = `# ${currentIdea.title}\n\n## Hook\n> ${currentIdea.hook}\n\n## Concept\n${currentIdea.description}\n\n## AI Script\n${currentIdea.scriptDraft || '...'}\n\n## Strategy\n- **Format:** ${currentIdea.format}`;
+    const content = `# ${currentIdea.title}\n\n## Hook\n> ${currentIdea.hook}\n\n## Concept\n${currentIdea.description}\n\n## AI Script\n${currentIdea.scriptDraft || '...'}`;
     const blob = new Blob([content], { type: 'text/markdown' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a'); a.href = url; a.download = `Brief-${currentIdea.title}.md`;
@@ -133,30 +137,12 @@ export function BriefCard({
     <div className="fixed inset-0 z-[150] bg-black flex flex-col animate-in slide-in-from-bottom-4 duration-500 overflow-hidden">
       <div className="h-20 border-b border-white/5 bg-black/60 backdrop-blur-xl px-6 md:px-12 flex items-center justify-between shrink-0 z-30">
         <div className="flex items-center gap-4">
-           <Button 
-             variant="ghost" 
-             onClick={() => setIsExpanded(false)}
-             className="h-11 pl-2 pr-5 rounded-full bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-all gap-3 group/back"
-           >
-              <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center group-hover/back:bg-blue-600 transition-colors text-white">
-                <ArrowLeft className="w-5 h-5" />
-              </div>
-              <span className="text-xs font-black uppercase tracking-widest hidden sm:inline">Dashboard</span>
-           </Button>
-           <div className="hidden lg:flex items-center gap-3 ml-4">
-              {getIcon(currentIdea.format)}
-              <Badge variant="outline" className="text-blue-300 text-[10px] border-blue-500/20 uppercase tracking-widest font-black">{currentIdea.format} Strategy</Badge>
-           </div>
+           <Button variant="ghost" onClick={() => setIsExpanded(false)} className="h-11 pl-2 pr-5 rounded-full bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-all gap-3 group/back text-white"><div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center group-hover/back:bg-blue-600 transition-colors text-white"><ArrowLeft className="w-5 h-5 text-white" /></div><span className="text-xs font-black uppercase tracking-widest hidden sm:inline text-white">Dashboard</span></Button>
+           <div className="hidden lg:flex items-center gap-3 ml-4">{getIcon(currentIdea.format)}<Badge variant="outline" className="text-blue-300 text-[10px] border-blue-500/20 uppercase tracking-widest font-black">{currentIdea.format} Strategy</Badge></div>
         </div>
         <div className="flex items-center gap-4">
            <div className="hidden md:flex items-center gap-2"><CopyBtn field="all" text={currentIdea.title} label="Copy Strategy" /><div className="h-4 w-px bg-white/10 mx-2" /></div>
-           <button 
-             onClick={() => setIsExpanded(false)}
-             className="group relative flex items-center justify-center w-10 h-10 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 hover:bg-rose-500 hover:text-white transition-all shadow-lg"
-           >
-             <X className="w-5 h-5 relative z-10" />
-             <div className="absolute inset-0 rounded-full bg-rose-500/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity" />
-           </button>
+           <button onClick={() => setIsExpanded(false)} className="group relative flex items-center justify-center w-10 h-10 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 hover:bg-rose-500 hover:text-white transition-all shadow-lg"><X className="w-5 h-5 relative z-10" /><div className="absolute inset-0 rounded-full bg-rose-500/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity" /></button>
         </div>
       </div>
       <div className="flex-1 overflow-y-auto custom-scrollbar relative">
@@ -166,15 +152,12 @@ export function BriefCard({
           <div className="flex flex-col lg:flex-row justify-between gap-12 text-left">
             <div className="space-y-6 flex-1">
                <h1 className="text-4xl md:text-6xl font-black text-white tracking-tighter leading-tight text-balance">{currentIdea.title}</h1>
-               <div className="flex flex-wrap gap-4">
-                  <div className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-white/5 border border-white/10 text-slate-300 text-sm font-medium"><Orbit className="w-4 h-4 text-blue-400 animate-spin-slow" />{currentIdea.format} Distribution</div>
-                  {remixHistory.length > 1 && <Badge className="bg-purple-500/10 text-purple-400 border-purple-500/20 px-3 py-1.5 rounded-full text-[10px] font-black uppercase animate-pulse"><Wand2 className="w-3.5 h-3.5 mr-2" /> Personalized Remix</Badge>}
-               </div>
+               <div className="flex flex-wrap gap-4"><div className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-white/5 border border-white/10 text-slate-300 text-sm font-medium"><Orbit className="w-4 h-4 text-blue-400 animate-spin-slow" />{currentIdea.format} Distribution</div>{remixHistory.length > 1 && <Badge className="bg-purple-500/10 text-purple-400 border-purple-500/20 px-3 py-1.5 rounded-full text-[10px] font-black uppercase animate-pulse"><Wand2 className="w-3.5 h-3.5 mr-2" /> Personalized Remix</Badge>}</div>
             </div>
             <div className="bg-white/[0.03] border border-white/10 rounded-[2rem] p-6 md:p-8 w-full lg:w-96 space-y-6 shadow-2xl backdrop-blur-md">
                <div className="flex items-center justify-between"><div className="flex items-center gap-2"><Sparkles className="w-4 h-4 text-purple-400" /><span className="text-[10px] font-black text-white uppercase tracking-[0.2em]">AI Remix</span></div>{remixHistory.length > 1 && <button onClick={undoRemix} className="text-[10px] font-bold text-slate-500 hover:text-white flex items-center gap-1 transition-colors"><RotateCcw className="w-3 h-3" /> Undo</button>}</div>
                <div className="grid grid-cols-2 gap-2">{REMIX_OPTIONS.map(o => <button key={o.label} onClick={() => handleRemix(o.label)} disabled={isRemixing} className="text-[10px] font-bold bg-white/5 hover:bg-purple-500/20 border border-white/5 rounded-xl transition-all disabled:opacity-50 p-2.5 flex items-center gap-2 text-white"><span>{o.icon}</span> {o.label.split(' ')[0]}</button>)}</div>
-               <div className="relative"><input type="text" placeholder="Custom..." value={customInstruction} onChange={e => setCustomInstruction(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleRemix(customInstruction)} className="w-full bg-black/40 border border-white/10 rounded-2xl px-4 py-3 text-xs text-white" /><button onClick={() => handleRemix(customInstruction)} className="absolute right-3 top-3 text-slate-500"><ArrowRight className="w-4 h-4" /></button></div>
+               <div className="relative"><input type="text" placeholder="Custom..." value={customInstruction} onChange={e => setCustomInstruction(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleRemix(customInstruction)} className="w-full bg-black/40 border border-white/10 rounded-2xl px-4 py-3 text-xs text-white" /><button onClick={() => handleRemix(customInstruction)} className="absolute right-3 top-3 text-slate-500 hover:text-purple-400"><ArrowRight className="w-4 h-4" /></button></div>
             </div>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 text-left">
@@ -198,7 +181,7 @@ export function BriefCard({
                 <div className="p-8 md:p-10 rounded-[2.5rem] bg-white/[0.02] border border-white/5 min-h-[300px] relative">
                   <div className={cn(isRemixing && "blur-md opacity-30")}>
                     <p className="text-slate-300 text-lg mb-10 font-light leading-relaxed">{currentIdea.description}</p>
-                    <div className="pt-10 border-t border-white/5"><div className="bg-black/40 p-8 rounded-3xl border border-white/5 relative group"><p className="text-base text-slate-400 font-mono leading-relaxed whitespace-pre-wrap">{currentIdea.scriptDraft || "Strategic breakdown processing..."}</p><div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity"><CopyBtn field="script" text={currentIdea.scriptDraft || ""} label="Copy Script" /></div></div></div>
+                    <div className="pt-10 border-t border-white/5"><div className="bg-black/40 p-8 rounded-3xl border border-white/5 relative group text-left"><p className="text-base text-slate-400 font-mono leading-relaxed whitespace-pre-wrap">{currentIdea.scriptDraft || "Strategic breakdown processing..."}</p><div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity"><CopyBtn field="script" text={currentIdea.scriptDraft || ""} label="Copy Script" /></div></div></div>
                   </div>
                   {isRemixing && <Loader2 className="absolute inset-0 m-auto animate-spin text-purple-500 w-10 h-10" />}
                 </div>
@@ -207,16 +190,13 @@ export function BriefCard({
             <div className="lg:col-span-4 space-y-12">
                <div className="space-y-6">
                   <div className="flex items-center gap-2 px-2"><TrendingUp className="w-5 h-5 text-emerald-400" /><h4 className="text-[11px] font-black text-slate-500 uppercase tracking-[0.3em]">Why it works</h4></div>
-                  <div className="p-8 rounded-[2rem] bg-emerald-500/5 border border-emerald-500/10 text-lg italic text-emerald-100/80 leading-relaxed font-light">{currentIdea.whyItWorks}</div>
+                  <div className="p-8 rounded-[2rem] bg-emerald-500/5 border border-emerald-500/10 text-lg italic text-emerald-100/80 leading-relaxed font-light text-left">{currentIdea.whyItWorks}</div>
                </div>
                <div className="space-y-6">
                   <div className="flex items-center gap-2 px-2"><Box className="w-5 h-5 text-blue-400" /><h4 className="text-[11px] font-black text-slate-500 uppercase tracking-[0.3em]">Workspace Sync</h4></div>
-                  <div className="grid grid-cols-1 gap-4">
-                     <div className="flex justify-between items-center p-6 bg-white/[0.02] rounded-[2rem] border border-white/5 hover:bg-white/[0.04] transition-all group/notion text-left">
-                        <div className="flex items-center gap-4">
-                           <div className="w-10 h-10 rounded-xl bg-black border border-white/10 flex items-center justify-center font-black text-sm text-white">N</div>
-                           <div><p className="text-sm font-bold text-white text-left">Notion Sync</p><p className="text-[10px] text-slate-500 uppercase tracking-widest font-medium">Ready for blocks</p></div>
-                        </div>
+                  <div className="grid grid-cols-1 gap-4 text-left">
+                     <div className="flex justify-between items-center p-6 bg-white/[0.02] rounded-[2rem] border border-white/5 hover:bg-white/[0.04] transition-all group/notion">
+                        <div className="flex items-center gap-4 text-left"><div className="w-10 h-10 rounded-xl bg-black border border-white/10 flex items-center justify-center font-black text-sm text-white">N</div><div className="text-left"><p className="text-sm font-bold text-white text-left">Notion Sync</p><p className="text-[10px] text-slate-500 uppercase tracking-widest font-medium">Ready for blocks</p></div></div>
                         <CopyBtn field="notion" text={formatForNotion()} label="Sync" icon={Share2} />
                      </div>
                      <Button variant="ghost" onClick={downloadMarkdown} className="w-full justify-between p-6 h-auto bg-white/[0.02] rounded-[2rem] border border-white/5 hover:bg-white/[0.04] text-white">
@@ -231,10 +211,11 @@ export function BriefCard({
       </div>
       <div className="p-8 pb-12 md:pb-8 bg-black border-t border-white/5 flex flex-col sm:flex-row justify-between items-center gap-8 shrink-0 relative z-40 shadow-2xl">
         <div className="hidden sm:block text-left max-w-md"><p className="text-sm font-medium text-slate-400 leading-snug text-balance text-left">Finalized strategy for <span className="text-white font-bold">{currentIdea.title}</span>. Ready to deploy?</p></div>
-        <div className="flex items-center gap-4 w-full sm:w-auto">
-          <Button onClick={() => setShowTeleprompter(true)} className="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-500 text-white rounded-full px-12 h-14 font-black shadow-2xl shadow-blue-500/25 group/rec transition-all hover:scale-105 active:scale-95">
-            <Smartphone className="w-6 h-6 mr-3 group-hover/rec:rotate-12 transition-transform" /> Record Now
-          </Button>
+        <div className="flex flex-wrap items-center gap-4 w-full sm:w-auto">
+          {initialStatus === 'published' && dbId && (
+            <Button onClick={() => setShowPerformanceModal(true)} className="bg-emerald-600/20 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-600 hover:text-white rounded-full px-6 h-14 font-black uppercase tracking-widest transition-all"><TrendingUp className="w-5 h-5 mr-2" /> Track Stats</Button>
+          )}
+          <Button onClick={() => setShowTeleprompter(true)} className="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-500 text-white rounded-full px-12 h-14 font-black shadow-2xl shadow-blue-500/25 group/rec transition-all hover:scale-105 active:scale-95"><Smartphone className="w-6 h-6 mr-3 group-hover/rec:rotate-12 transition-transform" /> Record Now</Button>
           {!hideSaveButton && <SaveIdeaButton title={currentIdea.title} ideaData={currentIdea} initialSaved={isSaved} variant="prominent" />}
         </div>
       </div>
@@ -243,7 +224,7 @@ export function BriefCard({
 
   return (
     <>
-      <div className="group relative h-full text-left">
+      <div className="group relative h-full">
         <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500/0 via-blue-500/0 to-blue-500/0 group-hover:from-blue-500/10 group-hover:to-emerald-500/10 rounded-[22px] blur opacity-0 group-hover:opacity-100 transition duration-500" />
         {variant === 'compact' ? (
           <Card className="relative bg-white/[0.03] border-white/10 rounded-2xl cursor-pointer p-4 h-full flex flex-col hover:bg-white/[0.05] transition-all text-left" onClick={() => setIsExpanded(true)}>
@@ -258,6 +239,7 @@ export function BriefCard({
       </div>
       {isExpanded && StrategyDetailView}
       {showTeleprompter && <Teleprompter title={currentIdea.title} script={currentIdea.scriptDraft || currentIdea.description} onClose={() => setShowTeleprompter(false)} />}
+      {showPerformanceModal && dbId && <PerformanceModal ideaId={dbId} title={currentIdea.title} isOpen={showPerformanceModal} onClose={() => setShowPerformanceModal(false)} />}
     </>
   )
 }

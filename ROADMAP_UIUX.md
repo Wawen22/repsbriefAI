@@ -17,9 +17,11 @@ This document tracks the strategic UI/UX improvements to elevate RepsBrief into 
 | 9 | **Brand Voice Tuning** | 🟡 Medium | ✅ Done | Analyze user's past successful posts to clone their exact writing style for future briefs. |
 | 10 | **Notion/Ecosystem Sync** | 🟢 Low | ✅ Done | 1-click export of strategies to Notion, Trello, or Markdown files. |
 | 11 | **Mobile Teleprompter Mode**| 🔴 High | ✅ Done | A dedicated recording mode for mobile that scrolls scripts like a professional teleprompter. |
-| 12 | **Performance Feedback Loop**| 🟡 Medium | 🚧 In Progress | Track view/like counts for published ideas to refine the AI's understanding of what works for you. |
+| 12 | **Performance Feedback Loop**| 🟡 Medium | ✅ Done | Track view/like counts for published ideas to refine the AI's understanding of what works for you. |
 | 13 | **Guided Onboarding Tour** | 🔴 High | ⬜ Todo | Interactive walkthrough for new users: Voice training -> First brief -> Kanban move. |
-| 14 | **Multi-Workspace Projects**| 🟡 Medium | ⬜ Todo | Manage multiple brands/channels with separate niches and brand voices under one account. |
+| 14 | **Trends Visualizer** | 🟡 Medium | ⬜ Todo | Dashboard section showing raw market signals (Reddit keywords, YouTube velocity) to prove AI data. |
+| 15 | **Shareable Strategy Links** | 🟡 Medium | ⬜ Todo | Generate public read-only links for specific strategies to collaborate with editors/assistants. |
+| 16 | **Custom Theme Accents** | 🟢 Low | ⬜ Todo | Allow users to choose their accent color (Blue, Emerald, Rose) for a personalized workspace. |
 
 ---
 
@@ -30,6 +32,5 @@ This document tracks the strategic UI/UX improvements to elevate RepsBrief into 
 - [x] **AI Interactivity:** Real-time persistence for AI remixed strategies.
 - [x] **Brand Voice Cloning:** AI-driven linguistic analysis to personalize script generation.
 - [x] **Growth History Timeline:** Redesigned vault experience with master cards and strategic summaries.
-- [x] **Command Palette (⌘K):** Professional navigation and quick action tool.
-- [x] **Workspace Sync:** Notion formatting and Markdown export functionality.
 - [x] **Teleprompter Mode:** Professional mobile-first script scroller with precision controls and countdown.
+- [x] **Performance Loop:** Automatic growth feedback modal when publishing ideas to train the local AI model.

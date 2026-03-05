@@ -24,8 +24,16 @@ const BriefSchema = z.array(IdeaSchema).min(1).max(30)
 
 const DEFAULT_TOTAL_IDEAS = 20
 const MAX_BATCH_ATTEMPTS = 4
+const SINGLE_SHOT_ATTEMPTS = 2
 
 type IdeaRecord = Record<string, unknown>
+type GenerationProfile = {
+  skipSingleShot: boolean
+  singleShotAttempts: number
+  chunkBatchSize: number
+  chunkMaxAttempts: number
+  maxOutputTokensCap: number
+}
 
 function sanitizeText(value: string, maxLength: number): string {
   return value
@@ -247,6 +255,38 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
+function isGpt5Model(modelName: string): boolean {
+  return /^gpt-5(\.|-|$)/i.test(modelName)
+}
+
+function getGenerationProfile(provider: string, model: string): GenerationProfile {
+  const gpt5OnAzure = provider === 'azure' && isGpt5Model(model)
+
+  if (gpt5OnAzure) {
+    // Azure GPT-5 is reliable with chunking, while 20-idea single-shot often wastes time on parse failures.
+    return {
+      skipSingleShot: true,
+      singleShotAttempts: 0,
+      chunkBatchSize: 10,
+      chunkMaxAttempts: 3,
+      maxOutputTokensCap: 3400,
+    }
+  }
+
+  return {
+    skipSingleShot: false,
+    singleShotAttempts: SINGLE_SHOT_ATTEMPTS,
+    chunkBatchSize: 8,
+    chunkMaxAttempts: MAX_BATCH_ATTEMPTS,
+    maxOutputTokensCap: 4096,
+  }
+}
+
+function estimateMaxTokens(count: number, cap: number): number {
+  const estimated = 450 + count * 280
+  return Math.max(1400, Math.min(cap, estimated))
+}
+
 function buildSystemPrompt(niche: NicheConfig, brandVoice?: string | null, highPerformers: string[] = []): string {
   const voiceInstructions = brandVoice
     ? `\n\nBRAND VOICE TO MATCH:\n${sanitizeText(brandVoice, 2000)}`
@@ -316,8 +356,17 @@ async function generateBatch(params: {
   excludedTitles: string[]
   count: number
   maxAttempts?: number
+  maxTokensCap?: number
 }): Promise<IdeaObject[]> {
-  const { ai, systemPrompt, trendsSummary, excludedTitles, count, maxAttempts = MAX_BATCH_ATTEMPTS } = params
+  const {
+    ai,
+    systemPrompt,
+    trendsSummary,
+    excludedTitles,
+    count,
+    maxAttempts = MAX_BATCH_ATTEMPTS,
+    maxTokensCap = 4096,
+  } = params
 
   let lastError: Error | null = null
 
@@ -335,7 +384,7 @@ async function generateBatch(params: {
         ],
         {
           jsonMode: true,
-          maxTokens: 4096,
+          maxTokens: estimateMaxTokens(count, maxTokensCap),
           temperature: attempt >= 3 ? 0.2 : 0.4,
         }
       )
@@ -392,6 +441,7 @@ export async function generateBrief(
   }
 
   const ai = getAIProvider()
+  const profile = getGenerationProfile(provider, model)
   const systemPrompt = buildSystemPrompt(niche, brandVoice, highPerformers)
 
   const trendsSummary = trendsData.length
@@ -406,46 +456,51 @@ export async function generateBrief(
     .map((title) => sanitizeText(title, 140))
     .filter(Boolean)
 
-  // Fast path: try single-shot generation first to minimize requests and latency.
-  try {
-    const singleShot = await generateBatch({
-      ai,
-      systemPrompt,
-      trendsSummary,
-      excludedTitles: historicalTitles,
-      count: DEFAULT_TOTAL_IDEAS,
-      maxAttempts: 2,
-    })
+  // Fast path: single-shot where it is reliable. On Azure GPT-5 we skip it to avoid repeated parse failures.
+  if (!profile.skipSingleShot) {
+    try {
+      const singleShot = await generateBatch({
+        ai,
+        systemPrompt,
+        trendsSummary,
+        excludedTitles: historicalTitles,
+        count: DEFAULT_TOTAL_IDEAS,
+        maxAttempts: profile.singleShotAttempts,
+        maxTokensCap: profile.maxOutputTokensCap,
+      })
 
-    const seen = new Set<string>()
-    for (const idea of singleShot) {
-      const key = titleKey(idea.title)
-      if (!seen.has(key)) {
-        collected.push(idea)
-        seen.add(key)
+      const seen = new Set<string>()
+      for (const idea of singleShot) {
+        const key = titleKey(idea.title)
+        if (!seen.has(key)) {
+          collected.push(idea)
+          seen.add(key)
+        }
+        if (collected.length >= DEFAULT_TOTAL_IDEAS) break
       }
-      if (collected.length >= DEFAULT_TOTAL_IDEAS) break
-    }
 
-    if (collected.length >= DEFAULT_TOTAL_IDEAS) {
-      console.log(`[Generator] ✅ Success (single-shot): ${collected.length} ideas`)
-      return collected.slice(0, DEFAULT_TOTAL_IDEAS)
+      if (collected.length >= DEFAULT_TOTAL_IDEAS) {
+        console.log(`[Generator] ✅ Success (single-shot): ${collected.length} ideas`)
+        return collected.slice(0, DEFAULT_TOTAL_IDEAS)
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown single-shot error'
+      console.warn(`[Generator] Single-shot generation failed, switching to chunk mode: ${message}`)
     }
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown single-shot error'
-    console.warn(`[Generator] Single-shot generation failed, switching to chunk mode: ${message}`)
+  } else {
+    console.log('[Generator] Skipping single-shot optimization for Azure GPT-5 profile')
   }
 
   let safetyCounter = 0
   let rounds = 0
   while (collected.length < DEFAULT_TOTAL_IDEAS) {
     rounds += 1
-    if (rounds > 14) {
+    if (rounds > 12) {
       throw new Error(`Generation incomplete: collected ${collected.length}/${DEFAULT_TOTAL_IDEAS} ideas`)
     }
 
     const remaining = DEFAULT_TOTAL_IDEAS - collected.length
-    const batchSize = remaining > 8 ? 8 : remaining
+    const batchSize = remaining > profile.chunkBatchSize ? profile.chunkBatchSize : remaining
 
     const batch = await generateBatch({
       ai,
@@ -453,6 +508,8 @@ export async function generateBrief(
       trendsSummary,
       excludedTitles: [...historicalTitles, ...collected.map((idea) => idea.title)],
       count: batchSize,
+      maxAttempts: profile.chunkMaxAttempts,
+      maxTokensCap: profile.maxOutputTokensCap,
     })
 
     let added = 0

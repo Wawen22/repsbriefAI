@@ -2,7 +2,7 @@
 
 ## 📋 Task Status Tracking
 
-- [x] **Current Task:** Azure Foundry GPT Integration + Provider Switching ✅
+- [x] **Current Task:** Generate-Now Speed Optimization (stable + faster on Azure GPT) ✅
 - [ ] **Next Task:** Trend Source Badges + Onboarding Welcome Modal
 - [ ] **Completed Tasks:**
   - [x] Initial Context & Prompt Review
@@ -46,6 +46,10 @@
   - [x] Azure provider: compatibilità GPT-5 (`max_completion_tokens`) + JSON mode fallback
   - [x] Azure provider: fallback automatico modello (`AI_MODEL` -> `AZURE_OPENAI_FALLBACK_MODEL`)
   - [x] .env aggiornato: switch attivo su Azure con credenziali Foundry
+  - [x] README: guida pratica per switch provider AI via `.env` (Azure/Gemini/OpenAI)
+  - [x] Generator performance profile: single-shot skip su Azure GPT-5 per evitare tentativi costosi inutili
+  - [x] Generator batching: chunk da 10 + tentativi ridotti + token budget dinamico per latenza più bassa
+  - [x] Smoke test reale: 20 idee completate con strategia ottimizzata
 
 > **Use this file as context when working on any part of the project.**
 > It contains all decisions already made: stack, architecture, business logic, and roadmap.

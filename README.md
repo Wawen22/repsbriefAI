@@ -1,36 +1,74 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# RepsBrief
 
-## Getting Started
+RepsBrief è una web app Next.js + Supabase per generare brief di contenuti da trend reali, con layer AI provider-agnostic (`getAIProvider()`).
 
-First, run the development server:
+## Avvio rapido
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+App locale: `http://localhost:3000`
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Switch AI Provider (solo via `.env`)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Il progetto non richiede modifiche al codice per cambiare provider AI: basta modificare variabili env e riavviare il server.
 
-## Learn More
+### 1) Variabili comuni
 
-To learn more about Next.js, take a look at the following resources:
+```env
+AI_PROVIDER=azure   # openai | anthropic | gemini | azure | groq
+AI_MODEL=gpt-5.3
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 2) Config provider
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+#### Azure Foundry / Azure OpenAI
 
-## Deploy on Vercel
+```env
+AI_PROVIDER=azure
+AI_MODEL=gpt-5.3
+AZURE_OPENAI_API_KEY=...
+AZURE_OPENAI_ENDPOINT=https://<resource>.openai.azure.com/openai/v1/
+AZURE_OPENAI_API_VERSION=2024-05-01-preview
+AZURE_OPENAI_FALLBACK_MODEL=gpt-5.2
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Note:
+- `AZURE_OPENAI_ENDPOINT` supporta sia formato Foundry (`.../openai/v1/`) sia endpoint legacy `cognitiveservices`.
+- Se `AI_MODEL` non esiste sul resource (es. `gpt-5.3` non deployato), il provider prova automaticamente `AZURE_OPENAI_FALLBACK_MODEL`.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+#### Gemini
+
+```env
+AI_PROVIDER=gemini
+AI_MODEL=gemini-2.5-flash
+GEMINI_API_KEY=...
+```
+
+#### OpenAI
+
+```env
+AI_PROVIDER=openai
+AI_MODEL=gpt-4o-mini
+OPENAI_API_KEY=...
+```
+
+### 3) Dopo il cambio provider
+
+1. Riavvia il dev server (`npm run dev`).
+2. Genera un brief da dashboard.
+3. Verifica che il brief venga salvato con `ai_provider` e `ai_model` corretti nella tabella `briefs`.
+
+## Architettura AI
+
+Tutte le chiamate AI passano da:
+
+```ts
+import { getAIProvider } from '@/lib/ai'
+const ai = getAIProvider()
+const response = await ai.complete(messages, options)
+```
+
+Non chiamare SDK AI direttamente fuori da `src/lib/ai/providers/`.

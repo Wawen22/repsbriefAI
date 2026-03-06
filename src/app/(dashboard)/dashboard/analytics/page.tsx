@@ -1,230 +1,313 @@
+// src/app/(dashboard)/dashboard/analytics/page.tsx
+
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
+import { IdeaObject } from "@/types/niche"
+import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 import { 
   BarChart3, 
   TrendingUp, 
-  Target, 
-  Zap, 
-  Eye, 
-  Star, 
+  Users, 
   Video, 
   Layers, 
   Hash, 
-  Mail,
-  Award,
-  ArrowUpRight,
-  BrainCircuit
+  Mail, 
+  Star, 
+  ArrowUpRight, 
+  Clock,
+  Eye,
+  CheckCircle2,
+  AlertCircle,
+  LayoutGrid,
+  ChevronRight
 } from "lucide-react"
-import { IdeaObject } from "@/types/niche"
 import { cn } from "@/lib/utils"
+import Link from "next/link"
 
 export const dynamic = 'force-dynamic'
+
+const FORMAT_ICONS: Record<string, any> = {
+  'Reel': Video,
+  'Carousel': Layers,
+  'Thread': Hash,
+  'Newsletter': Mail,
+  'Idea': LightbulbIcon
+}
+
+function LightbulbIcon(props: any) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .5 2.2 1.5 3.1.7.9 1.2 1.7 1.5 2.9" />
+      <path d="M9 18h6" />
+      <path d="M10 22h4" />
+    </svg>
+  )
+}
 
 export default async function AnalyticsPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    redirect('/login')
-  }
+  if (!user) redirect('/login')
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('plan, current_team_id')
+    .select('current_team_id')
     .eq('id', user.id)
     .single()
 
-  const isPro = profile?.plan === 'pro' || profile?.plan === 'team'
+  const teamId = profile?.current_team_id
 
+  // Fetch published ideas with performance data
   const { data: publishedIdeas } = await supabase
     .from('idea_history')
     .select('*')
-    .eq('team_id', profile?.current_team_id)
+    .eq('team_id', teamId)
     .eq('status', 'published')
     .order('published_at', { ascending: false })
 
   const ideas = publishedIdeas || []
-  const totalViews = ideas.reduce((acc, i) => acc + (i.views_count || 0), 0)
+  const totalPublished = ideas.length
+  const totalViews = ideas.reduce((acc, curr) => acc + (curr.views_count || 0), 0)
   const avgScore = ideas.length > 0 
-    ? (ideas.reduce((acc, i) => acc + (i.performance_score || 0), 0) / ideas.length).toFixed(1)
+    ? (ideas.reduce((acc, curr) => acc + (curr.performance_score || 0), 0) / ideas.length).toFixed(1)
     : 0
 
-  // Calculate format performance
-  const formatStats = ideas.reduce((acc: any, curr: any) => {
-    const fmt = curr.idea_data?.format || 'Idea'
-    if (!acc[fmt]) acc[fmt] = { count: 0, views: 0, score: 0 }
-    acc[fmt].count++
-    acc[fmt].views += curr.views_count || 0
-    acc[fmt].score += curr.performance_score || 0
+  // Aggregate by format
+  const formatStats = ideas.reduce((acc: any, curr) => {
+    const data = curr.idea_data as IdeaObject
+    const format = data?.format || 'Idea'
+    if (!acc[format]) {
+      acc[format] = { count: 0, views: 0, score: 0 }
+    }
+    acc[format].count += 1
+    acc[format].views += (curr.views_count || 0)
+    acc[format].score += (curr.performance_score || 0)
     return acc
   }, {})
 
-  const topPerformers = [...ideas]
-    .sort((a, b) => (b.views_count || 0) - (a.views_count || 0))
-    .slice(0, 3)
+  const formatList = Object.keys(formatStats).map(format => ({
+    name: format,
+    ...formatStats[format],
+    avgScore: (formatStats[format].score / formatStats[format].count).toFixed(1)
+  })).sort((a, b) => b.views - a.views)
+
+  const topPerformer = [...ideas].sort((a, b) => (b.views_count || 0) - (a.views_count || 0))[0]
 
   return (
-    <div className="space-y-10 pb-20 text-left">
+    <div className="mx-auto max-w-6xl space-y-12 pb-20 text-white">
+      
       {/* Header */}
-      <header className="space-y-4">
-        <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-2xl bg-blue-500/10 border border-blue-500/20">
-            <BarChart3 className="w-6 h-6 text-blue-400" />
+      <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 text-blue-400 text-[10px] font-black uppercase tracking-[0.2em]">
+             <BarChart3 className="w-3.5 h-3.5" />
+             Performance Engine
           </div>
-          <div className="space-y-0.5">
-             <Badge variant="outline" className="bg-blue-500/5 text-blue-300 border-blue-500/20 px-2 py-0.5 rounded-md text-[10px] font-bold tracking-widest uppercase">
-               Performance Hub
-             </Badge>
-             <p className="text-[10px] font-medium text-slate-500 uppercase tracking-widest text-left">Data-driven content strategy</p>
-          </div>
+          <h1 className="text-5xl font-black tracking-tighter">Analytics Dashboard</h1>
+          <p className="text-slate-500 text-lg font-light">Track how your strategies perform across social platforms.</p>
         </div>
-        <h1 className="text-5xl md:text-6xl font-black tracking-tighter text-white text-left">
-          Strategic <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400 font-extrabold">Analytics</span>
-        </h1>
+        
+        <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl p-4 backdrop-blur-xl">
+           <div className="text-right">
+              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-none mb-1">Global Health</p>
+              <p className="text-xl font-black text-emerald-400">92% Optimal</p>
+           </div>
+           <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+              <TrendingUp className="w-5 h-5 text-emerald-500" />
+           </div>
+        </div>
       </header>
 
-      {!isPro && (
-        <Card className="bg-gradient-to-br from-blue-600/20 to-purple-600/20 border-white/10 rounded-[2rem] overflow-hidden relative border-blue-500/30">
-          <CardContent className="p-10 flex flex-col md:flex-row items-center justify-between gap-8 text-left">
-            <div className="space-y-4 text-left">
-              <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-                <BrainCircuit className="w-6 h-6 text-blue-400" />
-                Unlock Advanced AI Insights
-              </h2>
-              <p className="text-slate-300 max-w-xl font-light">
-                Upgrade to PRO to see deep correlation between hooks, niches, and performance. Get AI-powered advice on what to post next based on your real data.
-              </p>
-            </div>
-            <Link href="/dashboard/settings">
-              <Button className="bg-white text-black hover:bg-slate-200 rounded-full px-10 h-14 font-black text-sm uppercase tracking-widest shadow-2xl transition-all hover:scale-105 active:scale-95">
-                Upgrade to Pro
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
+      {/* Overview Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {[
-          { label: "Total Reach", value: totalViews.toLocaleString(), icon: Eye, color: "text-blue-400", sub: "Aggregated Views" },
-          { label: "Avg Performance", value: `${avgScore}/5.0`, icon: Star, color: "text-yellow-400", sub: "Creator Satisfaction" },
-          { label: "Published Reps", value: ideas.length, icon: Zap, color: "text-emerald-400", sub: "Strategies Deployed" },
-        ].map((stat, i) => (
-          <Card key={i} className="bg-white/[0.02] border-white/5 rounded-[2rem] p-8 space-y-4 text-left">
-            <div className="flex items-center justify-between">
-              <div className={cn("p-3 rounded-2xl bg-white/5", stat.color.replace('text', 'bg').replace('400', '500/10'))}>
-                <stat.icon className={cn("w-6 h-6", stat.color)} />
-              </div>
-              <TrendingUp className="w-4 h-4 text-slate-700" />
-            </div>
-            <div className="space-y-1 text-left">
-              <p className="text-3xl font-black text-white tracking-tighter">{stat.value}</p>
-              <div className="flex flex-col text-left">
-                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{stat.label}</span>
-                <span className="text-[9px] text-slate-600 font-medium uppercase">{stat.sub}</span>
-              </div>
-            </div>
-          </Card>
+          { label: 'Published Strategies', val: totalPublished, icon: CheckCircle2, color: 'text-blue-400', bg: 'bg-blue-500/10' },
+          { label: 'Total Tracked Views', val: totalViews.toLocaleString(), icon: Eye, color: 'text-purple-400', bg: 'bg-purple-500/10' },
+          { label: 'Avg Performance', val: `${avgScore}/5.0`, icon: Star, color: 'text-amber-400', bg: 'bg-amber-500/10' }
+        ].map((s, i) => (
+          <div key={i} className="bg-white/[0.02] border border-white/5 rounded-[2.5rem] p-8 flex items-center gap-6 group hover:bg-white/[0.04] transition-all">
+             <div className={cn("w-16 h-16 rounded-[1.5rem] flex items-center justify-center shrink-0 transition-transform group-hover:scale-110", s.bg)}>
+                <s.icon className={cn("w-8 h-8", s.color)} />
+             </div>
+             <div>
+                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">{s.label}</p>
+                <p className="text-3xl font-black text-white tracking-tighter">{s.val}</p>
+             </div>
+          </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 text-left">
-        {/* Format Performance */}
-        <Card className="lg:col-span-7 bg-white/[0.02] border-white/5 rounded-[2.5rem] p-10 space-y-8 text-left">
-          <div className="flex items-center justify-between">
-            <div className="space-y-1 text-left text-left text-left">
-              <h3 className="text-xl font-bold text-white text-left">Format Distribution</h3>
-              <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Views by content type</p>
-            </div>
-            <Target className="w-5 h-5 text-slate-700" />
-          </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        {/* Format Performance Bar Chart (Custom CSS) */}
+        <div className="lg:col-span-2 space-y-6">
+           <div className="flex items-center justify-between px-2">
+              <h3 className="text-sm font-black uppercase tracking-widest text-slate-400">Format Distribution</h3>
+              <Badge variant="outline" className="border-white/5 bg-white/5 text-[9px] uppercase font-bold text-slate-500">By Total Views</Badge>
+           </div>
+           
+           <Card className="bg-black/40 border-white/5 rounded-[2.5rem] overflow-hidden backdrop-blur-xl">
+              <CardContent className="p-10 space-y-10">
+                 {formatList.length === 0 ? (
+                   <div className="py-20 text-center space-y-4">
+                      <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mx-auto">
+                         <Clock className="w-8 h-8 text-slate-700" />
+                      </div>
+                      <p className="text-slate-500 font-medium">No published data yet. Mark some ideas as &quot;Published&quot; to see stats.</p>
+                   </div>
+                 ) : (
+                   formatList.map((f, i) => {
+                     const Icon = FORMAT_ICONS[f.name] || LayoutGrid
+                     const percentage = Math.max(10, (f.views / totalViews) * 100)
+                     
+                     return (
+                       <div key={i} className="space-y-3">
+                          <div className="flex items-center justify-between">
+                             <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center">
+                                   <Icon className="w-4 h-4 text-slate-400" />
+                                </div>
+                                <span className="font-bold text-white uppercase text-xs tracking-widest">{f.name}s</span>
+                             </div>
+                             <div className="text-right">
+                                <span className="text-xs font-black text-white">{f.views.toLocaleString()} Views</span>
+                                <span className="text-[10px] text-slate-500 block">Avg. Score: {f.avgScore}</span>
+                             </div>
+                          </div>
+                          <div className="h-3 w-full bg-white/5 rounded-full overflow-hidden">
+                             <div 
+                               className="h-full bg-gradient-to-r from-blue-600 to-blue-400 rounded-full transition-all duration-1000" 
+                               style={{ width: `${percentage}%` }}
+                             />
+                          </div>
+                       </div>
+                     )
+                   })
+                 )}
+              </CardContent>
+           </Card>
+        </div>
 
-          <div className="space-y-6">
-            {Object.entries(formatStats).map(([format, data]: [string, any]) => (
-              <div key={format} className="space-y-2">
-                <div className="flex items-center justify-between px-1">
-                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{format}s ({data.count})</span>
-                  <span className="text-xs font-bold text-white">{data.views.toLocaleString()} Views</span>
-                </div>
-                <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-blue-500 rounded-full transition-all duration-1000" 
-                    style={{ width: `${(data.views / (totalViews || 1)) * 100}%` }}
-                  />
-                </div>
+        {/* Top Performer Card */}
+        <div className="space-y-6">
+           <h3 className="text-sm font-black uppercase tracking-widest text-slate-400 px-2">Top Performer</h3>
+           <Card className="bg-gradient-to-br from-blue-600/20 via-black to-black border-blue-500/30 rounded-[2.5rem] overflow-hidden relative group">
+              <div className="absolute top-0 right-0 p-10 opacity-[0.03] group-hover:scale-110 transition-transform">
+                 <Star className="w-48 h-48" />
               </div>
-            ))}
-            {Object.keys(formatStats).length === 0 && (
-              <p className="text-slate-600 text-sm italic py-10 text-center">No data available yet. Start publishing!</p>
-            )}
-          </div>
-        </Card>
+              <CardContent className="p-10 flex flex-col h-full space-y-8 relative z-10">
+                 {topPerformer ? (
+                   <>
+                     <div className="space-y-2">
+                        <Badge className="bg-blue-500 text-white font-black text-[9px] uppercase tracking-widest px-3 py-1 rounded-full border-none">
+                           Highest Impact
+                        </Badge>
+                        <h4 className="text-2xl font-bold tracking-tight text-white leading-tight">
+                           {topPerformer.idea_title}
+                        </h4>
+                     </div>
 
-        {/* Top Performers */}
-        <Card className="lg:col-span-5 bg-white/[0.02] border-white/5 rounded-[2.5rem] p-10 space-y-8 text-left">
-          <div className="flex items-center justify-between">
-            <div className="space-y-1 text-left text-left text-left text-left">
-              <h3 className="text-xl font-bold text-white">Top Performers</h3>
-              <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Highest reach strategies</p>
-            </div>
-            <Award className="w-5 h-5 text-yellow-500/50" />
-          </div>
+                     <div className="grid grid-cols-2 gap-4">
+                        <div className="bg-white/5 rounded-2xl p-4 border border-white/5">
+                           <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Views</p>
+                           <p className="text-lg font-black text-white">{topPerformer.views_count?.toLocaleString()}</p>
+                        </div>
+                        <div className="bg-white/5 rounded-2xl p-4 border border-white/5">
+                           <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Score</p>
+                           <p className="text-lg font-black text-amber-400">{topPerformer.performance_score}.0</p>
+                        </div>
+                     </div>
 
-          <div className="space-y-4">
-            {topPerformers.map((idea, i) => (
-              <div key={i} className="flex items-center justify-between p-4 rounded-2xl bg-white/[0.03] border border-white/5 hover:bg-white/[0.05] transition-all">
-                <div className="flex items-center gap-4">
-                  <div className="w-8 h-8 rounded-full bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center text-[10px] font-black text-yellow-500">
-                    #{i + 1}
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-xs font-bold text-white truncate max-w-[120px]">{idea.idea_title}</span>
-                    <span className="text-[9px] text-slate-500 uppercase font-black">{idea.idea_data?.format}</span>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <span className="text-xs font-black text-white">{idea.views_count?.toLocaleString()}</span>
-                  <p className="text-[8px] text-slate-600 font-bold uppercase">Views</p>
-                </div>
-              </div>
-            ))}
-            {topPerformers.length === 0 && (
-              <p className="text-slate-600 text-sm italic py-10 text-center">Your hall of fame is waiting.</p>
-            )}
-          </div>
-        </Card>
+                     <div className="pt-4 mt-auto">
+                        <Link href={`/dashboard/strategy/${topPerformer.id}`}>
+                           <Button className="w-full bg-white text-black hover:bg-slate-200 rounded-xl font-black text-[10px] uppercase tracking-[0.2em] h-12 shadow-2xl">
+                              Review Strategy <ArrowUpRight className="ml-2 w-3.5 h-3.5" />
+                           </Button>
+                        </Link>
+                     </div>
+                   </>
+                 ) : (
+                   <div className="py-20 text-center opacity-40">
+                      <p className="text-xs font-bold uppercase tracking-widest">No data available</p>
+                   </div>
+                 )}
+              </CardContent>
+           </Card>
+        </div>
       </div>
 
-      {/* AI STRATEGIC INSIGHT (Pro only mock for now) */}
-      {isPro && (
-        <section className="p-1 rounded-[3rem] bg-gradient-to-r from-blue-600/30 via-purple-600/30 to-emerald-600/30">
-          <div className="p-10 rounded-[2.8rem] bg-black/90 space-y-6 text-left">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-xl bg-blue-500/10 border border-blue-500/20">
-                <BrainCircuit className="w-6 h-6 text-blue-400" />
+      {/* Recent History Table Style List */}
+      <section className="space-y-6">
+         <div className="flex items-center justify-between px-2">
+            <h3 className="text-sm font-black uppercase tracking-widest text-slate-400">Recent Publications</h3>
+            <Link href="/dashboard/history" className="text-[10px] font-black uppercase tracking-widest text-blue-400 hover:text-blue-300 transition-colors flex items-center gap-1">
+               Full History <ChevronRight className="w-3 h-3" />
+            </Link>
+         </div>
+
+         <div className="space-y-3">
+            {ideas.slice(0, 5).map((idea, i) => (
+              <div 
+                key={i} 
+                className="bg-white/[0.02] border border-white/5 hover:border-white/10 p-5 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-6 transition-all group"
+              >
+                 <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center shrink-0">
+                       {(() => {
+                         const Icon = FORMAT_ICONS[(idea.idea_data as any)?.format] || LayoutGrid
+                         return <Icon className="w-5 h-5 text-slate-500" />
+                       })()}
+                    </div>
+                    <div>
+                       <p className="font-bold text-white group-hover:text-blue-400 transition-colors">{idea.idea_title}</p>
+                       <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">
+                          Published on {new Date(idea.published_at).toLocaleDateString()}
+                       </p>
+                    </div>
+                 </div>
+
+                 <div className="flex items-center gap-8">
+                    <div className="text-right">
+                       <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Performance</p>
+                       <div className="flex items-center gap-1 justify-end">
+                          <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
+                          <span className="font-black text-white">{idea.performance_score}.0</span>
+                       </div>
+                    </div>
+                    <div className="text-right min-w-[80px]">
+                       <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Reach</p>
+                       <p className="font-black text-white">{idea.views_count?.toLocaleString()}</p>
+                    </div>
+                    <Link href={`/dashboard/strategy/${idea.id}`}>
+                       <Button variant="ghost" size="icon" className="rounded-full text-slate-600 hover:text-white hover:bg-white/5">
+                          <ArrowUpRight className="w-4 h-4" />
+                       </Button>
+                    </Link>
+                 </div>
               </div>
-              <h2 className="text-2xl font-bold text-white">AI Strategic Insights</h2>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-left text-left">
-              <div className="space-y-4 text-left">
-                <h4 className="text-[10px] font-black text-blue-400 uppercase tracking-widest">The Pattern</h4>
-                <p className="text-slate-300 leading-relaxed font-light">
-                  Your <span className="text-white font-bold italic">Reels</span> are currently outperforming <span className="text-white font-bold italic">Carousels</span> by 42% in reach. However, <span className="text-white font-bold italic">Newsletters</span> have the highest creator satisfaction score (4.8/5).
-                </p>
+            ))}
+
+            {ideas.length === 0 && (
+              <div className="bg-white/[0.01] border border-dashed border-white/10 p-20 rounded-[3rem] text-center">
+                 <p className="text-slate-600 font-medium italic">Your publication history is empty.</p>
               </div>
-              <div className="space-y-4 text-left">
-                <h4 className="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Next Week Recommendation</h4>
-                <p className="text-slate-300 leading-relaxed font-light text-left">
-                  Double down on <span className="text-white font-bold italic">educational storytelling</span> in your Reels. We noticed that strategies mentioning "ROI" or "Data" get 2x more estimated views.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
+            )}
+         </div>
+      </section>
+
     </div>
   )
 }

@@ -36,7 +36,7 @@ export async function scheduleIdeaAction({
   const teamId = await getActiveTeamId(supabase, user.id)
   if (!teamId) return { error: 'No active workspace found' }
 
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from('content_calendar')
     .insert({
       team_id: teamId,
@@ -48,6 +48,8 @@ export async function scheduleIdeaAction({
       script_draft: script,
       notes
     })
+    .select('id')
+    .single()
 
   if (error) {
     console.error('Failed to schedule idea:', error)
@@ -55,7 +57,7 @@ export async function scheduleIdeaAction({
   }
 
   revalidatePath('/dashboard/calendar')
-  return { success: true }
+  return { success: true, calendarId: data.id }
 }
 
 export async function getCalendarEntriesAction(month?: number, year?: number) {

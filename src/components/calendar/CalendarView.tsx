@@ -23,11 +23,17 @@ import {
   Linkedin, 
   Youtube, 
   Clock,
-  ExternalLink
+  ExternalLink,
+  RefreshCw,
+  CheckCircle2
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { ScheduleDialog } from './ScheduleDialog'
+import { createClient } from '@/lib/supabase/client'
+import { useEffect } from 'react'
+import { bulkSyncFutureEventsAction } from '@/app/actions/calendar-sync'
+import { toast } from 'sonner'
 
 type CalendarEntry = {
   id: string;
@@ -47,6 +53,58 @@ export function CalendarView({ initialEntries }: { initialEntries: CalendarEntry
   const [isScheduleOpen, setIsScheduleOpen] = useState(false)
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined)
   const [selectedEntry, setSelectedEntry] = useState<CalendarEntry | undefined>(undefined)
+  const [isGoogleConnected, setIsGoogleConnected] = useState(false)
+  const [teamId, setTeamId] = useState<string | null>(null)
+  const [isSyncing, setIsSyncing] = useState(false)
+
+  const supabase = createClient()
+
+  useEffect(() => {
+    checkGoogleConnection()
+  }, [])
+
+  const checkGoogleConnection = async () => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('current_team_id')
+      .eq('id', user.id)
+      .single()
+
+    if (profile?.current_team_id) {
+      setTeamId(profile.current_team_id)
+      const { data: integration } = await supabase
+        .from('team_integrations')
+        .select('id')
+        .eq('team_id', profile.current_team_id)
+        .eq('provider', 'google_calendar')
+        .eq('status', 'active')
+        .maybeSingle()
+      
+      setIsGoogleConnected(!!integration)
+    }
+  }
+
+  const handleBulkSync = async () => {
+    if (!teamId || isSyncing) return
+    setIsSyncing(true)
+    const tid = toast.loading("Syncing all future events to Google Calendar...")
+    
+    try {
+      const res = await bulkSyncFutureEventsAction(teamId)
+      if (res.success) {
+        toast.success(`Successfully synced ${res.syncedCount} events to Google Calendar!`, { id: tid })
+      } else {
+        toast.error(res.error || "Bulk sync failed", { id: tid })
+      }
+    } catch (err) {
+      toast.error("An unexpected error occurred", { id: tid })
+    } finally {
+      setIsSyncing(false)
+    }
+  }
 
   const monthStart = startOfMonth(currentDate)
   const monthEnd = endOfMonth(monthStart)
@@ -133,6 +191,19 @@ export function CalendarView({ initialEntries }: { initialEntries: CalendarEntry
           <Button variant="outline" onClick={() => setCurrentDate(new Date())} className="h-10 rounded-xl border-white/10 text-xs font-bold text-slate-300">
             Today
           </Button>
+
+          {isGoogleConnected && (
+            <Button 
+              variant="outline" 
+              onClick={handleBulkSync}
+              disabled={isSyncing}
+              className="h-10 rounded-xl border-blue-500/20 bg-blue-500/5 text-xs font-bold text-blue-400 gap-2 px-4 hover:bg-blue-500/10 hover:border-blue-500/30 transition-all"
+            >
+              {isSyncing ? <RefreshCw className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+              <span className="hidden lg:inline">Sync with Google</span>
+            </Button>
+          )}
+
           <Button 
             onClick={handleAddClick}
             className="h-10 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold gap-2 px-4 shadow-xl shadow-blue-500/10 transition-all hover:scale-105"

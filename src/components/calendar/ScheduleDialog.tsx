@@ -137,8 +137,13 @@ export function ScheduleDialog({ isOpen, onOpenChange, initialData }: ScheduleDi
 
         if (res.success) {
           // 2. Se Google è connesso, sincronizza anche lì
-          if (isGoogleConnected && teamId && initialData?.ideaId) {
-            const googleRes = await syncToGoogleCalendarAction(teamId, initialData.ideaId, scheduledDate)
+          if (isGoogleConnected && teamId) {
+            // Se abbiamo un ideaId, usiamo quello (strategia), altrimenti usiamo il calendarId (manuale)
+            const ref = initialData?.ideaId 
+              ? { ideaId: initialData.ideaId } 
+              : { calendarId: res.calendarId } // Assicurati che scheduleIdeaAction restituisca il calendarId
+
+            const googleRes = await syncToGoogleCalendarAction(teamId, ref, scheduledDate)
             if (googleRes.success) {
               toast.success("Scheduled in App & Google Calendar!")
             } else {

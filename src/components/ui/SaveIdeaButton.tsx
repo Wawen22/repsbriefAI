@@ -11,12 +11,14 @@ import { IdeaObject } from '@/types/niche'
 export function SaveIdeaButton({ 
   title, 
   ideaData, 
+  niche = 'fitness',
   initialSaved = false,
   variant = 'icon',
   className
 }: { 
   title: string, 
   ideaData?: IdeaObject, 
+  niche?: string,
   initialSaved?: boolean,
   variant?: 'icon' | 'prominent',
   className?: string
@@ -32,7 +34,7 @@ export function SaveIdeaButton({
 
     setIsSaving(true)
     try {
-      const result = await saveIdeaAction(title, 'fitness', ideaData)
+      const result = await saveIdeaAction(title, niche, ideaData)
       if (result?.success) {
         setIsSaved(true)
         setAnimate(true)

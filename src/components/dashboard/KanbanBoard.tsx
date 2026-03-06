@@ -127,7 +127,6 @@ export function KanbanBoard({ initialIdeas, plan }: { initialIdeas: KanbanIdea[]
                           >
                             <BriefCard 
                               idea={idea.idea_data || { title: idea.idea_title, format: 'Idea', hook: 'Custom idea', description: '', whyItWorks: '' }} 
-                              hideSaveButton 
                               dbId={idea.id} 
                               variant="compact"
                               plan={plan}

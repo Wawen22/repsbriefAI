@@ -75,8 +75,8 @@ export async function saveIdeaAction(
   }
 
   if (error) {
-    console.error('Failed to save/upsert idea:', error)
-    return { error: 'Failed to persist idea' }
+    console.error('Persistence Error:', error)
+    return { error: `Failed to persist idea: ${error.message} (${error.code})` }
   }
 
   revalidatePath('/dashboard')

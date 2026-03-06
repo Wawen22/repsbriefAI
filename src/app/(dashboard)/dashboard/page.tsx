@@ -133,11 +133,15 @@ export default async function DashboardPage({
 
   const hasBrief = ideas.length > 0
   const alreadyGeneratedToday = !!generatedToday
-  const savedHashes = new Set(
+  
+  // Create a proper map of hash -> id for saved ideas
+  const savedIdsMap = new Map<string, string>(
     (savedHistory || [])
       .filter(row => row.saved)
-      .map(row => row.idea_hash)
+      .map(row => [row.idea_hash, row.id])
   )
+  const savedHashes = new Set(savedIdsMap.keys())
+  
   const activeNiche = profile?.active_niche || 'fitness'
   const userPlan = profile?.plan || 'starter'
 
@@ -167,38 +171,38 @@ export default async function DashboardPage({
       </div>
 
       {/* Main Action Header */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8">
-        <div className="space-y-2">
-          <h1 className="text-5xl md:text-6xl font-black tracking-tighter text-white leading-tight">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 text-left">
+        <div className="space-y-2 text-left">
+          <h1 className="text-5xl md:text-6xl font-black tracking-tighter text-white leading-tight text-left">
             The Weekly <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">Reps</span>
           </h1>
-          <p className="text-slate-400 text-lg font-light max-w-xl">
+          <p className="text-slate-400 text-lg font-light max-w-xl text-left">
             20 high-impact content ideas, AI-filtered from the top 1% of digital trends.
           </p>
         </div>
 
-        <div className="shrink-0">
+        <div className="shrink-0 text-left">
           <AddIdeaModal />
         </div>
       </header>
 
       {!hasBrief ? (
-        <div className="relative py-24 flex flex-col items-center justify-center text-center overflow-hidden rounded-3xl border border-white/5 bg-white/[0.02] shadow-2xl">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.05),transparent_70%)]" />
+        <div className="relative py-24 flex flex-col items-center justify-center text-center overflow-hidden rounded-3xl border border-white/5 bg-white/[0.02] shadow-2xl text-left">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.05),transparent_70%)] text-left" />
           
-          <div className="relative z-10 space-y-8 max-w-lg">
+          <div className="relative z-10 space-y-8 max-w-lg text-left text-center">
             <div className="w-20 h-20 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto shadow-2xl group cursor-pointer hover:bg-blue-500/10 hover:border-blue-500/20 transition-all duration-500">
                <Sparkles className="w-10 h-10 text-blue-400 group-hover:scale-110 transition-transform" />
             </div>
             
-            <div className="space-y-3">
+            <div className="space-y-3 text-center">
               <h2 className="text-3xl font-bold text-white tracking-tight">Your briefing is ready to generate</h2>
               <p className="text-slate-400 text-lg leading-relaxed font-light px-6">
                 Our engine has analyzed the latest Reddit, YouTube, and Google trends for your niche.
               </p>
             </div>
 
-            <div className="pt-4 flex flex-col items-center gap-4">
+            <div className="pt-4 flex flex-col items-center gap-4 text-center">
               <GenerateNowButton alreadyGeneratedToday={alreadyGeneratedToday} />
               <p className="text-[10px] text-slate-600 font-bold uppercase tracking-[0.2em]">Takes ~30 seconds to analyze</p>
             </div>
@@ -215,10 +219,10 @@ export default async function DashboardPage({
               <TabsList className="bg-white/5 border border-white/10 p-1.5 rounded-2xl h-auto gap-1 self-start">
                 {[
                   { value: 'all', label: 'All Formats' },
-                  { value: 'reel', label: 'Reels' },
-                  { value: 'carousel', label: 'Carousels' },
-                  { value: 'thread', label: 'Threads' },
-                  { value: 'newsletter', label: 'Newsletters' }
+                  { value: 'Reel', label: 'Reels' },
+                  { value: 'Carousel', label: 'Carousels' },
+                  { value: 'Thread', label: 'Threads' },
+                  { value: 'Newsletter', label: 'Newsletters' }
                 ].map((tab) => (
                   <TabsTrigger 
                     key={tab.value}
@@ -238,19 +242,19 @@ export default async function DashboardPage({
 
             <div className="min-h-[400px]">
               <TabsContent value="all" className="mt-0 focus-visible:outline-none animate-in fade-in slide-in-from-bottom-2 duration-500">
-                <BriefList ideas={ideas} savedHashes={savedHashes} plan={userPlan} />
+                <BriefList ideas={ideas} savedHashes={savedHashes} savedIdsMap={savedIdsMap} plan={userPlan} />
               </TabsContent>
-              <TabsContent value="reel" className="mt-0 focus-visible:outline-none animate-in fade-in slide-in-from-bottom-2 duration-500">
-                <BriefList ideas={ideas.filter(i => i.format === 'Reel')} savedHashes={savedHashes} plan={userPlan} />
+              <TabsContent value="Reel" className="mt-0 focus-visible:outline-none animate-in fade-in slide-in-from-bottom-2 duration-500">
+                <BriefList ideas={ideas.filter(i => i.format === 'Reel')} savedHashes={savedHashes} savedIdsMap={savedIdsMap} plan={userPlan} />
               </TabsContent>
-              <TabsContent value="carousel" className="mt-0 focus-visible:outline-none animate-in fade-in slide-in-from-bottom-2 duration-500">
-                <BriefList ideas={ideas.filter(i => i.format === 'Carousel')} savedHashes={savedHashes} plan={userPlan} />
+              <TabsContent value="Carousel" className="mt-0 focus-visible:outline-none animate-in fade-in slide-in-from-bottom-2 duration-500">
+                <BriefList ideas={ideas.filter(i => i.format === 'Carousel')} savedHashes={savedHashes} savedIdsMap={savedIdsMap} plan={userPlan} />
               </TabsContent>
-              <TabsContent value="thread" className="mt-0 focus-visible:outline-none animate-in fade-in slide-in-from-bottom-2 duration-500">
-                <BriefList ideas={ideas.filter(i => i.format === 'Thread')} savedHashes={savedHashes} plan={userPlan} />
+              <TabsContent value="Thread" className="mt-0 focus-visible:outline-none animate-in fade-in slide-in-from-bottom-2 duration-500">
+                <BriefList ideas={ideas.filter(i => i.format === 'Thread')} savedHashes={savedHashes} savedIdsMap={savedIdsMap} plan={userPlan} />
               </TabsContent>
-              <TabsContent value="newsletter" className="mt-0 focus-visible:outline-none animate-in fade-in slide-in-from-bottom-2 duration-500">
-                <BriefList ideas={ideas.filter(i => i.format === 'Newsletter')} savedHashes={savedHashes} plan={userPlan} />
+              <TabsContent value="Newsletter" className="mt-0 focus-visible:outline-none animate-in fade-in slide-in-from-bottom-2 duration-500">
+                <BriefList ideas={ideas.filter(i => i.format === 'Newsletter')} savedHashes={savedHashes} savedIdsMap={savedIdsMap} plan={userPlan} />
               </TabsContent>
             </div>
           </Tabs>

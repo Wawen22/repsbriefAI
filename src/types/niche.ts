@@ -28,6 +28,7 @@ export interface IdeaObject {
   description: string
   format: 'Reel' | 'Carousel' | 'Thread' | 'Newsletter' | 'Idea'
   whyItWorks: string
+  niche?: string
   // Expanded fields
   scriptDraft?: string
   alternativeHooks?: string[]

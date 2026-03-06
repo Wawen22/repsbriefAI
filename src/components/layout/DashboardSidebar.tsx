@@ -5,7 +5,18 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import { Button } from "@/components/ui/button"
-import { LayoutGrid, Calendar, Crown, Zap, Settings, Star, Loader2, Sparkles, BarChart3 } from "lucide-react"
+import { 
+  LayoutGrid, 
+  History as HistoryIcon, 
+  Crown, 
+  Zap, 
+  Settings, 
+  Star, 
+  Loader2, 
+  Sparkles, 
+  BarChart3,
+  CalendarDays
+} from "lucide-react"
 import { LogoutButton } from "@/components/ui/LogoutButton"
 import { cn } from '@/lib/utils'
 import { TeamSwitcher } from './TeamSwitcher'
@@ -50,8 +61,9 @@ export function DashboardSidebar({
 
   const navItems = [
     { name: 'This Week', href: '/dashboard', icon: LayoutGrid },
-    { name: 'History', href: '/dashboard/history', icon: Calendar },
+    { name: 'History', href: '/dashboard/history', icon: HistoryIcon },
     { name: 'Saved Ideas', href: '/dashboard/ideas', icon: Star },
+    { name: 'Calendar', href: '/dashboard/calendar', icon: CalendarDays },
     { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
     { name: 'Settings', href: '/dashboard/settings', icon: Settings },
   ]

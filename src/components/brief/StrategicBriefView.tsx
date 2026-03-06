@@ -23,7 +23,10 @@ import {
   AlertCircle,
   MessageSquare,
   ArrowRight,
-  ShieldCheck
+  ShieldCheck,
+  FileDown,
+  FileText,
+  FileCode
 } from "lucide-react"
 import { useState, useEffect } from "react"
 import { toast } from "sonner"
@@ -507,14 +510,14 @@ export function StrategicBriefView({
                 <h4 className="text-xs font-black text-white uppercase tracking-widest">Production Data</h4>
               </div>
               
-              <div className="grid grid-cols-1 gap-3">
-                 <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 flex items-center justify-between">
-                    <span className="text-[10px] font-bold text-slate-500 uppercase">Target Niche</span>
-                    <span className="text-[10px] font-black text-white uppercase tracking-widest">{currentIdea.niche || 'General'}</span>
+              <div className="grid grid-cols-2 gap-3">
+                 <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 flex flex-col gap-1.5">
+                    <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Target Niche</span>
+                    <span className="text-[10px] font-black text-white uppercase tracking-widest truncate">{currentIdea.niche || 'General'}</span>
                  </div>
-                 <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 flex items-center justify-between">
-                    <span className="text-[10px] font-bold text-slate-500 uppercase">Platform Opt.</span>
-                    <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest">{currentIdea.format}</span>
+                 <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 flex flex-col gap-1.5">
+                    <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Platform Opt.</span>
+                    <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest truncate">{currentIdea.format}</span>
                  </div>
               </div>
 
@@ -533,41 +536,41 @@ export function StrategicBriefView({
       </div>
 
       {/* Studio Distribution Footer (26px height, centered) */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[200] flex items-center gap-2 p-1.5 rounded-full bg-black/80 border border-white/10 backdrop-blur-3xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] ring-1 ring-white/5">
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[200] flex items-center gap-2 p-1.5 rounded-full bg-black/90 border border-white/15 backdrop-blur-3xl shadow-[0_20px_60px_rgba(0,0,0,0.8)] ring-1 ring-white/10">
          <Button 
            variant="ghost" 
-           className="h-[26px] px-4 rounded-full text-[9px] font-black uppercase tracking-[0.15em] text-slate-400 hover:text-white hover:bg-white/10 gap-2 transition-all group"
+           className="h-[28px] px-4 rounded-full text-[9px] font-black uppercase tracking-[0.15em] text-slate-300 hover:text-white hover:bg-white/10 gap-2 transition-all group"
            onClick={copyForNotion}
          >
-           <div className="w-1 h-1 rounded-full bg-slate-600 group-hover:bg-blue-400 transition-colors" />
+           <FileText className="w-3 h-3 text-slate-500 group-hover:text-blue-400 transition-colors" />
            NOTION
          </Button>
          <div className="w-px h-3 bg-white/10" />
          <Button 
            variant="ghost" 
-           className="h-[26px] px-4 rounded-full text-[9px] font-black uppercase tracking-[0.15em] text-slate-400 hover:text-white hover:bg-white/10 gap-2 transition-all group"
+           className="h-[28px] px-4 rounded-full text-[9px] font-black uppercase tracking-[0.15em] text-slate-300 hover:text-white hover:bg-white/10 gap-2 transition-all group"
            onClick={exportToPDF}
          >
-           <div className="w-1 h-1 rounded-full bg-slate-600 group-hover:bg-purple-400 transition-colors" />
+           <FileDown className="w-3 h-3 text-slate-500 group-hover:text-purple-400 transition-colors" />
            SAVE AS PDF
          </Button>
          <div className="w-px h-3 bg-white/10" />
          <Button 
            variant="ghost" 
-           className="h-[26px] px-4 rounded-full text-[9px] font-black uppercase tracking-[0.15em] text-slate-400 hover:text-white hover:bg-white/10 gap-2 transition-all group"
+           className="h-[28px] px-4 rounded-full text-[9px] font-black uppercase tracking-[0.15em] text-slate-300 hover:text-white hover:bg-white/10 gap-2 transition-all group"
            onClick={exportAsMarkdown}
          >
-           <div className="w-1 h-1 rounded-full bg-slate-600 group-hover:bg-blue-400 transition-colors" />
+           <FileCode className="w-3 h-3 text-slate-500 group-hover:text-emerald-400 transition-colors" />
            BRIEF.MD
          </Button>
          <div className="w-px h-3 bg-white/10" />
          <Button 
            variant="ghost" 
-           className="h-[26px] px-4 rounded-full text-[9px] font-black uppercase tracking-[0.15em] text-slate-400 hover:text-white hover:bg-white/10 gap-2 transition-all group"
+           className="h-[28px] px-4 rounded-full text-[9px] font-black uppercase tracking-[0.15em] text-blue-400 hover:text-white hover:bg-blue-600/20 bg-blue-500/5 gap-2 transition-all group"
            onClick={handleSaveStrategy}
            disabled={isSharing}
          >
-           <div className="w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)]" />
+           <Share2 className="w-3 h-3 text-blue-500" />
            SHARE STRATEGY
          </Button>
       </div>

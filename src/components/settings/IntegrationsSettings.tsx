@@ -44,7 +44,7 @@ const AVAILABLE_PROVIDERS = [
   }
 ]
 
-import { connectNotion } from "@/app/actions/integrations"
+import { connectNotion, connectGoogle } from "@/app/actions/integrations"
 
 export function IntegrationsSettings() {
   const [integrations, setIntegrations] = useState<Integration[]>([])
@@ -85,6 +85,8 @@ export function IntegrationsSettings() {
   const handleConnect = async (providerId: string) => {
     if (providerId === 'notion') {
       await connectNotion()
+    } else if (providerId === 'google_calendar') {
+      await connectGoogle()
     } else {
       toast.info(`L'integrazione con ${providerId} sarà disponibile a breve.`)
     }

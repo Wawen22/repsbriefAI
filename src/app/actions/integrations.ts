@@ -2,6 +2,7 @@
 'use client'
 
 import { getNotionAuthUrl } from "@/lib/integrations/notion-client"
+import { getGoogleAuthUrl } from "@/lib/integrations/google-client"
 import { createClient } from "@/lib/supabase/client"
 import { toast } from "sonner"
 
@@ -28,9 +29,33 @@ export async function connectNotion() {
     return
   }
 
-  // Il teamId viene passato come 'state' a Notion per riconnettere l'utente nel callback
   const authUrl = getNotionAuthUrl(profile.current_team_id)
+  window.location.href = authUrl
+}
+
+/**
+ * Inizia il flusso di autenticazione Google Calendar
+ */
+export async function connectGoogle() {
+  const supabase = createClient()
   
-  // Redirect alla pagina di autorizzazione Notion
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    toast.error("Devi essere loggato per connettere Google Calendar.")
+    return
+  }
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('current_team_id')
+    .eq('id', user.id)
+    .single()
+
+  if (!profile?.current_team_id) {
+    toast.error("Nessun team attivo trovato.")
+    return
+  }
+
+  const authUrl = getGoogleAuthUrl(profile.current_team_id)
   window.location.href = authUrl
 }

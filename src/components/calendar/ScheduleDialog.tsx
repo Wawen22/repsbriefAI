@@ -26,10 +26,13 @@ import {
   ExternalLink
 } from 'lucide-react'
 import { scheduleIdeaAction, updateCalendarEntryAction, deleteCalendarEntryAction } from '@/app/actions/calendar'
+import { syncToGoogleCalendarAction } from '@/app/actions/calendar-sync'
+import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import { format } from 'date-fns'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
+import { useEffect } from 'react'
 
 type Platform = 'instagram' | 'tiktok' | 'linkedin' | 'youtube'
 
@@ -55,6 +58,40 @@ export function ScheduleDialog({ isOpen, onOpenChange, initialData }: ScheduleDi
   const [notes, setNotes] = useState(initialData?.notes || '')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [isGoogleConnected, setIsGoogleConnected] = useState(false)
+  const [teamId, setTeamId] = useState<string | null>(null)
+
+  const supabase = createClient()
+
+  useEffect(() => {
+    if (isOpen) {
+      checkGoogleConnection()
+    }
+  }, [isOpen])
+
+  const checkGoogleConnection = async () => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('current_team_id')
+      .eq('id', user.id)
+      .single()
+
+    if (profile?.current_team_id) {
+      setTeamId(profile.current_team_id)
+      const { data: integration } = await supabase
+        .from('team_integrations')
+        .select('id')
+        .eq('team_id', profile.current_team_id)
+        .eq('provider', 'google_calendar')
+        .eq('status', 'active')
+        .maybeSingle()
+      
+      setIsGoogleConnected(!!integration)
+    }
+  }
 
   const isEditing = !!initialData?.calendarId
 
@@ -70,11 +107,13 @@ export function ScheduleDialog({ isOpen, onOpenChange, initialData }: ScheduleDi
     setIsSubmitting(true)
     
     try {
+      const scheduledDate = new Date(date).toISOString()
+
       if (isEditing && initialData?.calendarId) {
         const res = await updateCalendarEntryAction(initialData.calendarId, {
           title,
           platform,
-          scheduled_date: new Date(date).toISOString(),
+          scheduled_date: scheduledDate,
           notes
         })
         if (res.success) {
@@ -85,17 +124,30 @@ export function ScheduleDialog({ isOpen, onOpenChange, initialData }: ScheduleDi
           toast.error(res.error || "Failed to update")
         }
       } else {
+        // 1. Salva nel calendario interno
         const res = await scheduleIdeaAction({
           ideaId: initialData?.ideaId,
-          scheduledDate: new Date(date).toISOString(),
+          scheduledDate,
           platform,
           title,
           hook: initialData?.hook,
           script: initialData?.script,
           notes
         })
+
         if (res.success) {
-          toast.success("Content scheduled successfully!")
+          // 2. Se Google è connesso, sincronizza anche lì
+          if (isGoogleConnected && teamId && initialData?.ideaId) {
+            const googleRes = await syncToGoogleCalendarAction(teamId, initialData.ideaId, scheduledDate)
+            if (googleRes.success) {
+              toast.success("Scheduled in App & Google Calendar!")
+            } else {
+              toast.warning("Scheduled in App, but Google Sync failed.")
+            }
+          } else {
+            toast.success("Scheduled in editorial calendar!")
+          }
+
           onOpenChange(false)
           if (typeof window !== 'undefined') window.location.reload()
         } else {

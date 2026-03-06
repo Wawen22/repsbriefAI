@@ -67,6 +67,7 @@ export function StrategicBriefView({
   const [feedbackNotes, setFeedbackNotes] = useState<string>((idea as any).feedback_notes || '')
   const [isSubmittingApproval, setIsSubmittingApproval] = useState(false)
   const [isNotionConnected, setIsNotionConnected] = useState(false)
+  const [isGoogleConnected, setIsGoogleConnected] = useState(false)
   const [isExportingToNotion, setIsExportingToNotion] = useState(false)
 
   useEffect(() => {
@@ -85,16 +86,17 @@ export function StrategicBriefView({
       if (profile?.current_team_id) {
         setTeamId(profile.current_team_id)
         
-        // Check if Notion is connected
-        const { data: integration } = await supabase
+        // Check Integrations
+        const { data: integrations } = await supabase
           .from('team_integrations')
-          .select('id')
+          .select('provider')
           .eq('team_id', profile.current_team_id)
-          .eq('provider', 'notion')
           .eq('status', 'active')
-          .maybeSingle()
         
-        setIsNotionConnected(!!integration)
+        if (integrations) {
+          setIsNotionConnected(integrations.some(i => i.provider === 'notion'))
+          setIsGoogleConnected(integrations.some(i => i.provider === 'google_calendar'))
+        }
 
         const { data: member } = await supabase
           .from('team_members')
@@ -140,9 +142,12 @@ export function StrategicBriefView({
         setIsExportingToNotion(false)
       }
     } else {
-      // Fallback copy
       copyToClipboard(content, "Formatted for Notion (Copied)!")
     }
+  }
+
+  const handleGoogleCalendarAction = async () => {
+    setIsScheduleOpen(true)
   }
 
   const exportToPDF = async () => {
@@ -603,12 +608,12 @@ export function StrategicBriefView({
               </div>
 
               <Button 
-                onClick={() => setIsScheduleOpen(true)}
+                onClick={handleGoogleCalendarAction}
                 disabled={!isApproved && !isOwnerOrAdmin}
                 className="w-full h-12 rounded-2xl bg-white/5 border border-white/10 text-white hover:bg-white/10 font-bold gap-3 justify-center text-left"
               >
                 <CalendarDays className="w-4 h-4 text-blue-400" />
-                Schedule Production
+                {isGoogleConnected ? 'Sync to Calendar' : 'Schedule Production'}
               </Button>
             </section>
 
@@ -633,6 +638,18 @@ export function StrategicBriefView({
              <FileText className={cn("w-3 h-3 transition-colors", isNotionConnected ? "text-blue-400" : "text-slate-500 group-hover:text-blue-400")} />
            )}
            {isNotionConnected ? 'SEND TO NOTION' : 'NOTION'}
+         </Button>
+         <div className="w-px h-3 bg-white/10" />
+         <Button 
+           variant="ghost" 
+           className={cn(
+             "h-[28px] px-4 rounded-full text-[9px] font-black uppercase tracking-[0.15em] gap-2 transition-all group",
+             isGoogleConnected ? "text-white bg-blue-500/10 hover:bg-blue-500/20" : "text-slate-300 hover:text-white hover:bg-white/10"
+           )}
+           onClick={handleGoogleCalendarAction}
+         >
+           <CalendarDays className={cn("w-3 h-3 transition-colors", isGoogleConnected ? "text-blue-400" : "text-slate-500 group-hover:text-blue-400")} />
+           {isGoogleConnected ? 'SYNC TO GCAL' : 'CALENDAR'}
          </Button>
          <div className="w-px h-3 bg-white/10" />
          <Button 

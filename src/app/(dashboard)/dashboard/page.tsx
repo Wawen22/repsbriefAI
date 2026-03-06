@@ -12,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { CalendarDays, Zap, Sparkles, Orbit } from "lucide-react"
 import { stripe } from "@/lib/stripe"
 import { resolvePlanFromPriceId } from "@/lib/billing"
+import { OnboardingModal } from "@/components/dashboard/OnboardingModal"
 
 export const dynamic = 'force-dynamic'
 
@@ -104,7 +105,7 @@ export default async function DashboardPage({
       .maybeSingle(),
     supabase
       .from('profiles')
-      .select('active_niche, plan, current_team_id')
+      .select('active_niche, plan, current_team_id, has_onboarded')
       .eq('id', user.id)
       .single()
   ])
@@ -149,8 +150,11 @@ export default async function DashboardPage({
     ? new Date(brief.week_date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
     : null
 
+  const showOnboarding = !profile?.has_onboarded
+
   return (
     <div className="space-y-10">
+      {showOnboarding && <OnboardingModal userName={user.user_metadata?.full_name || user.email?.split('@')[0]} />}
       {/* Upper Utility Bar */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 py-2 border-b border-white/5">
         <div className="flex items-center gap-4">

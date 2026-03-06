@@ -54,6 +54,9 @@
   - [x] Settings Brand Voice: ripristinato export server action (`updateBrandVoiceAction`) con adapter compatibile (`success` + `data`)
   - [x] Settings UI/UX refactor: nuova information architecture (overview, account, workspace, niche, brand voice) + card hierarchy semplificata
   - [x] Settings UI/UX refactor v2: layout tab-based per feature (Account, Workspace, Niche, Brand Voice) con navigazione più leggibile
+  - [x] Settings Brand Voice fix: autorizzazioni owner/admin + salvataggio robusto su teams + messaggi errore espliciti
+  - [x] Settings Brand Voice fix v2: RPC `update_team_brand_voice` (SECURITY DEFINER) per stabilità cross-RLS
+  - [x] Settings Brand Voice fix v3: fallback cross-schema (`teams` -> `profiles`) per ambienti con colonne migrate parzialmente
 
 > **Use this file as context when working on any part of the project.**
 > It contains all decisions already made: stack, architecture, business logic, and roadmap.

@@ -39,6 +39,9 @@
     - [x] Save/Unsave ideas (saved column, RLS UPDATE policy, accurate star state)
     - [x] Settings UI/UX refactor (nuova struttura pagina, migliore gerarchia sezioni e flusso operativo)
     - [x] Settings UI/UX refactor v2 (navigazione a tab per feature)
+    - [x] Settings Brand Voice bugfix (permessi workspace + update affidabile su team)
+    - [x] Settings Brand Voice bugfix v2 (RPC SECURITY DEFINER per update/reset persona)
+    - [x] Settings Brand Voice bugfix v3 (fallback compatibilità schema team/profile)
 - [ ] **Phase 5: Deploy & Live Testing**
     - [ ] vercel.json with cron config
     - [ ] Vercel env vars setup

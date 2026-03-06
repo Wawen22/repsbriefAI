@@ -4,17 +4,24 @@
 import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import { CheckCircle2, FileText, Loader2, Save, Sparkles, Trash2, Wand2 } from "lucide-react"
+import { CheckCircle2, FileText, Loader2, Lock, Save, Sparkles, Trash2, Wand2 } from "lucide-react"
 import { updateBrandVoiceAction, resetBrandPersonaAction } from "@/app/actions/profile"
 import { toast } from "sonner"
 
-export function BrandVoiceSettings({ currentAnalysis }: { currentAnalysis: string | null }) {
+export function BrandVoiceSettings({
+  currentAnalysis,
+  canEdit = true,
+}: {
+  currentAnalysis: string | null
+  canEdit?: boolean
+}) {
   const [samples, setSamples] = useState("")
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [isResetting, setIsResetting] = useState(false)
   const [analysis, setAnalysis] = useState<string | null>(currentAnalysis)
 
   const handleAnalyze = async () => {
+    if (!canEdit) return
     if (!samples.trim()) return
     setIsAnalyzing(true)
     const toastId = toast.loading("Analyzing your content style...")
@@ -36,6 +43,7 @@ export function BrandVoiceSettings({ currentAnalysis }: { currentAnalysis: strin
   }
 
   const handleReset = async () => {
+    if (!canEdit) return
     if (!confirm("Are you sure? This will delete your current persona and writing style data.")) return
     
     setIsResetting(true)
@@ -58,6 +66,20 @@ export function BrandVoiceSettings({ currentAnalysis }: { currentAnalysis: strin
 
   return (
     <div className="space-y-6">
+      {!canEdit && (
+        <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-amber-100">
+          <div className="flex items-start gap-2">
+            <Lock className="mt-0.5 h-4 w-4 text-amber-300" />
+            <div className="space-y-1">
+              <p className="text-xs font-semibold">Permission required</p>
+              <p className="text-[11px] leading-relaxed text-amber-100/90">
+                Only workspace owners or admins can update the shared Brand Voice.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {analysis && (
         <div className="rounded-3xl border border-emerald-500/30 bg-emerald-500/5 p-5">
           <div className="flex items-start justify-between gap-3">
@@ -73,7 +95,7 @@ export function BrandVoiceSettings({ currentAnalysis }: { currentAnalysis: strin
             </div>
             <Button
               onClick={handleReset}
-              disabled={isResetting}
+              disabled={isResetting || !canEdit}
               variant="ghost"
               className="h-8 rounded-full px-3 text-[11px] font-semibold text-rose-300 hover:bg-rose-500/10 hover:text-rose-200"
             >
@@ -100,6 +122,7 @@ export function BrandVoiceSettings({ currentAnalysis }: { currentAnalysis: strin
             placeholder="Incolla qui i tuoi migliori contenuti..."
             value={samples}
             onChange={(e) => setSamples(e.target.value)}
+            disabled={!canEdit}
             className="min-h-[180px] resize-y rounded-2xl border-white/10 bg-white/[0.02] p-4 text-sm focus-visible:border-blue-500/40"
           />
 
@@ -109,7 +132,7 @@ export function BrandVoiceSettings({ currentAnalysis }: { currentAnalysis: strin
             </p>
             <Button
               onClick={handleAnalyze}
-              disabled={isAnalyzing || !samples.trim()}
+              disabled={!canEdit || isAnalyzing || !samples.trim()}
               className="h-10 rounded-full bg-white px-5 font-semibold text-black hover:bg-slate-200"
             >
               {isAnalyzing ? (

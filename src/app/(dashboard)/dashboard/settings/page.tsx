@@ -14,12 +14,19 @@ import { createClient } from "@/lib/supabase/server"
 
 export const dynamic = 'force-dynamic'
 
-export default async function SettingsPage() {
+export default async function SettingsPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ tab?: string }>
+}) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
     redirect('/login')
   }
+
+  const params = searchParams ? await searchParams : undefined
+  const defaultTab = params?.tab || "account"
 
   const { data: profile } = await supabase
     .from('profiles')
@@ -29,15 +36,36 @@ export default async function SettingsPage() {
 
   if (!profile) return null
 
-  let team: { name: string; brand_voice: string | null } | null = null
+  let team: { name: string } | null = null
+  let brandVoice: string | null = profile.brand_voice || null
+  let canEditBrandVoice = true
   if (profile.current_team_id) {
     const { data } = await supabase
       .from('teams')
-      .select('name, brand_voice')
+      .select('name')
       .eq('id', profile.current_team_id)
       .maybeSingle()
 
     team = data
+
+    const { data: teamVoice } = await supabase
+      .from('teams')
+      .select('brand_voice')
+      .eq('id', profile.current_team_id)
+      .maybeSingle()
+
+    if (teamVoice?.brand_voice) {
+      brandVoice = teamVoice.brand_voice
+    }
+
+    const { data: membership } = await supabase
+      .from('team_members')
+      .select('role')
+      .eq('team_id', profile.current_team_id)
+      .eq('user_id', user.id)
+      .maybeSingle()
+
+    canEditBrandVoice = membership ? ['owner', 'admin'].includes(membership.role) : false
   }
 
   const activeNicheLabel = NICHES[profile.active_niche]?.label || 'Fitness & Nutrition'
@@ -77,13 +105,13 @@ export default async function SettingsPage() {
               Niche: {activeNicheLabel}
             </Badge>
             <Badge variant="outline" className="border-white/15 bg-black/30 text-slate-300">
-              Persona: {team?.brand_voice ? 'Configured' : 'Not configured'}
+              Persona: {brandVoice ? 'Configured' : 'Not configured'}
             </Badge>
           </div>
         </div>
       </header>
 
-      <Tabs defaultValue="account" className="gap-5">
+      <Tabs defaultValue={defaultTab} className="gap-5">
         <TabsList className="h-auto w-full justify-start gap-2 overflow-x-auto overflow-y-hidden rounded-2xl border border-white/10 bg-white/[0.03] p-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
           <TabsTrigger value="account" className="h-9 shrink-0 rounded-xl border border-white/10 bg-white/[0.04] px-4 text-slate-300 hover:bg-white/[0.08] hover:text-white data-[state=active]:border-white/20 data-[state=active]:bg-white data-[state=active]:text-black">
             <User className="h-4 w-4" />
@@ -180,7 +208,10 @@ export default async function SettingsPage() {
               Definisci lo stile editoriale condiviso dal team per script, caption e remix.
             </p>
           </div>
-          <BrandVoiceSettings currentAnalysis={team?.brand_voice || null} />
+          <BrandVoiceSettings
+            currentAnalysis={brandVoice}
+            canEdit={canEditBrandVoice}
+          />
         </TabsContent>
       </Tabs>
     </div>

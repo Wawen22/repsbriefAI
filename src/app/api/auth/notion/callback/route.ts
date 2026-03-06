@@ -1,13 +1,13 @@
 // src/app/api/auth/notion/callback/route.ts
 
 import { NextRequest, NextResponse } from "next/server"
-import { exchangeCodeForToken, getDatabaseDataSources } from "@/lib/integrations/notion"
+import { exchangeCodeForToken, findFirstAvailableParent } from "@/lib/integrations/notion"
 import { createClient } from "@/lib/supabase/server"
 
 export async function GET(req: NextRequest) {
   const searchParams = req.nextUrl.searchParams
   const code = searchParams.get("code")
-  const state = searchParams.get("state") // Questo è il teamId passato nell'action
+  const state = searchParams.get("state")
   const error = searchParams.get("error")
 
   if (error || !code || !state) {
@@ -25,17 +25,11 @@ export async function GET(req: NextRequest) {
       throw new Error(tokenData.error_description || tokenData.error)
     }
 
-    const { access_token, workspace_id, workspace_name, workspace_icon, duplicated_template_id } = tokenData
+    const { access_token, workspace_id, workspace_name, workspace_icon } = tokenData
 
-    // 2. Se l'utente ha selezionato un database (duplicated_template_id), 
-    // recuperiamo il data_source_id per la v2025-09-03
-    let dataSourceId = null
-    if (duplicated_template_id) {
-      const dataSources = await getDatabaseDataSources(access_token, duplicated_template_id)
-      if (dataSources && dataSources.length > 0) {
-        dataSourceId = dataSources[0].id
-      }
-    }
+    // 2. Cerchiamo la prima destinazione disponibile (database o pagina)
+    const firstAvailable = await findFirstAvailableParent(access_token)
+    const dataSourceId = firstAvailable?.type === 'data_source_id' ? firstAvailable.id : null
 
     // 3. Salvo o aggiorno l'integrazione nel database
     const { error: dbError } = await supabase
@@ -47,8 +41,7 @@ export async function GET(req: NextRequest) {
           access_token,
           workspace_id,
           workspace_name,
-          workspace_icon,
-          duplicated_template_id
+          workspace_icon
         },
         settings: {
           data_source_id: dataSourceId,

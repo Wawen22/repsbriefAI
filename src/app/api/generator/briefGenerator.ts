@@ -14,6 +14,7 @@ const IdeaSchema = z.object({
   description: z.string().min(1).max(700),
   format: z.enum(VALID_FORMATS),
   whyItWorks: z.string().min(1).max(700),
+  sources: z.array(z.enum(['reddit', 'youtube', 'google-trends', 'rss'])).optional(),
   scriptDraft: z.string().min(1).max(1200).optional(),
   alternativeHooks: z.array(z.string().min(1).max(220)).max(5).optional(),
   trendingAudioSuggestion: z.string().min(1).max(220).optional(),
@@ -113,12 +114,28 @@ function normalizeIdeaCandidate(candidate: unknown): IdeaObject | null {
   const keyVisuals = readString(record, ['keyVisuals', 'visuals', 'key_visuals'], 260)
   const alternativeHooks = normalizeAltHooks(record.alternativeHooks ?? record.alternative_hooks)
 
+  // Normalize sources
+  let sources: ('reddit' | 'youtube' | 'google-trends' | 'rss')[] | undefined
+  const rawSources = record.sources ?? record.source_list ?? record.sourceTrend
+  if (Array.isArray(rawSources)) {
+    sources = rawSources
+      .filter((s): s is string => typeof s === 'string')
+      .map((s) => s.toLowerCase() as any)
+      .filter((s) => ['reddit', 'youtube', 'google-trends', 'rss'].includes(s))
+  } else if (typeof rawSources === 'string') {
+    const s = rawSources.toLowerCase()
+    if (['reddit', 'youtube', 'google-trends', 'rss'].includes(s)) {
+      sources = [s as any]
+    }
+  }
+
   return {
     title,
     hook,
     description,
     format,
     whyItWorks,
+    sources,
     scriptDraft,
     alternativeHooks,
     trendingAudioSuggestion,
@@ -340,6 +357,7 @@ Each idea object must contain:
 - "description" (max 260 chars)
 - "format" ("Reel" | "Carousel" | "Thread" | "Newsletter")
 - "whyItWorks" (max 260 chars)
+- "sources" (array of strings from: "reddit", "youtube", "google-trends", "rss". Match the trends you used.)
 - "scriptDraft" (max 500 chars)
 - "alternativeHooks" (array with max 2 hooks, each max 120 chars)
 - "trendingAudioSuggestion" (max 120 chars)

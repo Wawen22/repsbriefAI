@@ -16,8 +16,35 @@ import {
   ExternalLink,
   ShieldCheck,
   Clock,
-  AlertCircle
+  AlertCircle,
+  Youtube,
+  TrendingUp,
+  Rss
 } from "lucide-react"
+
+// ... (existing imports)
+
+// Simple helper for Source Icons
+const SourceBadge = ({ source }: { source: string }) => {
+  const configs: Record<string, { icon: any, color: string, label: string, bg: string }> = {
+    'reddit': { icon: Zap, color: 'text-orange-500', bg: 'bg-orange-500/10', label: 'Reddit' },
+    'youtube': { icon: Youtube, color: 'text-red-500', bg: 'bg-red-500/10', label: 'YouTube' },
+    'google-trends': { icon: TrendingUp, color: 'text-blue-500', bg: 'bg-blue-500/10', label: 'Trends' },
+    'rss': { icon: Rss, color: 'text-amber-500', bg: 'bg-amber-500/10', label: 'RSS' },
+  }
+
+  const config = configs[source.toLowerCase()] || { icon: Sparkles, color: 'text-slate-400', bg: 'bg-white/5', label: source }
+  const Icon = config.icon
+
+  return (
+    <div className={cn("flex items-center gap-1.5 px-2 py-0.5 rounded-md border border-white/5", config.bg)}>
+      <Icon className={cn("w-3 h-3", config.color)} />
+      <span className="text-[8px] font-black uppercase tracking-widest text-white/70">{config.label}</span>
+    </div>
+  )
+}
+
+// ... (rest of component)
 import { IdeaObject } from '@/types/niche'
 import { toast } from 'sonner'
 import { deleteIdeaAction } from '@/app/actions/ideas'
@@ -82,8 +109,13 @@ export function BriefCard({
     if (ideaId) {
       router.push(`/dashboard/strategy/${ideaId}`)
     } else {
-      toast.info("Save this idea to your board first to open the full studio.", {
-        description: "Ideas in the weekly brief must be saved to become editable strategies."
+      toast.info("Save to your board first", {
+        description: (
+          <div className="mt-1 flex flex-col gap-1">
+            <span className="text-slate-950 font-bold leading-tight">Clicking this will open the full Studio.</span>
+            <span className="text-slate-500 text-[11px] leading-tight">Ideas in the weekly brief must be saved to become editable strategies.</span>
+          </div>
+        )
       })
     }
   }
@@ -105,10 +137,11 @@ export function BriefCard({
       >
         <CardContent className="p-4 space-y-3">
           <div className="flex items-start justify-between gap-2">
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <Badge variant="outline" className={cn("text-[8px] font-black uppercase tracking-widest px-2 py-0 border-none", colors.bg, colors.text)}>
                 {format}
               </Badge>
+              {idea.sources?.map(s => <SourceBadge key={s} source={s} />)}
               <ApprovalIndicator />
             </div>
             <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -240,7 +273,7 @@ export function BriefCard({
             </div>
           </div>
 
-          <div className="px-8 pb-4 flex items-center gap-4 text-[9px] font-bold text-slate-600 uppercase tracking-widest text-left">
+          <div className="px-8 pb-4 flex flex-wrap items-center gap-4 text-[9px] font-bold text-slate-600 uppercase tracking-widest text-left">
              <div className="flex items-center gap-1.5 text-left">
                 <div className={cn("w-1 h-1 rounded-full shadow-[0_0_5px_currentColor]", colors.text, "bg-current")} />
                 <span>AI Verified</span>
@@ -249,6 +282,11 @@ export function BriefCard({
                <div className="flex items-center gap-1.5 text-left">
                   <div className="w-1 h-1 rounded-full bg-purple-500 shadow-[0_0_5px_rgba(168,85,247,0.5)]" />
                   <span>Script Ready</span>
+               </div>
+             )}
+             {idea.sources && idea.sources.length > 0 && (
+               <div className="flex items-center gap-2 border-l border-white/5 pl-4 ml-auto sm:ml-0">
+                  {idea.sources.map(s => <SourceBadge key={s} source={s} />)}
                </div>
              )}
           </div>

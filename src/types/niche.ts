@@ -29,6 +29,7 @@ export interface IdeaObject {
   format: 'Reel' | 'Carousel' | 'Thread' | 'Newsletter' | 'Idea'
   whyItWorks: string
   niche?: string
+  sources?: ('reddit' | 'youtube' | 'google-trends' | 'rss')[]
   // Expanded fields
   scriptDraft?: string
   alternativeHooks?: string[]

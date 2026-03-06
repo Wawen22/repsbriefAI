@@ -30,6 +30,7 @@ const SAMPLE_IDEAS = [
     format: "Reel" as const,
     whyItWorks: "Contrarian take on a universally accepted fact — high engagement bait with real science to back it up.",
     niche: "Fitness",
+    sources: ["reddit", "google-trends"],
     scriptDraft: "[Scene: Holding a fitness tracker]\nNarrator: Stop obsessing over this number.\n[Cut to: Science paper screenshot]\nNarrator: Research shows that after 7,000 steps, benefits plateau. Here is what you should focus on instead..."
   },
   {
@@ -38,7 +39,8 @@ const SAMPLE_IDEAS = [
     description: "Full meal prep recipe with cost breakdown. Compare the nutrient profile to popular supplements. Use a side-by-side comparison chart.",
     format: "Carousel" as const,
     whyItWorks: "Combines budget-friendly appeal with supplement skepticism — two trending topics in fitness right now.",
-    niche: "Fitness"
+    niche: "Fitness",
+    sources: ["youtube", "rss"]
   },
   {
     title: "The 3 Exercises Every Desk Worker Should Do Daily",
@@ -46,7 +48,8 @@ const SAMPLE_IDEAS = [
     description: "Thread covering 3 corrective exercises for anterior pelvic tilt. Each exercise includes form cues and sets/reps.",
     format: "Thread" as const,
     whyItWorks: "Targets the huge overlap between fitness audience and remote workers. Posture content is evergreen.",
-    niche: "Fitness"
+    niche: "Fitness",
+    sources: ["reddit"]
   },
   {
     title: "The 'Lazy' Morning Routine for 2x Focus",
@@ -54,7 +57,8 @@ const SAMPLE_IDEAS = [
     description: "Explain dopamine fasting in the morning. No phone, no coffee for 90 mins, just sunlight and 5 mins of planning.",
     format: "Newsletter" as const,
     whyItWorks: "Reverses the 'hustle culture' narrative which is currently seeing a massive backlash on social media.",
-    niche: "Self-Improvement"
+    niche: "Self-Improvement",
+    sources: ["rss", "google-trends"]
   },
   {
     title: "How to Build a 'Second Brain' for Content Ideas",
@@ -62,7 +66,8 @@ const SAMPLE_IDEAS = [
     description: "A deep dive into capture systems using Notion or Obsidian. How to turn random comments into full-scale content strategies.",
     format: "Carousel" as const,
     whyItWorks: "Tool-based productivity is a high-CPM niche with very loyal engagement.",
-    niche: "Tech & AI"
+    niche: "Tech & AI",
+    sources: ["reddit", "youtube"]
   },
   {
     title: "The Future of AI: From Chatbots to Agents",
@@ -71,6 +76,7 @@ const SAMPLE_IDEAS = [
     format: "Reel" as const,
     whyItWorks: "High authority content that positions you as a forward-thinker in the fastest moving industry.",
     niche: "Tech & AI",
+    sources: ["youtube", "google-trends"],
     scriptDraft: "[Visual: AI interface typing]\nNarrator: Stop thinking of AI as a search engine.\n[Visual: Automation flow]\nNarrator: The real revolution is happening here..."
   }
 ]
@@ -82,6 +88,23 @@ const FORMAT_COLORS: Record<string, { bg: string, text: string, border: string }
   'Newsletter': { bg: 'bg-emerald-500/10', text: 'text-emerald-400', border: 'border-emerald-500/20' },
   'Idea': { bg: 'bg-purple-500/10', text: 'text-purple-400', border: 'border-purple-500/20' },
   'Strategy': { bg: 'bg-slate-500/10', text: 'text-slate-400', border: 'border-slate-500/20' },
+}
+
+const SourceBadge = ({ source }: { source: string }) => {
+  const configs: any = {
+    'reddit': { icon: Zap, color: 'text-orange-500', bg: 'bg-orange-500/10', label: 'Reddit' },
+    'youtube': { icon: Youtube, color: 'text-red-500', bg: 'bg-red-500/10', label: 'YouTube' },
+    'google-trends': { icon: TrendingUp, color: 'text-blue-500', bg: 'bg-blue-500/10', label: 'Trends' },
+    'rss': { icon: Rss, color: 'text-amber-500', bg: 'bg-amber-500/10', label: 'RSS' },
+  }
+  const config = configs[source] || { icon: Sparkles, color: 'text-slate-400', bg: 'bg-white/5', label: source }
+  const Icon = config.icon
+  return (
+    <div className={cn("flex items-center gap-1 px-1.5 py-0.5 rounded border border-white/5", config.bg)}>
+      <Icon className={cn("w-2.5 h-2.5", config.color)} />
+      <span className="text-[7px] font-black uppercase tracking-widest text-white/70">{config.label}</span>
+    </div>
+  )
 }
 
 export function SampleBriefButton() {
@@ -157,9 +180,12 @@ export function SampleBriefButton() {
                 >
                   <div className="p-8 pb-4 space-y-4">
                     <div className="flex items-center justify-between">
-                      <Badge variant="outline" className={cn("text-[10px] font-black uppercase tracking-widest px-3 py-1", colors.bg, colors.text, colors.border)}>
-                        {idea.format} Strategy
-                      </Badge>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Badge variant="outline" className={cn("text-[10px] font-black uppercase tracking-widest px-3 py-1", colors.bg, colors.text, colors.border)}>
+                          {idea.format} Strategy
+                        </Badge>
+                        {idea.sources?.map(s => <SourceBadge key={s} source={s} />)}
+                      </div>
                       <div className="flex items-center gap-2">
                          <div className="h-8 w-8 rounded-full bg-white/5 flex items-center justify-center text-slate-500">
                             <Star className="w-4 h-4" />

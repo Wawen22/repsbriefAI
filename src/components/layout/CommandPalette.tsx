@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 import {
   LayoutGrid,
   Calendar,
@@ -9,9 +9,7 @@ import {
   Settings,
   LogOut,
   Plus,
-  Zap,
   Search,
-  Dumbbell,
   Sparkles,
 } from "lucide-react"
 
@@ -26,11 +24,13 @@ import {
   CommandShortcut,
 } from "@/components/ui/command"
 import { createClient } from "@/lib/supabase/client"
+import { cn } from "@/lib/utils"
 import { toast } from "sonner"
 
 export function CommandPalette() {
   const [open, setOpen] = React.useState(false)
   const router = useRouter()
+  const pathname = usePathname()
   const supabase = createClient()
 
   React.useEffect(() => {
@@ -57,22 +57,35 @@ export function CommandPalette() {
       toast.success('Logged out successfully')
       router.push('/login')
       router.refresh()
-    } catch (error: any) {
+    } catch {
       toast.error('Failed to log out')
     }
   }
 
+  const isStrategyPage = pathname?.includes('/dashboard/strategy/')
+
   return (
     <>
-      {/* Visual Indicator in UI - Moved to bottom-center for better UX */}
-      <div id="command-palette-indicator" className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[50] hidden lg:block">
+      {/* Visual Indicator in UI - Repositioned based on context */}
+      <div 
+        id="command-palette-indicator" 
+        className={cn(
+          "fixed z-[250] hidden lg:block transition-all duration-500 ease-in-out",
+          isStrategyPage 
+            ? "bottom-8 left-8" 
+            : "bottom-6 left-1/2 -translate-x-1/2"
+        )}
+      >
          <button 
            onClick={() => setOpen(true)}
-           className="flex items-center gap-3 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-slate-400 hover:text-white hover:bg-white/10 hover:border-white/20 transition-all text-[10px] font-bold uppercase tracking-[0.2em] backdrop-blur-xl shadow-2xl group"
+           className={cn(
+             "flex items-center gap-3 px-4 py-2 rounded-full bg-black/80 border border-white/10 text-slate-400 hover:text-white hover:bg-white/10 hover:border-white/20 transition-all text-[10px] font-black uppercase tracking-[0.2em] backdrop-blur-3xl shadow-2xl group ring-1 ring-white/5",
+             isStrategyPage && "hover:scale-105 active:scale-95"
+           )}
          >
            <div className="flex items-center gap-1.5">
-              <Search className="w-3 h-3 text-blue-400 group-hover:scale-110 transition-transform" />
-              <span>Command Palette</span>
+              <Search className="w-3.5 h-3.5 text-blue-400 group-hover:scale-110 transition-transform" />
+              <span>Search</span>
            </div>
            <div className="h-3 w-px bg-white/10" />
            <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded bg-white/10 px-1.5 font-mono text-[10px] font-medium text-slate-300 opacity-100">

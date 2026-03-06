@@ -1,10 +1,11 @@
 // src/app/(dashboard)/dashboard/settings/page.tsx
 
 import { redirect } from "next/navigation"
-import { Fingerprint, Settings, ShieldCheck, Target, Users, User } from "lucide-react"
+import { Fingerprint, Settings, ShieldCheck, Target, Users, User, Link2 } from "lucide-react"
 import { BrandVoiceSettings } from "@/components/settings/BrandVoiceSettings"
 import { NicheSwitcher } from "@/components/settings/NicheSwitcher"
 import { TeamWorkspaceSettings } from "@/components/settings/TeamWorkspaceSettings"
+import { IntegrationsSettings } from "@/components/settings/IntegrationsSettings"
 import { LogoutButton } from "@/components/ui/LogoutButton"
 import { UpgradeToProButton } from "@/components/settings/UpgradeToProButton"
 import { Badge } from "@/components/ui/badge"
@@ -121,6 +122,10 @@ export default async function SettingsPage({
             <Users className="h-4 w-4" />
             Workspace
           </TabsTrigger>
+          <TabsTrigger value="integrations" className="h-9 shrink-0 rounded-xl border border-white/10 bg-white/[0.04] px-4 text-slate-300 hover:bg-white/[0.08] hover:text-white data-[state=active]:border-white/20 data-[state=active]:bg-white data-[state=active]:text-black">
+            <Link2 className="h-4 w-4" />
+            Integrations
+          </TabsTrigger>
           <TabsTrigger value="niche" className="h-9 shrink-0 rounded-xl border border-white/10 bg-white/[0.04] px-4 text-slate-300 hover:bg-white/[0.08] hover:text-white data-[state=active]:border-white/20 data-[state=active]:bg-white data-[state=active]:text-black">
             <Target className="h-4 w-4" />
             Niche
@@ -181,6 +186,19 @@ export default async function SettingsPage({
             </p>
           </div>
           <TeamWorkspaceSettings />
+        </TabsContent>
+
+        <TabsContent value="integrations" className="mt-0 rounded-3xl border border-white/10 bg-white/[0.03] p-6 md:p-8">
+          <div className="mb-6 space-y-1">
+            <div className="flex items-center gap-2 text-slate-300">
+              <Link2 className="h-4 w-4 text-blue-400" />
+              <h2 className="text-lg font-semibold text-white">Connections & Plugins</h2>
+            </div>
+            <p className="text-sm text-slate-500">
+              Collega RepsBrief ai tuoi strumenti di lavoro preferiti.
+            </p>
+          </div>
+          <IntegrationsSettings />
         </TabsContent>
 
         <TabsContent value="niche" className="mt-0 rounded-3xl border border-white/10 bg-white/[0.03] p-6 md:p-8">

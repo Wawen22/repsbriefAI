@@ -42,6 +42,7 @@
     - [x] Settings Brand Voice bugfix (permessi workspace + update affidabile su team)
     - [x] Settings Brand Voice bugfix v2 (RPC SECURITY DEFINER per update/reset persona)
     - [x] Settings Brand Voice bugfix v3 (fallback compatibilità schema team/profile)
+    - [x] StrategicBriefView bugfix (`exportAsMarkdown` definita + export BRIEF.MD funzionante)
 - [ ] **Phase 5: Deploy & Live Testing**
     - [ ] vercel.json with cron config
     - [ ] Vercel env vars setup

@@ -2,7 +2,7 @@
 
 ## 📋 Task Status Tracking
 
-- [x] **Current Task:** Settings UI/UX Structure Refactor ✅
+- [x] **Current Task:** Strategic Brief Export Bugfix ✅
 - [ ] **Next Task:** Trend Source Badges + Onboarding Welcome Modal
 - [ ] **Completed Tasks:**
   - [x] Initial Context & Prompt Review
@@ -57,6 +57,7 @@
   - [x] Settings Brand Voice fix: autorizzazioni owner/admin + salvataggio robusto su teams + messaggi errore espliciti
   - [x] Settings Brand Voice fix v2: RPC `update_team_brand_voice` (SECURITY DEFINER) per stabilità cross-RLS
   - [x] Settings Brand Voice fix v3: fallback cross-schema (`teams` -> `profiles`) per ambienti con colonne migrate parzialmente
+  - [x] StrategicBriefView fix: handler `exportAsMarkdown` aggiunto + export `.md` funzionante + import `Clock` ripristinato
 
 > **Use this file as context when working on any part of the project.**
 > It contains all decisions already made: stack, architecture, business logic, and roadmap.

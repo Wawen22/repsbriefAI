@@ -22,7 +22,8 @@ import {
   Video, 
   Linkedin, 
   Youtube, 
-  Clock
+  Clock,
+  ExternalLink
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -36,6 +37,8 @@ type CalendarEntry = {
   status: string;
   hook?: string;
   script_draft?: string;
+  notes?: string;
+  idea_id?: string;
 }
 
 export function CalendarView({ initialEntries }: { initialEntries: CalendarEntry[] }) {
@@ -43,6 +46,7 @@ export function CalendarView({ initialEntries }: { initialEntries: CalendarEntry
   const [entries] = useState(initialEntries)
   const [isScheduleOpen, setIsScheduleOpen] = useState(false)
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined)
+  const [selectedEntry, setSelectedEntry] = useState<CalendarEntry | undefined>(undefined)
 
   const monthStart = startOfMonth(currentDate)
   const monthEnd = endOfMonth(monthStart)
@@ -67,17 +71,41 @@ export function CalendarView({ initialEntries }: { initialEntries: CalendarEntry
     }
   }
 
-  const handleAddClick = (date?: Date) => {
-    setSelectedDate(date)
+  const handleDayClick = (day: Date) => {
+    setSelectedEntry(undefined)
+    setSelectedDate(day)
+    setIsScheduleOpen(true)
+  }
+
+  const handleEntryClick = (e: React.MouseEvent, entry: CalendarEntry) => {
+    e.stopPropagation()
+    setSelectedDate(undefined)
+    setSelectedEntry(entry)
+    setIsScheduleOpen(true)
+  }
+
+  const handleAddClick = () => {
+    setSelectedEntry(undefined)
+    setSelectedDate(new Date())
     setIsScheduleOpen(true)
   }
 
   return (
     <div className="flex flex-col h-full text-left">
       <ScheduleDialog 
+        key={selectedEntry?.id || selectedDate?.toString() || 'new'}
         isOpen={isScheduleOpen} 
         onOpenChange={setIsScheduleOpen} 
-        initialData={selectedDate ? { title: '', date: selectedDate } : undefined} 
+        initialData={selectedEntry ? {
+          calendarId: selectedEntry.id,
+          ideaId: selectedEntry.idea_id,
+          title: selectedEntry.title,
+          hook: selectedEntry.hook,
+          script: selectedEntry.script_draft,
+          date: new Date(selectedEntry.scheduled_date),
+          platform: selectedEntry.platform as any,
+          notes: selectedEntry.notes
+        } : (selectedDate ? { title: '', date: selectedDate } : undefined)} 
       />
 
       {/* Calendar Header */}
@@ -106,7 +134,7 @@ export function CalendarView({ initialEntries }: { initialEntries: CalendarEntry
             Today
           </Button>
           <Button 
-            onClick={() => handleAddClick()}
+            onClick={handleAddClick}
             className="h-10 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold gap-2 px-4 shadow-xl shadow-blue-500/10 transition-all hover:scale-105"
           >
             <Plus className="w-4 h-4" />
@@ -134,7 +162,7 @@ export function CalendarView({ initialEntries }: { initialEntries: CalendarEntry
           return (
             <div 
               key={day.toString()} 
-              onClick={() => isSelectedMonth && handleAddClick(day)}
+              onClick={() => isSelectedMonth && handleDayClick(day)}
               className={cn(
                 "min-h-[140px] p-2 border-r border-b border-white/5 transition-colors group flex flex-col gap-2 cursor-pointer",
                 !isSelectedMonth && "bg-black/40 opacity-40 grayscale-[0.5]",
@@ -156,19 +184,23 @@ export function CalendarView({ initialEntries }: { initialEntries: CalendarEntry
                 )}
               </div>
 
-              <div className="flex flex-col gap-1.5 overflow-y-auto max-h-[100px] scrollbar-hide pointer-events-none">
+              <div className="flex flex-col gap-1.5 overflow-y-auto max-h-[120px] scrollbar-hide px-1">
                 {dayEntries.map((entry) => (
                   <div 
                     key={entry.id}
-                    className="p-2 rounded-lg bg-white/[0.03] border border-white/5 hover:border-white/10 hover:bg-white/[0.06] transition-all group/item text-left"
+                    onClick={(e) => handleEntryClick(e, entry)}
+                    className="p-2 rounded-lg bg-white/[0.04] border border-white/5 hover:border-blue-500/30 hover:bg-blue-500/5 transition-all group/item text-left relative"
                   >
                     <div className="flex items-center gap-1.5 mb-1 text-left">
                       {getPlatformIcon(entry.platform)}
-                      <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">{entry.platform}</span>
+                      <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">{entry.platform}</span>
                     </div>
-                    <p className="text-[10px] font-bold text-white leading-tight truncate">
+                    <p className="text-[10px] font-bold text-white leading-tight truncate pr-4">
                       {entry.title}
                     </p>
+                    <div className="absolute right-1 top-1/2 -translate-y-1/2 opacity-0 group-hover/item:opacity-100 transition-opacity">
+                       <ExternalLink className="w-2.5 h-2.5 text-blue-400" />
+                    </div>
                   </div>
                 ))}
               </div>

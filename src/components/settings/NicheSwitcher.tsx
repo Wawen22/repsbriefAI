@@ -1,19 +1,22 @@
 'use client'
 
 import { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Dumbbell, PiggyBank, Briefcase, Baby, Cpu, Check, Loader2, Sparkles } from 'lucide-react'
+import { Briefcase, Cpu, Dumbbell, Loader2, PiggyBank, Sparkles, Baby, Check } from 'lucide-react'
 import { updateActiveNicheAction } from '@/app/actions/profile'
 import { toast } from 'sonner'
 import { Badge } from '@/components/ui/badge'
+import { NICHES } from '@/config/niches'
+import { cn } from '@/lib/utils'
 
-const NICHE_OPTIONS = [
-  { id: 'fitness', label: 'Fitness & Nutrition', icon: Dumbbell, active: true, color: 'text-blue-400', bg: 'bg-blue-500/10' },
-  { id: 'personal_finance', label: 'Personal Finance', icon: PiggyBank, active: false, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
-  { id: 'b2b_marketing', label: 'B2B Marketing', icon: Briefcase, active: false, color: 'text-purple-400', bg: 'bg-purple-500/10' },
-  { id: 'parenting', label: 'Parenting', icon: Baby, active: false, color: 'text-rose-400', bg: 'bg-rose-500/10' },
-  { id: 'tech_ai', label: 'AI & Tech', icon: Cpu, active: false, color: 'text-amber-400', bg: 'bg-amber-500/10' },
-]
+const NICHE_META = {
+  fitness: { label: 'Fitness & Nutrition', icon: Dumbbell, accent: 'text-blue-400', badge: 'bg-blue-500/10 border-blue-500/20 text-blue-300' },
+  personal_finance: { label: 'Personal Finance', icon: PiggyBank, accent: 'text-emerald-400', badge: 'bg-emerald-500/10 border-emerald-500/20 text-emerald-300' },
+  b2b_marketing: { label: 'B2B Marketing', icon: Briefcase, accent: 'text-violet-400', badge: 'bg-violet-500/10 border-violet-500/20 text-violet-300' },
+  parenting: { label: 'Parenting', icon: Baby, accent: 'text-rose-400', badge: 'bg-rose-500/10 border-rose-500/20 text-rose-300' },
+  tech_ai: { label: 'AI & Tech', icon: Cpu, accent: 'text-amber-400', badge: 'bg-amber-500/10 border-amber-500/20 text-amber-300' },
+} as const
+
+const DISPLAY_ORDER = ['fitness', 'personal_finance', 'b2b_marketing', 'parenting', 'tech_ai'] as const
 
 interface NicheSwitcherProps {
   currentNiche: string
@@ -22,6 +25,19 @@ interface NicheSwitcherProps {
 export function NicheSwitcher({ currentNiche }: NicheSwitcherProps) {
   const [selected, setSelected] = useState(currentNiche)
   const [loading, setLoading] = useState<string | null>(null)
+
+  const nicheOptions = DISPLAY_ORDER.map((id) => {
+    const config = NICHES[id]
+    const meta = NICHE_META[id]
+    return {
+      id,
+      label: config?.label || meta.label,
+      icon: meta.icon,
+      accent: meta.accent,
+      badge: meta.badge,
+      active: config?.active ?? false,
+    }
+  })
 
   const handleSwitch = async (nicheId: string) => {
     if (nicheId === selected || loading) return
@@ -33,7 +49,7 @@ export function NicheSwitcher({ currentNiche }: NicheSwitcherProps) {
         toast.error(result.error)
       } else {
         setSelected(nicheId)
-        toast.success('Content niche updated!')
+        toast.success('Content niche updated.')
       }
     } catch {
       toast.error('Failed to update niche')
@@ -43,8 +59,8 @@ export function NicheSwitcher({ currentNiche }: NicheSwitcherProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      {NICHE_OPTIONS.map((niche) => {
+    <div className="grid gap-3 sm:grid-cols-2">
+      {nicheOptions.map((niche) => {
         const Icon = niche.icon
         const isSelected = selected === niche.id
         const isLoading = loading === niche.id
@@ -54,59 +70,64 @@ export function NicheSwitcher({ currentNiche }: NicheSwitcherProps) {
             key={niche.id}
             onClick={() => niche.active && handleSwitch(niche.id)}
             disabled={!niche.active || !!loading}
-            className={`
-              relative group flex flex-col items-start gap-4 p-5 rounded-2xl border transition-all text-left overflow-hidden
-              ${isSelected
-                ? 'bg-white/[0.05] border-blue-500/40 shadow-[0_0_20px_-12px_rgba(59,130,246,0.5)]'
-                : niche.active
-                ? 'bg-white/[0.02] border-white/5 hover:border-white/20 hover:bg-white/[0.04]'
-                : 'bg-white/[0.01] border-white/5 opacity-40 cursor-not-allowed'
-              }
-            `}
+            aria-pressed={isSelected}
+            className={cn(
+              'group relative overflow-hidden rounded-2xl border p-4 text-left transition-all',
+              isSelected && 'border-blue-500/40 bg-blue-500/[0.08] shadow-[0_0_24px_-16px_rgba(59,130,246,0.9)]',
+              !isSelected && niche.active && 'border-white/10 bg-white/[0.02] hover:border-white/25 hover:bg-white/[0.04]',
+              !niche.active && 'cursor-not-allowed border-white/5 bg-white/[0.01] opacity-55'
+            )}
           >
-            {/* Background Glow for Selected */}
             {isSelected && (
-              <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/10 rounded-full blur-2xl pointer-events-none" />
+              <div className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-blue-500/20 blur-2xl" />
             )}
 
-            <div className="flex items-center justify-between w-full">
-              <div className={`p-2.5 rounded-xl border transition-colors ${
-                isSelected ? 'bg-blue-500/10 border-blue-500/20' : 'bg-white/5 border-white/5 group-hover:bg-white/10'
-              }`}>
+            <div className="flex items-start justify-between gap-3">
+              <div
+                className={cn(
+                  'rounded-xl border p-2.5 transition-colors',
+                  isSelected ? 'border-blue-500/30 bg-blue-500/10' : 'border-white/10 bg-white/5'
+                )}
+              >
                 {isLoading ? (
-                  <Loader2 className="w-5 h-5 animate-spin text-blue-400" />
+                  <Loader2 className="h-4 w-4 animate-spin text-blue-400" />
                 ) : (
-                  <Icon className={`w-5 h-5 ${isSelected ? 'text-blue-400' : 'text-slate-500'}`} />
+                  <Icon className={cn('h-4 w-4', isSelected ? 'text-blue-300' : niche.accent)} />
                 )}
               </div>
+
               {isSelected && (
-                 <Badge className="bg-blue-500/10 text-blue-400 border-blue-500/20 text-[10px] font-bold uppercase tracking-widest px-2 py-0.5">
-                    Active
-                 </Badge>
+                <Badge className="border-blue-500/20 bg-blue-500/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-blue-300">
+                  Active
+                </Badge>
               )}
               {!niche.active && (
-                <div className="p-1 rounded-md bg-white/5">
-                   <Sparkles className="w-3.5 h-3.5 text-slate-700" />
-                </div>
+                <Badge className={cn('border px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest', niche.badge)}>
+                  Coming Soon
+                </Badge>
               )}
             </div>
 
-            <div className="space-y-1">
-              <p className={`font-bold tracking-tight ${isSelected ? 'text-white' : 'text-slate-300'}`}>
+            <div className="mt-3 space-y-1">
+              <p className={cn('font-semibold tracking-tight', isSelected ? 'text-white' : 'text-slate-200')}>
                 {niche.label}
               </p>
-              {!niche.active ? (
-                <p className="text-[11px] text-slate-600 font-medium uppercase tracking-wider">Coming Q2 2026</p>
+              {isSelected ? (
+                <p className="text-[11px] text-blue-300">Currently used for trend scouting and brief generation.</p>
+              ) : niche.active ? (
+                <p className="text-[11px] text-slate-500">Available now. Click to switch your strategy focus.</p>
               ) : (
-                <p className="text-[11px] text-slate-500 leading-none">
-                  {isSelected ? 'Generating your briefings' : 'Available for strategy'}
-                </p>
+                <p className="text-[11px] text-slate-600">Planned for future releases.</p>
               )}
             </div>
 
-            {/* Selection indicator dot */}
             {isSelected && (
-               <div className="absolute bottom-4 right-4 w-1.5 h-1.5 rounded-full bg-blue-400 shadow-[0_0_8px_rgba(59,130,246,0.8)]" />
+              <div className="absolute bottom-4 right-4 rounded-full border border-blue-500/30 bg-blue-500/10 p-1">
+                <Check className="h-3 w-3 text-blue-300" />
+              </div>
+            )}
+            {!niche.active && (
+              <Sparkles className="absolute bottom-4 right-4 h-3.5 w-3.5 text-slate-700" />
             )}
           </button>
         )

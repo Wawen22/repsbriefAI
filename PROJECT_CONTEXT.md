@@ -2,7 +2,7 @@
 
 ## 📋 Task Status Tracking
 
-- [x] **Current Task:** Generate-Now Speed Optimization (stable + faster on Azure GPT) ✅
+- [x] **Current Task:** Settings UI/UX Structure Refactor ✅
 - [ ] **Next Task:** Trend Source Badges + Onboarding Welcome Modal
 - [ ] **Completed Tasks:**
   - [x] Initial Context & Prompt Review
@@ -52,6 +52,7 @@
   - [x] Smoke test reale: 20 idee completate con strategia ottimizzata
   - [x] Generator tuning v2: retry adattivo per batch + logging tempi per round
   - [x] Settings Brand Voice: ripristinato export server action (`updateBrandVoiceAction`) con adapter compatibile (`success` + `data`)
+  - [x] Settings UI/UX refactor: nuova information architecture (overview, account, workspace, niche, brand voice) + card hierarchy semplificata
 
 > **Use this file as context when working on any part of the project.**
 > It contains all decisions already made: stack, architecture, business logic, and roadmap.

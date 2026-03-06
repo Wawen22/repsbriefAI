@@ -37,6 +37,7 @@
     - [x] briefGenerator resilience (fallback prompt, relaxed Zod, maxTokens 8192)
     - [x] Gemini provider rewrite (systemInstruction, generateContent)
     - [x] Save/Unsave ideas (saved column, RLS UPDATE policy, accurate star state)
+    - [x] Settings UI/UX refactor (nuova struttura pagina, migliore gerarchia sezioni e flusso operativo)
 - [ ] **Phase 5: Deploy & Live Testing**
     - [ ] vercel.json with cron config
     - [ ] Vercel env vars setup

@@ -49,7 +49,7 @@ export async function getUserTeamsAction() {
 
   const { data: memberships } = await supabase
     .from('team_members')
-    .select('team_id, role, teams(id, name, owner_id)')
+    .select('team_id, role, teams(id, name, owner_id, logo_url, primary_color)')
     .eq('user_id', user.id)
 
   const teams = memberships?.map(m => ({
@@ -175,3 +175,49 @@ export async function acceptInvitationAction(token: string) {
   revalidatePath('/', 'layout')
   return { success: true }
 }
+
+export async function updateTeamBrandingAction(logoUrl?: string, primaryColor?: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Unauthorized' }
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('current_team_id, plan')
+    .eq('id', user.id)
+    .single()
+
+  if (!profile?.current_team_id) return { error: 'No active workspace' }
+  if (profile.plan !== 'team') return { error: 'Upgrade to Team Plan for white-labeling' }
+
+  // 1. Verify admin/owner role
+  const { data: membership } = await supabase
+    .from('team_members')
+    .select('role')
+    .eq('team_id', profile.current_team_id)
+    .eq('user_id', user.id)
+    .single()
+
+  if (!membership || !['admin', 'owner'].includes(membership.role)) {
+    return { error: 'Only admins or owners can update branding' }
+  }
+
+  // 2. Update team
+  const updateData: any = {}
+  if (logoUrl !== undefined) updateData.logo_url = logoUrl
+  if (primaryColor !== undefined) updateData.primary_color = primaryColor
+
+  const { error } = await supabase
+    .from('teams')
+    .update(updateData)
+    .eq('id', profile.current_team_id)
+
+  if (error) {
+    console.error('Failed to update branding:', error)
+    return { error: 'Failed to update branding settings' }
+  }
+
+  revalidatePath('/dashboard/settings')
+  return { success: true }
+}
+

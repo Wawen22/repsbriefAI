@@ -1,13 +1,15 @@
 // src/app/(dashboard)/dashboard/settings/page.tsx
 
-import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
-import { NicheSwitcher } from "@/components/settings/NicheSwitcher"
+import { Fingerprint, Settings, ShieldCheck, Target, Users } from "lucide-react"
 import { BrandVoiceSettings } from "@/components/settings/BrandVoiceSettings"
+import { NicheSwitcher } from "@/components/settings/NicheSwitcher"
 import { TeamWorkspaceSettings } from "@/components/settings/TeamWorkspaceSettings"
-import { Badge } from "@/components/ui/badge"
-import { Settings, User, Zap, ShieldCheck, Sparkles, Fingerprint, Users } from "lucide-react"
 import { LogoutButton } from "@/components/ui/LogoutButton"
+import { UpgradeToProButton } from "@/components/settings/UpgradeToProButton"
+import { Badge } from "@/components/ui/badge"
+import { NICHES } from "@/config/niches"
+import { createClient } from "@/lib/supabase/server"
 
 export const dynamic = 'force-dynamic'
 
@@ -26,100 +28,135 @@ export default async function SettingsPage() {
 
   if (!profile) return null
 
-  // Fetch the active team to get the shared persona
-  const { data: team } = await supabase
-    .from('teams')
-    .select('brand_voice')
-    .eq('id', profile.current_team_id)
-    .single()
+  let team: { name: string; brand_voice: string | null } | null = null
+  if (profile.current_team_id) {
+    const { data } = await supabase
+      .from('teams')
+      .select('name, brand_voice')
+      .eq('id', profile.current_team_id)
+      .maybeSingle()
+
+    team = data
+  }
+
+  const activeNicheLabel = NICHES[profile.active_niche]?.label || 'Fitness & Nutrition'
+  const planLabel = profile.plan === 'team' ? 'Team' : profile.plan === 'pro' ? 'Pro' : 'Starter'
+  const currentWorkspace = team?.name || 'Personal Workspace'
+  const initials = user.email?.[0]?.toUpperCase() || 'U'
 
   return (
-    <div className="max-w-5xl mx-auto space-y-12 pb-20 text-left text-white">
-      {/* Header */}
-      <header className="space-y-4">
-        <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-2xl bg-blue-500/10 border border-blue-500/20">
-            <Settings className="w-6 h-6 text-blue-400" />
+    <div className="mx-auto max-w-6xl space-y-8 pb-16 text-white">
+      <header className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03] p-6 md:p-8">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.2),transparent_45%)]" />
+        <div className="relative space-y-6">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="rounded-2xl border border-blue-500/20 bg-blue-500/10 p-2.5">
+                <Settings className="h-5 w-5 text-blue-400" />
+              </div>
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-slate-400">Account Settings</p>
+                <p className="text-sm text-slate-300">Workspace, niche e brand voice in un unico punto.</p>
+              </div>
+            </div>
+            <Badge variant="outline" className="border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-emerald-300">
+              {planLabel} Plan
+            </Badge>
           </div>
-          <div className="space-y-0.5">
-             <Badge variant="outline" className="bg-blue-500/5 text-blue-300 border-blue-500/20 px-2 py-0.5 rounded-md text-[10px] font-bold tracking-widest uppercase">
-               System Settings
-             </Badge>
-             <p className="text-[10px] font-medium text-slate-500 uppercase tracking-widest">Manage your creator identity</p>
+
+          <h1 className="text-4xl font-black tracking-tight md:text-5xl">
+            Settings
+          </h1>
+
+          <div className="grid gap-3 sm:grid-cols-3">
+            <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Workspace</p>
+              <p className="mt-1 text-sm font-semibold text-white">{currentWorkspace}</p>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Active Niche</p>
+              <p className="mt-1 text-sm font-semibold text-white">{activeNicheLabel}</p>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Persona</p>
+              <p className="mt-1 text-sm font-semibold text-white">{team?.brand_voice ? 'Configured' : 'Not configured'}</p>
+            </div>
           </div>
         </div>
-        <h1 className="text-5xl md:text-6xl font-black tracking-tighter text-white">
-          Control <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400 font-extrabold">Center</span>
-        </h1>
       </header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-        {/* Left Column: Account & Niche */}
-        <div className="lg:col-span-5 space-y-8">
-          
-          {/* Team Workspace Settings */}
-          <section className="p-8 rounded-[2.5rem] bg-white/[0.02] border border-white/10 space-y-6">
-             <div className="flex items-center gap-3 px-2">
-              <Users className="w-5 h-5 text-blue-400" />
-              <div className="space-y-1">
-                <h3 className="text-xs font-black text-white uppercase tracking-[0.2em]">Workspaces</h3>
-                <p className="text-[10px] text-slate-500 font-medium">Switch or manage your teams</p>
+      <div className="grid items-start gap-8 lg:grid-cols-12">
+        <aside className="space-y-6 lg:col-span-4">
+          <section className="rounded-3xl border border-white/10 bg-white/[0.03] p-6">
+            <div className="flex items-start gap-4">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 text-xl font-black text-white">
+                {initials}
               </div>
+              <div className="space-y-1">
+                <p className="text-xs font-semibold text-white">{user.email}</p>
+                <div className="flex items-center gap-2 text-[11px] text-slate-400">
+                  <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
+                  <span>{planLabel} member</span>
+                </div>
+                <div className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[10px] uppercase tracking-widest text-slate-500">
+                  <Users className="h-3 w-3" />
+                  {currentWorkspace}
+                </div>
+              </div>
+            </div>
+            <div className="mt-5 border-t border-white/10 pt-4">
+              <LogoutButton />
+            </div>
+          </section>
+
+          <section className="rounded-3xl border border-white/10 bg-white/[0.03] p-6 space-y-5">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2 text-slate-300">
+                <Target className="h-4 w-4 text-blue-400" />
+                <h2 className="text-sm font-semibold">Content Niche</h2>
+              </div>
+              <p className="text-xs text-slate-500">
+                Seleziona il dominio in cui il motore trend genera i tuoi brief settimanali.
+              </p>
+            </div>
+
+            <NicheSwitcher currentNiche={profile.active_niche || 'fitness'} />
+
+            {profile.plan === 'starter' && (
+              <div className="space-y-2 rounded-2xl border border-blue-500/20 bg-blue-500/5 p-4">
+                <p className="text-xs font-semibold text-white">Sblocca storico, filtri avanzati e automazioni complete.</p>
+                <UpgradeToProButton />
+              </div>
+            )}
+          </section>
+        </aside>
+
+        <div className="space-y-6 lg:col-span-8">
+          <section className="rounded-3xl border border-white/10 bg-white/[0.03] p-6 md:p-8">
+            <div className="mb-6 space-y-1">
+              <div className="flex items-center gap-2 text-slate-300">
+                <Users className="h-4 w-4 text-blue-400" />
+                <h2 className="text-lg font-semibold text-white">Workspace Management</h2>
+              </div>
+              <p className="text-sm text-slate-500">
+                Cambia workspace, gestisci branding e controlla i permessi del team.
+              </p>
             </div>
             <TeamWorkspaceSettings />
           </section>
 
-          {/* Profile Quick Look */}
-          <section className="p-8 rounded-[2.5rem] bg-white/[0.02] border border-white/10 space-y-6">
-            <div className="flex items-center gap-4">
-               <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-2xl font-black text-white shadow-2xl">
-                 {user.email?.[0].toUpperCase()}
-               </div>
-               <div className="space-y-1">
-                  <h3 className="text-lg font-bold text-white leading-tight">{user.email}</h3>
-                  <div className="flex items-center gap-2">
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                    <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">{profile.plan} Member</span>
-                  </div>
-               </div>
-            </div>
-            <div className="pt-4 border-t border-white/5">
-               <LogoutButton />
-            </div>
-          </section>
-
-          {/* Niche Management */}
-          <section className="space-y-4">
-            <div className="flex items-center gap-3 px-2">
-              <Zap className="w-4 h-4 text-blue-400" />
-              <h3 className="text-xs font-black text-slate-500 uppercase tracking-[0.2em]">Strategic Niche</h3>
-            </div>
-            <NicheSwitcher currentNiche={profile.active_niche || 'fitness'} />
-          </section>
-
-        </div>
-
-        {/* Right Column: AI Persona */}
-        <div className="lg:col-span-7 space-y-8">
-          
-          <section className="p-1 rounded-[3rem] bg-gradient-to-b from-white/10 to-transparent">
-            <div className="p-8 md:p-10 rounded-[2.8rem] bg-black/90 space-y-8">
-              <div className="space-y-2">
-                <div className="flex items-center gap-3">
-                  <Fingerprint className="w-6 h-6 text-purple-400" />
-                  <h2 className="text-2xl font-bold text-white tracking-tight">AI Brand Persona</h2>
-                </div>
-                <p className="text-slate-400 text-sm leading-relaxed font-light">
-                  Define the unique content identity for this workspace. Every member of the team will generate content following this persona.
-                </p>
+          <section className="rounded-3xl border border-white/10 bg-white/[0.03] p-6 md:p-8">
+            <div className="mb-6 space-y-1">
+              <div className="flex items-center gap-2 text-slate-300">
+                <Fingerprint className="h-4 w-4 text-purple-400" />
+                <h2 className="text-lg font-semibold text-white">AI Brand Voice</h2>
               </div>
-
-              <BrandVoiceSettings 
-                currentAnalysis={team?.brand_voice || null} 
-              />
+              <p className="text-sm text-slate-500">
+                Definisci lo stile editoriale condiviso dal team per script, caption e remix.
+              </p>
             </div>
+            <BrandVoiceSettings currentAnalysis={team?.brand_voice || null} />
           </section>
-
         </div>
       </div>
     </div>

@@ -97,10 +97,13 @@ export async function shareIdeaAction(idea: IdeaObject, niche: string) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Unauthorized' }
 
+  const teamId = await getCurrentTeamId(supabase, user.id)
+
   const { data, error } = await supabase
     .from('shared_strategies')
     .insert({
       user_id: user.id,
+      team_id: teamId,
       idea_data: idea,
       niche: niche,
       creator_name: user.user_metadata?.full_name || user.email?.split('@')[0]

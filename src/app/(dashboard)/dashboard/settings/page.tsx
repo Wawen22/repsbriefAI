@@ -1,13 +1,14 @@
 // src/app/(dashboard)/dashboard/settings/page.tsx
 
 import { redirect } from "next/navigation"
-import { Fingerprint, Settings, ShieldCheck, Target, Users } from "lucide-react"
+import { Fingerprint, Settings, ShieldCheck, Target, Users, User } from "lucide-react"
 import { BrandVoiceSettings } from "@/components/settings/BrandVoiceSettings"
 import { NicheSwitcher } from "@/components/settings/NicheSwitcher"
 import { TeamWorkspaceSettings } from "@/components/settings/TeamWorkspaceSettings"
 import { LogoutButton } from "@/components/ui/LogoutButton"
 import { UpgradeToProButton } from "@/components/settings/UpgradeToProButton"
 import { Badge } from "@/components/ui/badge"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { NICHES } from "@/config/niches"
 import { createClient } from "@/lib/supabase/server"
 
@@ -45,18 +46,18 @@ export default async function SettingsPage() {
   const initials = user.email?.[0]?.toUpperCase() || 'U'
 
   return (
-    <div className="mx-auto max-w-6xl space-y-8 pb-16 text-white">
+    <div className="mx-auto max-w-5xl space-y-6 pb-16 text-white">
       <header className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03] p-6 md:p-8">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.2),transparent_45%)]" />
-        <div className="relative space-y-6">
+        <div className="relative space-y-5">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <div className="rounded-2xl border border-blue-500/20 bg-blue-500/10 p-2.5">
                 <Settings className="h-5 w-5 text-blue-400" />
               </div>
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-slate-400">Account Settings</p>
-                <p className="text-sm text-slate-300">Workspace, niche e brand voice in un unico punto.</p>
+                <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-slate-400">Settings Hub</p>
+                <p className="text-sm text-slate-300">Organizzato per feature, con flusso a tab.</p>
               </div>
             </div>
             <Badge variant="outline" className="border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-emerald-300">
@@ -68,97 +69,120 @@ export default async function SettingsPage() {
             Settings
           </h1>
 
-          <div className="grid gap-3 sm:grid-cols-3">
-            <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Workspace</p>
-              <p className="mt-1 text-sm font-semibold text-white">{currentWorkspace}</p>
-            </div>
-            <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Active Niche</p>
-              <p className="mt-1 text-sm font-semibold text-white">{activeNicheLabel}</p>
-            </div>
-            <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Persona</p>
-              <p className="mt-1 text-sm font-semibold text-white">{team?.brand_voice ? 'Configured' : 'Not configured'}</p>
-            </div>
+          <div className="flex flex-wrap gap-2">
+            <Badge variant="outline" className="border-white/15 bg-black/30 text-slate-300">
+              Workspace: {currentWorkspace}
+            </Badge>
+            <Badge variant="outline" className="border-white/15 bg-black/30 text-slate-300">
+              Niche: {activeNicheLabel}
+            </Badge>
+            <Badge variant="outline" className="border-white/15 bg-black/30 text-slate-300">
+              Persona: {team?.brand_voice ? 'Configured' : 'Not configured'}
+            </Badge>
           </div>
         </div>
       </header>
 
-      <div className="grid items-start gap-8 lg:grid-cols-12">
-        <aside className="space-y-6 lg:col-span-4">
-          <section className="rounded-3xl border border-white/10 bg-white/[0.03] p-6">
-            <div className="flex items-start gap-4">
+      <Tabs defaultValue="account" className="gap-5">
+        <TabsList className="h-auto w-full justify-start gap-2 overflow-x-auto overflow-y-hidden rounded-2xl border border-white/10 bg-white/[0.03] p-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+          <TabsTrigger value="account" className="h-9 shrink-0 rounded-xl border border-white/10 bg-white/[0.04] px-4 text-slate-300 hover:bg-white/[0.08] hover:text-white data-[state=active]:border-white/20 data-[state=active]:bg-white data-[state=active]:text-black">
+            <User className="h-4 w-4" />
+            Account
+          </TabsTrigger>
+          <TabsTrigger value="workspace" className="h-9 shrink-0 rounded-xl border border-white/10 bg-white/[0.04] px-4 text-slate-300 hover:bg-white/[0.08] hover:text-white data-[state=active]:border-white/20 data-[state=active]:bg-white data-[state=active]:text-black">
+            <Users className="h-4 w-4" />
+            Workspace
+          </TabsTrigger>
+          <TabsTrigger value="niche" className="h-9 shrink-0 rounded-xl border border-white/10 bg-white/[0.04] px-4 text-slate-300 hover:bg-white/[0.08] hover:text-white data-[state=active]:border-white/20 data-[state=active]:bg-white data-[state=active]:text-black">
+            <Target className="h-4 w-4" />
+            Niche
+          </TabsTrigger>
+          <TabsTrigger value="voice" className="h-9 shrink-0 rounded-xl border border-white/10 bg-white/[0.04] px-4 text-slate-300 hover:bg-white/[0.08] hover:text-white data-[state=active]:border-white/20 data-[state=active]:bg-white data-[state=active]:text-black">
+            <Fingerprint className="h-4 w-4" />
+            Brand Voice
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="account" className="mt-0 rounded-3xl border border-white/10 bg-white/[0.03] p-6 md:p-8">
+          <div className="space-y-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
               <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 text-xl font-black text-white">
                 {initials}
               </div>
-              <div className="space-y-1">
-                <p className="text-xs font-semibold text-white">{user.email}</p>
+              <div className="space-y-1.5">
+                <p className="text-sm font-semibold text-white">{user.email}</p>
                 <div className="flex items-center gap-2 text-[11px] text-slate-400">
                   <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
                   <span>{planLabel} member</span>
                 </div>
-                <div className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[10px] uppercase tracking-widest text-slate-500">
-                  <Users className="h-3 w-3" />
-                  {currentWorkspace}
-                </div>
               </div>
             </div>
-            <div className="mt-5 border-t border-white/10 pt-4">
-              <LogoutButton />
-            </div>
-          </section>
 
-          <section className="rounded-3xl border border-white/10 bg-white/[0.03] p-6 space-y-5">
-            <div className="space-y-1">
-              <div className="flex items-center gap-2 text-slate-300">
-                <Target className="h-4 w-4 text-blue-400" />
-                <h2 className="text-sm font-semibold">Content Niche</h2>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Current Workspace</p>
+                <p className="mt-1 text-sm font-semibold text-white">{currentWorkspace}</p>
               </div>
-              <p className="text-xs text-slate-500">
-                Seleziona il dominio in cui il motore trend genera i tuoi brief settimanali.
-              </p>
+              <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Active Niche</p>
+                <p className="mt-1 text-sm font-semibold text-white">{activeNicheLabel}</p>
+              </div>
             </div>
-
-            <NicheSwitcher currentNiche={profile.active_niche || 'fitness'} />
 
             {profile.plan === 'starter' && (
               <div className="space-y-2 rounded-2xl border border-blue-500/20 bg-blue-500/5 p-4">
-                <p className="text-xs font-semibold text-white">Sblocca storico, filtri avanzati e automazioni complete.</p>
+                <p className="text-xs font-semibold text-white">Passa a Pro per sbloccare storico e controlli avanzati.</p>
                 <UpgradeToProButton />
               </div>
             )}
-          </section>
-        </aside>
 
-        <div className="space-y-6 lg:col-span-8">
-          <section className="rounded-3xl border border-white/10 bg-white/[0.03] p-6 md:p-8">
-            <div className="mb-6 space-y-1">
-              <div className="flex items-center gap-2 text-slate-300">
-                <Users className="h-4 w-4 text-blue-400" />
-                <h2 className="text-lg font-semibold text-white">Workspace Management</h2>
-              </div>
-              <p className="text-sm text-slate-500">
-                Cambia workspace, gestisci branding e controlla i permessi del team.
-              </p>
+            <div className="border-t border-white/10 pt-4">
+              <LogoutButton />
             </div>
-            <TeamWorkspaceSettings />
-          </section>
+          </div>
+        </TabsContent>
 
-          <section className="rounded-3xl border border-white/10 bg-white/[0.03] p-6 md:p-8">
-            <div className="mb-6 space-y-1">
-              <div className="flex items-center gap-2 text-slate-300">
-                <Fingerprint className="h-4 w-4 text-purple-400" />
-                <h2 className="text-lg font-semibold text-white">AI Brand Voice</h2>
-              </div>
-              <p className="text-sm text-slate-500">
-                Definisci lo stile editoriale condiviso dal team per script, caption e remix.
-              </p>
+        <TabsContent value="workspace" className="mt-0 rounded-3xl border border-white/10 bg-white/[0.03] p-6 md:p-8">
+          <div className="mb-6 space-y-1">
+            <div className="flex items-center gap-2 text-slate-300">
+              <Users className="h-4 w-4 text-blue-400" />
+              <h2 className="text-lg font-semibold text-white">Workspace Management</h2>
             </div>
-            <BrandVoiceSettings currentAnalysis={team?.brand_voice || null} />
-          </section>
-        </div>
-      </div>
+            <p className="text-sm text-slate-500">
+              Cambia workspace, gestisci branding e controlla i permessi del team.
+            </p>
+          </div>
+          <TeamWorkspaceSettings />
+        </TabsContent>
+
+        <TabsContent value="niche" className="mt-0 rounded-3xl border border-white/10 bg-white/[0.03] p-6 md:p-8">
+          <div className="mb-6 space-y-1">
+            <div className="flex items-center gap-2 text-slate-300">
+              <Target className="h-4 w-4 text-blue-400" />
+              <h2 className="text-lg font-semibold text-white">Content Niche</h2>
+            </div>
+            <p className="text-sm text-slate-500">
+              Seleziona la nicchia usata per trend scouting e generazione dei tuoi brief.
+            </p>
+          </div>
+          <div className="space-y-5">
+            <NicheSwitcher currentNiche={profile.active_niche || 'fitness'} />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="voice" className="mt-0 rounded-3xl border border-white/10 bg-white/[0.03] p-6 md:p-8">
+          <div className="mb-6 space-y-1">
+            <div className="flex items-center gap-2 text-slate-300">
+              <Fingerprint className="h-4 w-4 text-purple-400" />
+              <h2 className="text-lg font-semibold text-white">AI Brand Voice</h2>
+            </div>
+            <p className="text-sm text-slate-500">
+              Definisci lo stile editoriale condiviso dal team per script, caption e remix.
+            </p>
+          </div>
+          <BrandVoiceSettings currentAnalysis={team?.brand_voice || null} />
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }

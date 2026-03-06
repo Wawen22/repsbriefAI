@@ -213,8 +213,8 @@ export async function updateTeamBrandingAction(logoUrl?: string, primaryColor?: 
     .eq('id', profile.current_team_id)
 
   if (error) {
-    console.error('Failed to update branding:', error)
-    return { error: 'Failed to update branding settings' }
+    console.error('Database Error in updateTeamBrandingAction:', error)
+    return { error: `Failed to update: ${error.message}` }
   }
 
   revalidatePath('/dashboard/settings')

@@ -53,6 +53,7 @@
   - [x] Generator tuning v2: retry adattivo per batch + logging tempi per round
   - [x] Settings Brand Voice: ripristinato export server action (`updateBrandVoiceAction`) con adapter compatibile (`success` + `data`)
   - [x] Settings UI/UX refactor: nuova information architecture (overview, account, workspace, niche, brand voice) + card hierarchy semplificata
+  - [x] Settings UI/UX refactor v2: layout tab-based per feature (Account, Workspace, Niche, Brand Voice) con navigazione più leggibile
 
 > **Use this file as context when working on any part of the project.**
 > It contains all decisions already made: stack, architecture, business logic, and roadmap.

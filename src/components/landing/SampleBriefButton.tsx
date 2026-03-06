@@ -4,7 +4,23 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
-import { Video, Layers, Hash, Mail, Sparkles, ArrowRight, Lightbulb, TrendingUp, Info } from 'lucide-react'
+import { 
+  Video, 
+  Layers, 
+  Hash, 
+  Mail, 
+  Sparkles, 
+  ArrowRight, 
+  Lightbulb, 
+  TrendingUp, 
+  Info,
+  Orbit,
+  Star,
+  ChevronRight,
+  Maximize2,
+  CalendarDays
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 const SAMPLE_IDEAS = [
   {
@@ -12,8 +28,9 @@ const SAMPLE_IDEAS = [
     hook: "Your step counter is lying to you. Here's what the science actually says about daily movement.",
     description: "Break down why the 10,000 steps recommendation was a marketing gimmick. Show what research says about NEAT, zone 2 cardio, and minimum effective dose for health.",
     format: "Reel" as const,
-    whyItWorks: "Contrarian take on a universally accepted 'fact' — high engagement bait with real science to back it up.",
-    trend: "+240% breakout"
+    whyItWorks: "Contrarian take on a universally accepted fact — high engagement bait with real science to back it up.",
+    niche: "Fitness",
+    scriptDraft: "[Scene: Holding a fitness tracker]\nNarrator: Stop obsessing over this number.\n[Cut to: Science paper screenshot]\nNarrator: Research shows that after 7,000 steps, benefits plateau. Here is what you should focus on instead..."
   },
   {
     title: "The $5 Meal Prep That Outperforms Most Supplements",
@@ -21,7 +38,7 @@ const SAMPLE_IDEAS = [
     description: "Full meal prep recipe with cost breakdown. Compare the nutrient profile to popular supplements. Use a side-by-side comparison chart.",
     format: "Carousel" as const,
     whyItWorks: "Combines budget-friendly appeal with supplement skepticism — two trending topics in fitness right now.",
-    trend: "High Intent"
+    niche: "Fitness"
   },
   {
     title: "The 3 Exercises Every Desk Worker Should Do Daily",
@@ -29,15 +46,42 @@ const SAMPLE_IDEAS = [
     description: "Thread covering 3 corrective exercises for anterior pelvic tilt. Each exercise includes form cues and sets/reps.",
     format: "Thread" as const,
     whyItWorks: "Targets the huge overlap between fitness audience and remote workers. Posture content is evergreen.",
-    trend: "Viral Potential"
+    niche: "Fitness"
   },
+  {
+    title: "The 'Lazy' Morning Routine for 2x Focus",
+    hook: "Productivity isn't about waking up at 4 AM. It's about what you DON'T do in the first 60 minutes.",
+    description: "Explain dopamine fasting in the morning. No phone, no coffee for 90 mins, just sunlight and 5 mins of planning.",
+    format: "Newsletter" as const,
+    whyItWorks: "Reverses the 'hustle culture' narrative which is currently seeing a massive backlash on social media.",
+    niche: "Self-Improvement"
+  },
+  {
+    title: "How to Build a 'Second Brain' for Content Ideas",
+    hook: "I stopped 'thinking' of ideas. Now I just collect them from my digital environment.",
+    description: "A deep dive into capture systems using Notion or Obsidian. How to turn random comments into full-scale content strategies.",
+    format: "Carousel" as const,
+    whyItWorks: "Tool-based productivity is a high-CPM niche with very loyal engagement.",
+    niche: "Tech & AI"
+  },
+  {
+    title: "The Future of AI: From Chatbots to Agents",
+    hook: "ChatGPT was just the tutorial. We're moving from 'AI you talk to' to 'AI that works for you'.",
+    description: "Explain the shift to autonomous agents. Give 3 examples of current tools that are already doing this.",
+    format: "Reel" as const,
+    whyItWorks: "High authority content that positions you as a forward-thinker in the fastest moving industry.",
+    niche: "Tech & AI",
+    scriptDraft: "[Visual: AI interface typing]\nNarrator: Stop thinking of AI as a search engine.\n[Visual: Automation flow]\nNarrator: The real revolution is happening here..."
+  }
 ]
 
-const formatIcons: Record<string, React.ReactNode> = {
-  Reel: <Video className="w-3.5 h-3.5" />,
-  Carousel: <Layers className="w-3.5 h-3.5" />,
-  Thread: <Hash className="w-3.5 h-3.5" />,
-  Newsletter: <Mail className="w-3.5 h-3.5" />,
+const FORMAT_COLORS: Record<string, { bg: string, text: string, border: string }> = {
+  'Reel': { bg: 'bg-pink-500/10', text: 'text-pink-400', border: 'border-pink-500/20' },
+  'Carousel': { bg: 'bg-blue-500/10', text: 'text-blue-400', border: 'border-blue-500/20' },
+  'Thread': { bg: 'bg-cyan-500/10', text: 'text-cyan-400', border: 'border-cyan-500/20' },
+  'Newsletter': { bg: 'bg-emerald-500/10', text: 'text-emerald-400', border: 'border-emerald-500/20' },
+  'Idea': { bg: 'bg-purple-500/10', text: 'text-purple-400', border: 'border-purple-500/20' },
+  'Strategy': { bg: 'bg-slate-500/10', text: 'text-slate-400', border: 'border-slate-500/20' },
 }
 
 export function SampleBriefButton() {
@@ -49,14 +93,14 @@ export function SampleBriefButton() {
         <Button
           size="lg"
           variant="outline"
-          className="h-14 px-8 text-base border-white/10 bg-white/5 backdrop-blur-md text-slate-300 w-full sm:w-auto hover:bg-white/10 hover:text-white hover:border-white/20 transition-all rounded-full group"
+          className="h-16 px-10 text-[10px] font-black uppercase tracking-[0.2em] border-white/10 bg-white/5 backdrop-blur-md text-slate-300 w-full sm:w-auto hover:bg-white/10 hover:text-white hover:border-white/20 transition-all rounded-full group"
         >
-          <Sparkles className="mr-2 w-4 h-4 text-blue-400 group-hover:rotate-12 transition-transform" />
+          <Sparkles className="mr-3 w-4 h-4 text-blue-400 group-hover:rotate-12 transition-transform" />
           See a Sample Brief
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden p-0 bg-black border-white/10 text-slate-50 shadow-[0_0_50px_-12px_rgba(59,130,246,0.3)] flex flex-col rounded-3xl">
+      <DialogContent className="max-w-[95vw] md:max-w-7xl max-h-[90vh] overflow-hidden p-0 bg-[#050505] border-white/10 text-slate-50 shadow-[0_0_100px_-20px_rgba(59,130,246,0.2)] flex flex-col rounded-[3rem] border-solid">
         
         {/* Hidden but required for accessibility */}
         <DialogHeader className="sr-only">
@@ -65,106 +109,136 @@ export function SampleBriefButton() {
         </DialogHeader>
 
         {/* Modal Background Glow */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/10 rounded-full blur-[100px] pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-emerald-600/5 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/[0.05] rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-emerald-600/[0.03] rounded-full blur-[120px] pointer-events-none" />
 
-        <div className="p-8 pb-4 relative z-10">
-          <div className="text-left">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 rounded-lg bg-blue-500/10 border border-blue-500/20">
-                <Mail className="w-5 h-5 text-blue-400" />
+        {/* Header (Dashboard Style) */}
+        <div className="p-10 border-b border-white/5 relative z-10 bg-black/40 backdrop-blur-xl">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 text-left">
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-2xl bg-blue-500/10 border border-blue-500/20">
+                  <Orbit className="w-6 h-6 text-blue-400 animate-[spin_4s_linear_infinite]" />
+                </div>
+                <div className="space-y-0.5">
+                   <Badge variant="outline" className="bg-blue-500/5 text-blue-300 border-blue-500/20 px-2 py-0.5 rounded-md text-[10px] font-bold tracking-widest uppercase">
+                     Live Strategy Sample
+                   </Badge>
+                   <p className="text-[10px] font-medium text-slate-500 uppercase tracking-widest">Monday, March 9, 2026</p>
+                </div>
               </div>
-              <Badge variant="outline" className="bg-blue-500/5 text-blue-300 border-blue-500/20 px-2 py-0.5 rounded-md text-[10px] font-bold tracking-widest uppercase">
-                Monday Morning Briefing
-              </Badge>
+              <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-white">
+                The Weekly <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">Reps</span>
+              </h2>
+              <p className="text-slate-400 text-lg font-light max-w-2xl leading-relaxed">
+                20 high-impact content ideas, AI-filtered from the top 1% of digital trends. This is a snapshot of our latest strategic output.
+              </p>
             </div>
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-2">
-              Your Weekly <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400 font-extrabold">RepsBrief</span>
-            </h2>
-            <p className="text-slate-400 text-base max-w-2xl">
-              This is exactly what our subscribers receive every Monday. Data-backed, trend-verified, and ready to record.
-            </p>
+
+            <div className="hidden lg:flex items-center gap-3 px-5 py-3 rounded-2xl bg-emerald-500/5 border border-emerald-500/10">
+               <Sparkles className="w-5 h-5 text-emerald-400 fill-emerald-400/20" />
+               <div className="flex flex-col">
+                  <span className="text-[11px] font-black text-emerald-400 uppercase tracking-widest leading-none">Analysis Verified</span>
+                  <span className="text-[9px] text-emerald-500/60 uppercase font-bold tracking-tighter mt-1">98.4% Confidence Score</span>
+               </div>
+            </div>
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-8 py-4 space-y-6 relative z-10 custom-scrollbar">
-          {SAMPLE_IDEAS.map((idea, i) => (
-            <div key={i} className="group relative">
-              {/* Card Decoration */}
-              <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500/0 via-blue-500/0 to-blue-500/0 group-hover:from-blue-500/10 group-hover:to-emerald-500/10 rounded-2xl blur opacity-0 group-hover:opacity-100 transition duration-500" />
-              
-              <div className="relative bg-white/[0.03] border border-white/10 rounded-2xl p-6 transition-all duration-300 group-hover:bg-white/[0.05] group-hover:border-white/20">
-                <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2.5 rounded-xl bg-white/5 border border-white/5">
-                      {formatIcons[idea.format]}
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-bold text-white group-hover:text-blue-300 transition-colors leading-tight">
-                        {idea.title}
-                      </h3>
-                      <div className="flex items-center gap-2 mt-1">
-                        <Badge variant="secondary" className="bg-white/5 text-slate-400 hover:bg-white/10 transition-colors text-[10px] px-1.5 py-0 border-none">
-                          {idea.format}
-                        </Badge>
-                        <div className="flex items-center gap-1 text-[10px] text-emerald-400 font-medium">
-                          <TrendingUp className="w-3 h-3" />
-                          {idea.trend}
-                        </div>
+        {/* Content Area (Dashboard Style Grid) */}
+        <div className="flex-1 overflow-y-auto p-10 custom-scrollbar relative z-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {SAMPLE_IDEAS.map((idea, i) => {
+              const colors = FORMAT_COLORS[idea.format] || FORMAT_COLORS['Strategy']
+              return (
+                <div 
+                  key={i} 
+                  className="group bg-white/[0.03] border border-white/5 hover:border-white/10 transition-all duration-500 rounded-[2.5rem] overflow-hidden text-left flex flex-col h-full relative"
+                >
+                  <div className="p-8 pb-4 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <Badge variant="outline" className={cn("text-[10px] font-black uppercase tracking-widest px-3 py-1", colors.bg, colors.text, colors.border)}>
+                        {idea.format} Strategy
+                      </Badge>
+                      <div className="flex items-center gap-2">
+                         <div className="h-8 w-8 rounded-full bg-white/5 flex items-center justify-center text-slate-500">
+                            <Star className="w-4 h-4" />
+                         </div>
                       </div>
                     </div>
+                    <h3 className="text-2xl font-bold tracking-tight text-white group-hover:text-blue-400 transition-colors duration-300">
+                      {idea.title}
+                    </h3>
                   </div>
-                  <div className="hidden md:block text-right">
-                    <span className="text-[10px] font-mono text-slate-600 uppercase tracking-widest">Idea {i + 1}/20</span>
-                  </div>
-                </div>
 
-                <div className="space-y-4">
-                  <div className="relative">
-                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-500 to-emerald-500 rounded-full opacity-50" />
-                    <p className="pl-5 text-base italic text-slate-200 leading-relaxed font-light">
-                      &ldquo;{idea.hook}&rdquo;
-                    </p>
-                  </div>
-                  
-                  <p className="text-sm text-slate-400 leading-relaxed pl-5">
-                    {idea.description}
-                  </p>
-
-                  <div className="pt-4 border-t border-white/5 flex flex-col sm:flex-row sm:items-center gap-3">
-                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-500/5 border border-emerald-500/10 w-fit">
-                      <Lightbulb className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                      <span className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">Strategist Note</span>
+                  <div className="px-8 pb-6 space-y-4 flex-1">
+                    <div className="space-y-2">
+                      <span className="text-[10px] font-black text-blue-500 uppercase tracking-[0.2em]">The Hook</span>
+                      <p className="text-sm text-slate-200 leading-relaxed font-medium italic">&ldquo;{idea.hook}&rdquo;</p>
                     </div>
-                    <p className="text-xs text-slate-400 italic leading-snug">
-                      {idea.whyItWorks}
-                    </p>
+                    
+                    <div className="space-y-2">
+                      <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Strategy Preview</span>
+                      <p className="text-sm text-slate-400 leading-relaxed font-light line-clamp-3">
+                        {idea.description}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="px-8 pb-4 flex items-center gap-4 text-[9px] font-bold text-slate-600 uppercase tracking-widest">
+                     <div className="flex items-center gap-1.5">
+                        <div className={cn("w-1 h-1 rounded-full shadow-[0_0_5px_currentColor]", colors.text, "bg-current")} />
+                        <span>AI Verified</span>
+                     </div>
+                     {idea.scriptDraft && (
+                       <div className="flex items-center gap-1.5">
+                          <div className="w-1 h-1 rounded-full bg-purple-500 shadow-[0_0_5px_rgba(168,85,247,0.5)]" />
+                          <span>Script Ready</span>
+                       </div>
+                     )}
+                  </div>
+
+                  <div className="p-4 bg-white/[0.02] border-t border-white/5 flex items-center justify-between gap-2 mt-auto">
+                    <div className="flex items-center gap-1.5">
+                      <Button 
+                        variant="ghost" 
+                        className="h-10 px-4 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 text-[11px] font-black uppercase tracking-widest gap-2"
+                      >
+                        <Maximize2 className="w-4 h-4" />
+                        Preview Studio
+                      </Button>
+                    </div>
+                    <div className="px-4 text-[9px] font-black text-slate-600 uppercase tracking-widest">
+                       Draft Mode
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
-          ))}
+              )
+            })}
+          </div>
 
-          <div className="py-12 flex flex-col items-center text-center">
-             <div className="w-16 h-16 rounded-full bg-blue-500/10 flex items-center justify-center mb-6 border border-blue-500/20 animate-pulse">
-                <Info className="w-8 h-8 text-blue-400" />
+          <div className="py-20 flex flex-col items-center text-center">
+             <div className="w-20 h-20 rounded-[2rem] bg-white/5 border border-white/10 flex items-center justify-center mb-8 shadow-2xl">
+                <Info className="w-10 h-10 text-slate-700" />
              </div>
-             <h4 className="text-xl font-bold mb-2">And 17 more ideas...</h4>
-             <p className="text-slate-500 max-w-sm">Every Monday morning, your content plan is ready before you even wake up.</p>
+             <h4 className="text-3xl font-bold mb-4 tracking-tight">And 14 more strategic ideas...</h4>
+             <p className="text-slate-500 max-w-md text-lg font-light leading-relaxed">
+               Every Monday morning, your workspace is updated with 20 fresh strategies tailored to your niche.
+             </p>
           </div>
         </div>
 
-        {/* Footer CTA */}
-        <div className="p-8 bg-gradient-to-t from-blue-900/20 to-transparent border-t border-white/10 relative z-20 backdrop-blur-sm">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-6 max-w-3xl mx-auto">
-            <div className="text-center sm:text-left">
-              <p className="text-lg font-bold text-white mb-1">Ready to scale your content?</p>
-              <p className="text-sm text-slate-400">Join 500+ creators getting ahead with data.</p>
+        {/* Footer CTA (Studio Style) */}
+        <div className="p-10 bg-black border-t border-white/5 relative z-20 backdrop-blur-xl">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-8 max-w-5xl mx-auto">
+            <div className="text-left space-y-1">
+              <p className="text-2xl font-black text-white tracking-tighter uppercase">Ready to scale your content?</p>
+              <p className="text-slate-500 font-medium tracking-tight">Join high-impact studios getting ahead with strategic data.</p>
             </div>
-            <Button className="w-full sm:w-auto bg-blue-600 hover:bg-blue-500 text-white px-8 h-12 rounded-full font-bold shadow-lg shadow-blue-500/25 transition-all hover:scale-105 group" asChild>
+            <Button className="w-full md:w-auto bg-white text-black hover:bg-slate-200 px-10 h-16 rounded-full text-xs font-black uppercase tracking-widest shadow-2xl transition-all hover:scale-105 group" asChild>
               <a href="/signup">
-                Start Free Trial
-                <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                Claim Your Workspace
+                <ArrowRight className="ml-3 w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </a>
             </Button>
           </div>

@@ -13,7 +13,10 @@ import {
   Star,
   ChevronRight,
   Maximize2,
-  ExternalLink
+  ExternalLink,
+  ShieldCheck,
+  Clock,
+  AlertCircle
 } from "lucide-react"
 import { IdeaObject } from '@/types/niche'
 import { toast } from 'sonner'
@@ -58,6 +61,7 @@ export function BriefCard({
   const ideaId = dbId || (idea as any).id || (idea as any).dbId
   const format = idea.format || 'Idea'
   const colors = FORMAT_COLORS[format] || FORMAT_COLORS['Strategy']
+  const approvalStatus = (idea as any).approval_status || 'draft'
 
   const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -84,18 +88,29 @@ export function BriefCard({
     }
   }
 
+  // Helper for approval indicator
+  const ApprovalIndicator = () => {
+    if (approvalStatus === 'approved') return <ShieldCheck className="w-3 h-3 text-emerald-400" />
+    if (approvalStatus === 'pending') return <Clock className="w-3 h-3 text-amber-400 animate-pulse" />
+    if (approvalStatus === 'rejected') return <AlertCircle className="w-3 h-3 text-rose-400" />
+    return null
+  }
+
   // --- COMPACT VARIANT (For Kanban/Saved Ideas) ---
   if (variant === 'compact') {
     return (
       <Card 
-        className="group bg-white/[0.03] border-white/5 hover:border-blue-500/20 hover:bg-white/[0.05] transition-all duration-300 rounded-2xl overflow-hidden text-left cursor-pointer border-solid"
+        className="group bg-white/[0.03] border-white/5 hover:border-white/20 hover:bg-white/[0.05] transition-all duration-300 rounded-2xl overflow-hidden text-left cursor-pointer border-solid"
         onClick={handleNavigateToStrategy}
       >
         <CardContent className="p-4 space-y-3">
           <div className="flex items-start justify-between gap-2">
-            <Badge variant="outline" className={cn("text-[8px] font-black uppercase tracking-widest px-2 py-0 border-none", colors.bg, colors.text)}>
-              {format}
-            </Badge>
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className={cn("text-[8px] font-black uppercase tracking-widest px-2 py-0 border-none", colors.bg, colors.text)}>
+                {format}
+              </Badge>
+              <ApprovalIndicator />
+            </div>
             <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                <PerformanceModal idea={idea} />
                <Button 
@@ -166,9 +181,17 @@ export function BriefCard({
         <CardContent className="p-0 text-left flex-1 flex flex-col">
           <div className="p-8 pb-4 space-y-4">
             <div className="flex items-center justify-between">
-              <Badge variant="outline" className={cn("text-[10px] font-black uppercase tracking-widest px-3 py-1", colors.bg, colors.text, colors.border)}>
-                {format} Strategy
-              </Badge>
+              <div className="flex items-center gap-2">
+                <Badge variant="outline" className={cn("text-[10px] font-black uppercase tracking-widest px-3 py-1", colors.bg, colors.text, colors.border)}>
+                  {format} Strategy
+                </Badge>
+                {approvalStatus === 'approved' && (
+                  <div className="flex items-center gap-1 text-emerald-400 px-2 py-0.5 rounded-full bg-emerald-400/10 border border-emerald-400/20">
+                    <ShieldCheck className="w-3 h-3" />
+                    <span className="text-[8px] font-black uppercase tracking-widest">Approved</span>
+                  </div>
+                )}
+              </div>
               <div className="flex items-center gap-2">
                  {isHistory || !ideaId ? (
                    <SaveIdeaButton title={idea.title} ideaData={idea} niche={idea.niche} initialSaved={isSaved} />
@@ -206,7 +229,7 @@ export function BriefCard({
             
             <div className="space-y-2 text-left">
               <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Strategy Preview</span>
-              <p className="text-sm text-slate-400 leading-relaxed font-light line-clamp-3">
+              <p className="text-sm text-slate-400 leading-relaxed font-light line-clamp-3 text-left">
                 {idea.description}
               </p>
             </div>

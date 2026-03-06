@@ -4,7 +4,12 @@ import { Badge } from "@/components/ui/badge"
 import { 
   CheckCircle2, TrendingUp, Mail, Zap, Clock, Users, Video, Layers, 
   Hash, Star, ArrowRight, Sparkles, Code, Orbit, BrainCircuit, 
-  LayoutGrid, Wand2, Box, Download, Smartphone, Timer, Maximize2, ShieldCheck, X
+  LayoutGrid, Wand2, Box, Download, Smartphone, Timer, Maximize2, ShieldCheck, X,
+  Calendar,
+  Lock,
+  MousePointer2,
+  Workflow,
+  Share2
 } from "lucide-react"
 import Link from "next/link"
 import { SampleBriefButton } from "@/components/landing/SampleBriefButton"
@@ -28,17 +33,17 @@ export default function LandingPage() {
             <div className="relative flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-700 shadow-lg shadow-blue-500/20 group-hover:shadow-blue-500/40 transition-all text-white">
               <Zap className="w-4 h-4 text-white fill-white" />
             </div>
-            <span className="text-xl font-semibold tracking-tight text-white">RepsBrief</span>
+            <span className="text-xl font-semibold tracking-tight text-white uppercase tracking-tighter">RepsBrief</span>
           </div>
           <div className="hidden md:flex items-center gap-8">
-            <Link href="#features" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Features</Link>
-            <Link href="#how-it-works" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Workflow</Link>
-            <Link href="#pricing" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Pricing</Link>
+            <Link href="#features" className="text-xs font-bold uppercase tracking-widest text-slate-400 hover:text-white transition-colors">Features</Link>
+            <Link href="#how-it-works" className="text-xs font-bold uppercase tracking-widest text-slate-400 hover:text-white transition-colors">Workflow</Link>
+            <Link href="#pricing" className="text-xs font-bold uppercase tracking-widest text-slate-400 hover:text-white transition-colors">Pricing</Link>
             <div className="h-4 w-px bg-white/10" />
-            <Link href="/login" className="text-sm font-medium text-slate-300 hover:text-white transition-colors text-white">
+            <Link href="/login" className="text-xs font-bold uppercase tracking-widest text-slate-300 hover:text-white transition-colors">
               Login
             </Link>
-            <Button className="bg-white text-black hover:bg-slate-200 text-sm font-semibold rounded-full px-6 transition-transform hover:scale-105" asChild>
+            <Button className="bg-white text-black hover:bg-slate-200 text-[10px] font-black uppercase tracking-widest rounded-full px-6 transition-all hover:scale-105" asChild>
               <Link href="/signup">Get Started</Link>
             </Button>
           </div>
@@ -52,30 +57,30 @@ export default function LandingPage() {
         <section className="relative pt-24 pb-32 lg:pt-36 lg:pb-40 overflow-hidden text-center">
           <div className="container mx-auto px-4">
             
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-blue-500/30 bg-blue-500/10 text-blue-300 text-sm font-medium mb-8 backdrop-blur-md">
-              <Sparkles className="w-4 h-4" />
-              <span>Personalized AI Content Ecosystem for 2026</span>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-blue-500/30 bg-blue-500/10 text-blue-300 text-[10px] font-black uppercase tracking-[0.2em] mb-8 backdrop-blur-md">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Multi-player Content Studio</span>
             </div>
 
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-8 tracking-tighter max-w-5xl mx-auto leading-[1.1] text-white">
-              From viral trends to <br className="hidden md:block" />
+            <h1 className="text-6xl md:text-8xl lg:text-9xl font-black mb-8 tracking-tighter max-w-6xl mx-auto leading-[0.9] text-white">
+              The Strategic <br className="hidden md:block" />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-200 to-blue-500">
-                Published content.
+                Hub for Creators.
               </span>
             </h1>
 
-            <p className="text-lg md:text-xl text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed font-light">
-              The only content engine that learns your <b>Brand Voice</b>, manages your <b>Kanban pipeline</b>, and provides a professional <b>Teleprompter</b> for recording.
+            <p className="text-xl md:text-2xl text-slate-400 mb-12 max-w-3xl mx-auto leading-relaxed font-light">
+              Stop guessing. Start building. From viral trend discovery to professional script production—RepsBrief is the data-backed Studio built for <b>Solo Creators</b> and <b>Scaling Agencies</b>.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button size="lg" className="bg-blue-600 hover:bg-blue-500 text-white h-14 px-8 rounded-full text-base font-semibold w-full sm:w-auto shadow-lg shadow-blue-500/25 transition-all hover:shadow-blue-500/40 hover:-translate-y-0.5 group" asChild>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+              <Button size="lg" className="bg-blue-600 hover:bg-blue-500 text-white h-16 px-10 rounded-full text-xs font-black uppercase tracking-widest w-full sm:w-auto shadow-2xl shadow-blue-500/25 transition-all hover:shadow-blue-500/40 hover:-translate-y-1 group" asChild>
                 <Link href="/signup">
-                  Get Your Free Strategy Brief
+                  Launch Your Studio
                   <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </Button>
-              <div className="w-full sm:w-auto text-white">
+              <div className="w-full sm:w-auto">
                 <SampleBriefButton />
               </div>
             </div>
@@ -84,61 +89,73 @@ export default function LandingPage() {
             <div className="mt-24 relative perspective-1000">
               <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent z-20 h-full w-full pointer-events-none" />
               
-              {/* Teleprompter Mockup Overlay */}
+              {/* Floating Dashboard Elements */}
               <div className="absolute -top-12 -right-4 md:right-12 z-30 transform rotate-3 hidden md:block">
-                 <div className="bg-black border border-white/10 rounded-3xl p-1 shadow-2xl w-48 overflow-hidden">
-                    <div className="bg-blue-600/10 p-3 flex flex-col items-center gap-2 border-b border-white/5">
-                       <Smartphone className="w-4 h-4 text-blue-400" />
-                       <span className="text-[8px] font-black text-white uppercase tracking-widest">Recording Mode</span>
+                 <div className="bg-[#0a0a0a] border border-white/10 rounded-[2rem] p-1 shadow-2xl w-56 overflow-hidden">
+                    <div className="bg-blue-600/10 p-4 flex flex-col items-center gap-2 border-b border-white/5">
+                       <ShieldCheck className="w-5 h-5 text-emerald-400" />
+                       <span className="text-[9px] font-black text-white uppercase tracking-widest">Admin Approved</span>
                     </div>
-                    <div className="p-4 space-y-2">
-                       <div className="h-1.5 w-full bg-white/20 rounded-full" />
-                       <div className="h-1.5 w-4/5 bg-white/40 rounded-full" />
-                       <div className="h-1.5 w-full bg-white/20 rounded-full" />
-                       <div className="h-1.5 w-2/3 bg-blue-500/40 rounded-full" />
+                    <div className="p-5 space-y-3">
+                       <div className="h-2 w-full bg-white/10 rounded-full" />
+                       <div className="h-2 w-4/5 bg-white/5 rounded-full" />
+                       <div className="pt-2 flex justify-end">
+                          <div className="w-6 h-6 rounded-full bg-blue-500 border-2 border-black" />
+                          <div className="w-6 h-6 rounded-full bg-emerald-500 border-2 border-black -ml-2" />
+                       </div>
                     </div>
                  </div>
               </div>
 
-              <div className="relative rounded-3xl border border-white/10 bg-black/50 backdrop-blur-xl shadow-2xl mx-auto max-w-6xl overflow-hidden ring-1 ring-white/5 transform transition-all duration-700 hover:rotate-0 rotate-x-2 scale-100 sm:scale-105 lg:scale-110 mt-10">
-                <div className="bg-white/5 px-4 py-3 flex items-center justify-between border-b border-white/5">
-                  <div className="flex gap-1.5">
-                    <div className="w-3 h-3 rounded-full bg-rose-500/80" />
-                    <div className="w-3 h-3 rounded-full bg-amber-500/80" />
-                    <div className="w-3 h-3 rounded-full bg-emerald-500/80" />
+              <div className="relative rounded-[3rem] border border-white/10 bg-black/50 backdrop-blur-xl shadow-2xl mx-auto max-w-6xl overflow-hidden ring-1 ring-white/5 transform transition-all duration-1000 hover:rotate-0 rotate-x-2 scale-100 sm:scale-105 lg:scale-110 mt-10">
+                <div className="bg-white/5 px-6 py-4 flex items-center justify-between border-b border-white/5">
+                  <div className="flex gap-2">
+                    <div className="w-3 h-3 rounded-full bg-rose-500/50" />
+                    <div className="w-3 h-3 rounded-full bg-amber-500/50" />
+                    <div className="w-3 h-3 rounded-full bg-emerald-500/50" />
                   </div>
-                  <div className="bg-white/5 rounded-md px-4 py-1 text-[10px] text-slate-400 font-mono">repsbrief.app/strategy-vault</div>
-                  <div className="w-10" />
+                  <div className="bg-white/5 rounded-full px-6 py-1.5 text-[10px] text-slate-500 font-mono tracking-widest uppercase">studio.repsbrief.app/workspace</div>
+                  <div className="flex items-center gap-2">
+                     <Users className="w-4 h-4 text-slate-600" />
+                     <div className="w-6 h-6 rounded-full bg-white/10" />
+                  </div>
                 </div>
 
-                <div className="p-8 space-y-10 text-left">
+                <div className="p-10 space-y-12 text-left">
                   {/* Stats & Header Mockup */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 opacity-90">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 opacity-90">
                      {[
-                       { label: 'Market Velocity', val: 'Trending Up', icon: <TrendingUp className="w-4 h-4 text-emerald-400"/>, bg: 'bg-emerald-500/10' },
-                       { label: 'Voice Match', val: '98% Accuracy', icon: <BrainCircuit className="w-4 h-4 text-purple-400"/>, bg: 'bg-purple-500/10' },
-                       { label: 'Production', val: '4 Ready to record', icon: <Smartphone className="w-4 h-4 text-blue-400"/>, bg: 'bg-blue-500/10' }
+                       { label: 'Team Velocity', val: '+240% Growth', icon: <TrendingUp className="w-5 h-5 text-emerald-400"/>, bg: 'bg-emerald-500/10' },
+                       { label: 'Brand Persona', val: 'Global Sync', icon: <BrainCircuit className="w-5 h-5 text-purple-400"/>, bg: 'bg-purple-500/10' },
+                       { label: 'Scheduled', val: '12 Posts Active', icon: <Calendar className="w-5 h-5 text-blue-400"/>, bg: 'bg-blue-500/10' }
                      ].map((s, i) => (
-                       <div key={i} className="bg-white/[0.03] border border-white/10 rounded-2xl p-4 flex items-center gap-4">
-                          <div className={cn("p-2 rounded-xl", s.bg)}>{s.icon}</div>
+                       <div key={i} className="bg-white/[0.03] border border-white/10 rounded-3xl p-6 flex items-center gap-5">
+                          <div className={cn("p-3 rounded-2xl", s.bg)}>{s.icon}</div>
                           <div>
-                             <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest">{s.label}</p>
-                             <p className="text-sm font-bold text-white">{s.val}</p>
+                             <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest">{s.label}</p>
+                             <p className="text-lg font-bold text-white tracking-tight">{s.val}</p>
                           </div>
                        </div>
                      ))}
                   </div>
 
                   {/* Kanban Mockup Preview */}
-                  <div className="flex flex-col md:flex-row gap-6">
-                    {["To Review", "Scripting", "Published"].map((col, i) => (
-                      <div key={i} className="flex-1 space-y-4">
-                        <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-2">{col}</h4>
-                        <div className="space-y-3 p-2 rounded-2xl border border-white/5 bg-white/[0.01] min-h-[100px]">
-                           <div className="bg-white/5 border border-white/10 p-4 rounded-xl space-y-3 group cursor-pointer hover:bg-white/10 transition-all">
-                              <div className="flex justify-between"><Badge className="bg-blue-500/10 text-blue-400 border-none text-[8px]">Reel</Badge><Zap className="w-3 h-3 text-blue-500"/></div>
+                  <div className="flex flex-col md:flex-row gap-8">
+                    {["Pending Review", "Approved", "Editorial Calendar"].map((col, i) => (
+                      <div key={i} className="flex-1 space-y-5">
+                        <h4 className="text-[11px] font-black text-slate-500 uppercase tracking-widest pl-3">{col}</h4>
+                        <div className="space-y-4 p-3 rounded-[2rem] border border-white/5 bg-white/[0.01] min-h-[160px]">
+                           <div className="bg-white/[0.04] border border-white/10 p-5 rounded-2xl space-y-4 group cursor-pointer hover:bg-white/[0.08] transition-all">
+                              <div className="flex justify-between items-center">
+                                 <Badge className="bg-pink-500/10 text-pink-400 border-none text-[9px] font-black uppercase">Reel</Badge>
+                                 <Clock className="w-3.5 h-3.5 text-amber-500 animate-pulse" />
+                              </div>
                               <div className="h-2 w-full bg-white/10 rounded-full" />
                               <div className="h-2 w-2/3 bg-white/5 rounded-full" />
+                              <div className="flex items-center gap-2 pt-2 border-t border-white/5">
+                                 <div className="w-5 h-5 rounded-full bg-blue-500/50" />
+                                 <span className="text-[8px] font-bold text-slate-600 uppercase">Creator: Marco</span>
+                              </div>
                            </div>
                         </div>
                       </div>
@@ -150,161 +167,173 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Killer Features Section */}
-        <section id="features" className="py-32 relative">
+        {/* Studio Core Section */}
+        <section id="features" className="py-32 relative bg-white/[0.01]">
           <div className="container mx-auto px-4">
-            <div className="text-center mb-24">
-              <h2 className="text-4xl md:text-6xl font-bold mb-6 tracking-tight text-white">Strategy meets Execution.</h2>
-              <p className="text-slate-400 max-w-2xl mx-auto text-xl font-light">We don&apos;t just give you a list of ideas. We give you a production studio.</p>
+            <div className="text-center mb-24 space-y-4">
+              <h2 className="text-5xl md:text-7xl font-black mb-6 tracking-tighter text-white">The Studio Architecture.</h2>
+              <p className="text-slate-400 max-w-3xl mx-auto text-xl font-light leading-relaxed">
+                RepsBrief isn&apos;t just an AI tool. It&apos;s a collaborative production environment designed to move strategies from concept to camera in minutes.
+              </p>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
               {[
                 {
+                  icon: <Users className="w-8 h-8 text-blue-400" />,
+                  title: "Team Workspaces",
+                  desc: "Invite creators, editors, and admins. Centralize your niche research and maintain 100% visibility over the production pipeline."
+                },
+                {
                   icon: <BrainCircuit className="w-8 h-8 text-purple-400" />,
-                  title: "Brand Voice Training",
-                  desc: "Our AI analyzes your past successes to extract your unique linguistic profile. Every script sounds like YOU, not a bot."
+                  title: "Shared AI Persona",
+                  desc: "Train the AI once on your brand&apos;s unique voice. Now every team member can generate scripts that sound exactly like you."
                 },
                 {
-                  icon: <Smartphone className="w-8 h-8 text-blue-400" />,
-                  title: "Mobile Teleprompter",
-                  desc: "Record like a pro. Transform your phone into a professional script-scroller with adjustable speed and focus lines."
+                  icon: <Workflow className="w-8 h-8 text-emerald-400" />,
+                  title: "Approval Workflow",
+                  desc: "Professional content gating. Members submit, Admins approve. No more 'off-brand' content hitting your channels."
                 },
                 {
-                  icon: <LayoutGrid className="w-8 h-8 text-emerald-400" />,
-                  title: "Production Kanban",
-                  desc: "A dedicated workspace to move your ideas from 'Saved' to 'Published'. Track your workflow with drag-and-drop ease."
+                  icon: <Calendar className="w-8 h-8 text-rose-400" />,
+                  title: "Editorial Calendar",
+                  desc: "Plan your month across Instagram, TikTok, and LinkedIn in one unified grid. Strategic scheduling has never been this fluid."
                 },
                 {
-                  icon: <Wand2 className="w-8 h-8 text-amber-400" />,
-                  title: "AI Magic Remix",
-                  desc: "Instantly change tone, platform (TikTok/YouTube), or length with one click. Your strategy is now interactive."
+                  icon: <Maximize2 className="w-8 h-8 text-cyan-400" />,
+                  title: "Full-Screen Studio",
+                  desc: "An immersive environment for high-focus strategy remixing. Teleprompter, script-drafting, and distribution tools in one view."
                 },
                 {
-                  icon: <TrendingUp className="w-8 h-8 text-rose-400" />,
-                  title: "Performance Loop",
-                  desc: "Log your results and let the AI strategist learn what works for your specific audience. Growth on autopilot."
-                },
-                {
-                  icon: <Box className="w-8 h-8 text-blue-300" />,
-                  title: "Ecosystem Sync",
-                  desc: "Sync your finalized strategies directly to Notion blocks or download as Markdown for your filming team."
+                  icon: <Share2 className="w-8 h-8 text-amber-400" />,
+                  title: "Agency White-Label",
+                  desc: "Share strategy briefs with clients via professional, private URLs. Your brand, your insights, our technology."
                 }
               ].map((f, i) => (
-                <div key={i} className="bg-white/[0.02] border border-white/5 rounded-[2rem] p-8 hover:bg-white/[0.04] hover:border-white/10 transition-all group">
-                   <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <div key={i} className="bg-white/[0.02] border border-white/5 rounded-[2.5rem] p-10 hover:bg-white/[0.04] hover:border-white/10 transition-all group relative overflow-hidden">
+                   <div className="absolute -bottom-4 -right-4 p-8 opacity-[0.02] group-hover:scale-150 transition-transform duration-700">
                       {f.icon}
                    </div>
-                   <h3 className="text-xl font-bold text-white mb-3">{f.title}</h3>
-                   <p className="text-slate-400 leading-relaxed font-light text-sm">{f.desc}</p>
+                   <div className="w-16 h-16 rounded-3xl bg-white/5 flex items-center justify-center mb-8 group-hover:scale-110 group-hover:bg-white/10 transition-all">
+                      {f.icon}
+                   </div>
+                   <h3 className="text-2xl font-bold text-white mb-4 tracking-tight">{f.title}</h3>
+                   <p className="text-slate-400 leading-relaxed font-light text-base">{f.desc}</p>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* Pricing Section - Refined for 2026 Premium SaaS */}
+        {/* Pricing Section - Refined for Team Scaling */}
         <section id="pricing" className="py-32 relative overflow-hidden">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-blue-600/5 blur-[120px] pointer-events-none" />
           <div className="container mx-auto px-4 relative z-10">
-            <div className="text-center mb-20">
-              <h2 className="text-4xl md:text-5xl font-bold mb-4 tracking-tight text-white">Simple, Powerful Pricing</h2>
-              <p className="text-slate-400 max-w-xl mx-auto text-lg font-light">Join the top 1% of content creators scaling with data.</p>
+            <div className="text-center mb-20 space-y-4">
+              <h2 className="text-5xl md:text-6xl font-black mb-4 tracking-tighter text-white uppercase">Pick Your Power.</h2>
+              <p className="text-slate-400 max-w-xl mx-auto text-xl font-light">Join the top 1% of content studios scaling with strategic data.</p>
             </div>
             
-            <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto items-stretch">
+            <div className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto items-stretch">
               
               {/* Free Plan */}
-              <Card className="bg-black/40 backdrop-blur-sm border-white/10 text-white rounded-[2.5rem] p-2 flex flex-col">
-                <div className="bg-white/[0.02] rounded-[2.2rem] p-8 lg:p-10 flex-1 flex flex-col">
-                  <div className="mb-8">
-                    <CardTitle className="text-lg font-black text-slate-500 uppercase tracking-[0.2em]">Free Trial</CardTitle>
-                    <div className="mt-4 flex items-baseline gap-1">
-                      <span className="text-5xl font-bold text-white">$0</span>
+              <Card className="bg-black border-white/5 text-white rounded-[3rem] p-3 flex flex-col group hover:border-white/10 transition-all">
+                <div className="bg-white/[0.02] rounded-[2.8rem] p-10 lg:p-12 flex-1 flex flex-col">
+                  <div className="mb-10">
+                    <CardTitle className="text-[10px] font-black text-slate-600 uppercase tracking-[0.3em]">Individual</CardTitle>
+                    <div className="mt-6 flex items-baseline gap-1">
+                      <span className="text-6xl font-black text-white">$0</span>
                     </div>
-                    <p className="text-xs text-slate-600 mt-2">Test the engine core.</p>
+                    <p className="text-xs text-slate-600 mt-3 font-bold uppercase tracking-widest">Test the Studio Core.</p>
                   </div>
-                  <div className="space-y-4 mb-10 flex-1">
-                    {['1 Custom AI Generation', '10 Weekly Ideas', 'Basic AI Remix', 'Community Support'].map((f, i) => (
-                      <div key={i} className="flex gap-3 text-sm text-slate-400 items-center">
-                        <CheckCircle2 className="w-4 h-4 text-slate-600 shrink-0" /> {f}
+                  <div className="space-y-5 mb-12 flex-1">
+                    {['1 Weekly Strategic Brief', '10 AI Trend Ideas', 'Basic Studio Access', 'Markdown Export'].map((f, i) => (
+                      <div key={i} className="flex gap-4 text-sm text-slate-500 items-center font-medium">
+                        <CheckCircle2 className="w-4 h-4 text-slate-700 shrink-0" /> {f}
                       </div>
                     ))}
-                    {['Full Kanban Board', 'Teleprompter Mode', 'Brand Voice Training'].map((f, i) => (
-                      <div key={i} className="flex gap-3 text-sm text-slate-700 items-center line-through decoration-slate-800">
-                        <X className="w-4 h-4 text-slate-800 shrink-0" /> {f}
+                    {['Editorial Calendar', 'Brand Persona Sync', 'Team Collaboration'].map((f, i) => (
+                      <div key={i} className="flex gap-4 text-sm text-slate-800 items-center line-through decoration-slate-800 opacity-40">
+                        <Lock className="w-3.5 h-3.5 text-slate-800 shrink-0" /> {f}
                       </div>
                     ))}
                   </div>
-                  <Button variant="outline" className="w-full rounded-full border-white/10 text-slate-500 hover:bg-white hover:text-black h-12 font-bold transition-all" asChild>
-                    <Link href="/signup">Start Testing</Link>
+                  <Button variant="outline" className="w-full rounded-full border-white/10 text-slate-400 hover:bg-white hover:text-black h-14 text-xs font-black uppercase tracking-widest transition-all" asChild>
+                    <Link href="/signup">Start Free</Link>
                   </Button>
                 </div>
               </Card>
 
               {/* Pro Plan (Popular) */}
-              <Card className="bg-gradient-to-b from-blue-600/30 to-blue-900/10 backdrop-blur-md border-blue-500/40 text-white relative overflow-hidden rounded-[2.5rem] p-1 shadow-2xl shadow-blue-500/10 transform md:-translate-y-6">
+              <Card className="bg-gradient-to-br from-blue-600/20 via-black to-black backdrop-blur-xl border-blue-500/30 text-white relative overflow-hidden rounded-[3rem] p-1.5 shadow-2xl shadow-blue-500/10 transform md:-translate-y-8 transition-transform hover:-translate-y-10 duration-500">
                 <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-blue-400 to-transparent" />
-                <div className="bg-black/60 rounded-[2.2rem] p-8 lg:p-10 flex-1 flex flex-col relative h-full">
-                  <div className="absolute top-8 right-8">
-                    <Badge className="bg-blue-500 hover:bg-blue-600 text-white font-black px-3 py-1 rounded-full border-none text-[10px] tracking-widest">
-                      POPULAR
+                <div className="bg-black/80 rounded-[2.8rem] p-10 lg:p-12 flex-1 flex flex-col relative h-full">
+                  <div className="absolute top-10 right-10">
+                    <Badge className="bg-blue-500 text-white font-black px-4 py-1.5 rounded-full border-none text-[10px] tracking-widest animate-pulse">
+                      MOST POPULAR
                     </Badge>
                   </div>
-                  <div className="mb-8">
-                    <CardTitle className="text-lg font-black text-blue-400 uppercase tracking-[0.2em]">Professional</CardTitle>
-                    <div className="mt-4 flex items-baseline gap-1">
-                      <span className="text-6xl font-black text-white">$19</span>
-                      <span className="text-blue-200/50 font-medium">/mo</span>
+                  <div className="mb-10">
+                    <CardTitle className="text-[10px] font-black text-blue-400 uppercase tracking-[0.3em]">Pro Creator</CardTitle>
+                    <div className="mt-6 flex items-baseline gap-1">
+                      <span className="text-7xl font-black text-white">$19</span>
+                      <span className="text-blue-200/50 font-bold uppercase text-xs tracking-widest">/mo</span>
                     </div>
-                    <p className="text-xs text-blue-200/40 mt-2">Everything you need to grow.</p>
+                    <p className="text-xs text-blue-300/40 mt-3 font-bold uppercase tracking-widest">Master your personal brand.</p>
                   </div>
-                  <div className="space-y-4 mb-10 flex-1">
+                  <div className="space-y-5 mb-12 flex-1">
                     {[
-                      'Unlimited Weekly Briefs', 
-                      'Full Production Board', 
-                      'Mobile Teleprompter', 
-                      'Brand Voice Analysis', 
-                      'AI Magic Remix (Unlimited)',
-                      'Notion & Markdown Sync',
-                      'Priority Strategist Support'
+                      'Unlimited Strategic Briefs', 
+                      'Full Studio Hub Access', 
+                      'AI Persona Training', 
+                      'Editorial Calendar', 
+                      'Advanced AI Remixing',
+                      'Notion & Public Share Links'
                     ].map((f, i) => (
-                      <div key={i} className="flex gap-3 text-sm text-slate-100 items-center font-medium">
-                        <div className="w-5 h-5 rounded-full bg-blue-500/20 flex items-center justify-center shrink-0">
-                           <CheckCircle2 className="w-3.5 h-3.5 text-blue-400" /> 
+                      <div key={i} className="flex gap-4 text-sm text-slate-100 items-center font-bold">
+                        <div className="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center shrink-0 border border-blue-500/20">
+                           <CheckCircle2 className="w-4 h-4 text-blue-400" /> 
                         </div>
                         {f}
                       </div>
                     ))}
                   </div>
-                  <Button className="w-full rounded-full bg-blue-600 hover:bg-blue-500 text-white font-black h-14 shadow-lg shadow-blue-500/25 transition-all hover:scale-105 active:scale-95" asChild>
-                    <Link href="/signup">Get Full Access</Link>
+                  <Button className="w-full rounded-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-black uppercase tracking-widest h-16 shadow-2xl shadow-blue-500/30 transition-all hover:scale-105 active:scale-95" asChild>
+                    <Link href="/signup">Get Pro Access</Link>
                   </Button>
                 </div>
               </Card>
 
-              {/* Team Plan (Coming Soon) */}
-              <Card className="bg-white/[0.02] border-white/5 text-white rounded-[2.5rem] p-2 flex flex-col relative group opacity-60">
-                <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/40 backdrop-blur-[2px] rounded-[2.5rem]">
-                   <Badge className="bg-white/10 border-white/20 text-white font-black px-4 py-2 uppercase tracking-[0.3em] rounded-full">Coming Q3</Badge>
-                </div>
-                <div className="bg-white/[0.01] rounded-[2.2rem] p-8 lg:p-10 flex-1 flex flex-col">
-                  <div className="mb-8">
-                    <CardTitle className="text-lg font-black text-slate-700 uppercase tracking-[0.2em]">Agency</CardTitle>
-                    <div className="mt-4 flex items-baseline gap-1">
-                      <span className="text-5xl font-bold text-slate-700">$39</span>
-                      <span className="text-slate-800 font-medium">/mo</span>
+              {/* Team Plan */}
+              <Card className="bg-black border-emerald-500/20 text-white rounded-[3rem] p-3 flex flex-col group hover:border-emerald-500/40 transition-all relative overflow-hidden">
+                <div className="bg-white/[0.02] rounded-[2.8rem] p-10 lg:p-12 flex-1 flex flex-col">
+                  <div className="mb-10">
+                    <CardTitle className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.3em]">Team Studio</CardTitle>
+                    <div className="mt-6 flex items-baseline gap-1">
+                      <span className="text-6xl font-black text-white">$39</span>
+                      <span className="text-slate-600 font-bold uppercase text-xs tracking-widest">/mo</span>
                     </div>
+                    <p className="text-xs text-emerald-500/40 mt-3 font-bold uppercase tracking-widest">Scale with collaborators.</p>
                   </div>
-                  <div className="space-y-4 mb-10 flex-1 text-slate-700">
-                    {['Up to 3 Niches', 'Team Collaboration', 'Brand Voice for Clients', 'White-label Briefs', 'API Access'].map((f, i) => (
-                      <div key={i} className="flex gap-3 text-sm items-center">
-                        <ShieldCheck className="w-4 h-4 shrink-0" /> {f}
+                  <div className="space-y-5 mb-12 flex-1">
+                    {[
+                      'Everything in Pro',
+                      'Up to 5 Team Seats',
+                      'Approval Workflows',
+                      'Shared Workspace Persona',
+                      'White-label Strategy Pages',
+                      'Admin Content Oversight'
+                    ].map((f, i) => (
+                      <div key={i} className="flex gap-4 text-sm text-slate-300 items-center font-semibold">
+                        <div className="w-6 h-6 rounded-full bg-emerald-500/10 flex items-center justify-center shrink-0 border border-emerald-500/10">
+                           <ShieldCheck className="w-4 h-4 text-emerald-500" /> 
+                        </div>
+                        {f}
                       </div>
                     ))}
                   </div>
-                  <Button disabled className="w-full rounded-full bg-white/5 border border-white/5 text-slate-700 h-12 font-bold">
-                    Join Waitlist
+                  <Button className="w-full rounded-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black uppercase tracking-widest h-14 shadow-2xl shadow-emerald-500/20 transition-all" asChild>
+                    <Link href="/signup">Scale My Team</Link>
                   </Button>
                 </div>
               </Card>
@@ -315,24 +344,31 @@ export default function LandingPage() {
       </main>
 
       {/* Footer */}
-      <footer className="py-16 border-t border-white/5 bg-black relative z-10">
+      <footer className="py-20 border-t border-white/5 bg-black relative z-10">
         <div className="container mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-12">
-          <div className="flex flex-col items-center md:items-start gap-4">
+          <div className="flex flex-col items-center md:items-start gap-6">
             <div className="flex items-center gap-2">
-              <Zap className="w-6 h-6 text-white fill-white" />
-              <span className="text-xl font-bold tracking-tight text-white uppercase">RepsBrief</span>
+              <Zap className="w-8 h-8 text-white fill-white" />
+              <span className="text-2xl font-black tracking-tighter text-white uppercase tracking-widest">RepsBrief</span>
             </div>
-            <p className="text-sm text-slate-600 max-w-xs text-center md:text-left font-light">
-              Elevating content creators through personalized AI and strategic data signals.
+            <p className="text-sm text-slate-600 max-w-xs text-center md:text-left font-medium leading-relaxed">
+              The first AI-powered Studio for modern content teams. Architecture for high-impact creators.
             </p>
           </div>
-          <div className="flex flex-wrap justify-center items-center gap-10 text-sm font-bold uppercase tracking-widest text-slate-500">
+          <div className="flex flex-wrap justify-center items-center gap-12 text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">
              <Link href="#" className="hover:text-white transition-colors">Privacy</Link>
              <Link href="#" className="hover:text-white transition-colors">Terms</Link>
              <Link href="#" className="hover:text-white transition-colors">Twitter</Link>
              <Link href="#" className="hover:text-white transition-colors">Support</Link>
           </div>
-          <p className="text-xs text-slate-700 font-mono tracking-tighter">&copy; 2026 RepsBrief Studio. All rights reserved.</p>
+          <div className="flex flex-col items-center md:items-end gap-2">
+             <p className="text-[10px] text-slate-700 font-mono tracking-tighter">&copy; 2026 RepsBrief Studio. AI Optimized.</p>
+             <div className="flex gap-2">
+                <div className="w-1 h-1 rounded-full bg-blue-500" />
+                <div className="w-1 h-1 rounded-full bg-purple-500" />
+                <div className="w-1 h-1 rounded-full bg-emerald-500" />
+             </div>
+          </div>
         </div>
       </footer>
     </div>

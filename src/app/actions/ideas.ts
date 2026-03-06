@@ -36,6 +36,10 @@ export async function saveIdeaAction(
   let error
   let newId
 
+  const { data: profile } = await supabase.from('profiles').select('plan').eq('id', user.id).single()
+  const isTeamPlan = profile?.plan === 'team'
+  const initialApprovalStatus = isTeamPlan ? 'draft' : 'approved'
+
   if (existing) {
     const result = await supabase
       .from('idea_history')
@@ -44,7 +48,8 @@ export async function saveIdeaAction(
         idea_data: ideaData || null,
         idea_title: title.trim(),
         used_at: new Date().toISOString(),
-        status: existing.status || status 
+        status: existing.status || status,
+        approval_status: isTeamPlan ? (existing.approval_status || 'draft') : 'approved'
       })
       .eq('id', existing.id)
       .eq('team_id', teamId)
@@ -65,7 +70,8 @@ export async function saveIdeaAction(
         idea_data: ideaData || null,
         saved: true,
         used_at: new Date().toISOString(),
-        status: status
+        status: status,
+        approval_status: initialApprovalStatus
       })
       .select('id')
       .single()

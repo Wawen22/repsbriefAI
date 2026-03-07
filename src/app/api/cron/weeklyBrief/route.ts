@@ -92,6 +92,16 @@ export async function POST(req: Request) {
 
         if (briefError) throw briefError
 
+        // TRIGGER WEBHOOK
+        const { triggerWebhooks } = require('@/lib/integrations/webhooks')
+        if (user.current_team_id) {
+          await triggerWebhooks(user.current_team_id, 'brief.ready', {
+            week_date: weekDate,
+            niche: nicheId,
+            ideas_count: ideas.length
+          })
+        }
+
         // 6. Send email via Resend
         if (process.env.RESEND_API_KEY) {
           const { sendBrief } = require('../../email/sendBrief')

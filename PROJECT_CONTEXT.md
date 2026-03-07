@@ -2,8 +2,8 @@
 
 ## 📋 Task Status Tracking
 
-- [x] **Current Task:** Notion API Integration & Export System ✅
-- [ ] **Next Task:** Google Calendar Sync Integration
+- [x] **Current Task:** Full Integrations Hub (Notion, GCal, Webhooks) ✅
+- [ ] **Next Task:** Slack & Discord Notification Channels
 - [ ] **Completed Tasks:**
   - [x] Initial Context & Prompt Review
   - [x] Architectural Summarization
@@ -17,48 +17,12 @@
   - [x] Weekly Cron Job Orchestration (Scrape + Generate + Save)
   - [x] Resend Email Integration with React Email Template
   - [x] Stripe Checkout & Webhook Integration
-  - [x] Dark Energetic Fitness Landing Page
   - [x] Fitness Dashboard with Format Filters & Empty State
   - [x] Niche Picker & Multi-format Content Display
-  - [x] Supabase Auth (Login/Signup) Pages
-  - [x] Verified Production Build
-  - [x] Final Prototype Delivered (Phase 1-2 UI)
-  - [x] Settings Page: NicheSwitcher, Plan Features, Upgrade CTA, Stripe Portal
-  - [x] History Page: savedHashes sync, ai_model display, parallel fetch, badges
-  - [x] Ideas Page: NicheFilterBar (URL searchParams), saved count badge, improved empty states
-  - [x] Server Action: updateActiveNicheAction (profile.ts)
-  - [x] Fixed pre-existing TS errors in cron route
-  - [x] Generate Now Button: API route + GenerateNowButton component + animated loading states
-  - [x] Dashboard: fixed week_date bug (ora usa il brief più recente), empty state rinnovato con source badges
-  - [x] briefGenerator: resilienza migliorata (fallback prompt, Zod rilassato min 10/max 25, markdown fence stripping, maxTokens 8192)
-  - [x] Gemini provider: riscritto con systemInstruction nativa, generateContent per single-turn
-  - [x] Error handling: messaggi d'errore reali propagati al client
-  - [x] idea_history: colonna `saved` (bool) per distinguere dedup vs salvataggio manuale
-  - [x] saveIdeaAction: select+update/insert invece di upsert, RLS policy UPDATE aggiunta
-  - [x] Dashboard/History: filtro savedHashes su `saved=true` per stelle accurate
-  - [x] Stripe hardening: checkout con auth server-side + price IDs da env
-  - [x] Webhook Stripe: sync robusta su `checkout.session.completed` + `customer.subscription.*`
-  - [x] Settings: bottone "Upgrade to Pro" ora attivo (client action) e redirect a Stripe Checkout
-  - [x] Generator hardening: parsing JSON multi-layer (extract + repair + normalize)
-  - [x] Generator hardening: generazione a batch con retry per evitare output troncati
-  - [x] Generate-now route: tipizzazione robusta + error handling non-`any`
-  - [x] Azure provider: supporto endpoint Foundry (`/openai/v1/`) + legacy (`cognitiveservices`)
-  - [x] Azure provider: compatibilità GPT-5 (`max_completion_tokens`) + JSON mode fallback
-  - [x] Azure provider: fallback automatico modello (`AI_MODEL` -> `AZURE_OPENAI_FALLBACK_MODEL`)
-  - [x] .env aggiornato: switch attivo su Azure con credenziali Foundry
-  - [x] README: guida pratica per switch provider AI via `.env` (Azure/Gemini/OpenAI)
-  - [x] Generator performance profile: single-shot skip su Azure GPT-5 per evitare tentativi costosi inutili
-  - [x] Generator batching: chunk da 10 + tentativi ridotti + token budget dinamico per latenza più bassa
-  - [x] Smoke test reale: 20 idee completate con strategia ottimizzata
-  - [x] Generator tuning v2: retry adattivo per batch + logging tempi per round
-  - [x] Settings Brand Voice: ripristinato export server action (`updateBrandVoiceAction`) con adapter compatibile (`success` + `data`)
-  - [x] Settings UI/UX refactor: nuova information architecture (overview, account, workspace, niche, brand voice) + card hierarchy semplificata
-  - [x] Settings UI/UX refactor v2: layout tab-based per feature (Account, Workspace, Niche, Brand Voice) con navigazione più leggibile
-  - [x] Settings Brand Voice fix: autorizzazioni owner/admin + salvataggio robusto su teams + messaggi errore espliciti
-  - [x] Settings Brand Voice fix v2: RPC `update_team_brand_voice` (SECURITY DEFINER) per stabilità cross-RLS
-  - [x] Settings Brand Voice fix v3: fallback compatibilità schema team/profile)
-  - [x] StrategicBriefView fix: handler `exportAsMarkdown` aggiunto + export `.md` funzionante + import `Clock` ripristinato
-  - [x] Integrazione Notion API: Flusso OAuth e export diretto delle strategie (v2025-09-03 ready).
-  - [x] Tab Integrazioni: Nuova interfaccia in Settings per gestire le connessioni esterne.
+  - [x] Settings Page UI Refactor (Tab-based)
+  - [x] Notion API Integration: OAuth flow + Dynamic Title Export.
+  - [x] Google Calendar Integration: OAuth flow + Bulk Sync + Studio Integration.
+  - [x] Webhooks Engine: Zapier/Make compatible system with HMAC signatures.
+  - [x] Strategic Studio: Added Save as PDF, Markdown and Export to Integrations.
 
 ... (rest of file)

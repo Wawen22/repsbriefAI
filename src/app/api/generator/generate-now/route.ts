@@ -34,7 +34,7 @@ export async function POST() {
     // 2. Load user profile including brand voice
     const { data: profile, error: profileError } = await supabaseAdmin
       .from('profiles')
-      .select('active_niche, plan, brand_voice')
+      .select('active_niche, plan, brand_voice, current_team_id')
       .eq('id', user.id)
       .single()
 
@@ -149,6 +149,16 @@ export async function POST() {
     if (briefError) {
       console.error('[GenerateNow] Failed to save brief:', briefError)
       return NextResponse.json({ error: 'Failed to save brief' }, { status: 500 })
+    }
+
+    // TRIGGER WEBHOOK
+    const { triggerWebhooks } = await import('@/lib/integrations/webhooks')
+    if (profile.current_team_id) {
+      await triggerWebhooks(profile.current_team_id, 'brief.ready', {
+        week_date: weekDate,
+        niche: nicheId,
+        ideas_count: ideas.length
+      })
     }
 
     // 8. Save idea titles for future deduplication (saved=false, not visible in My Ideas)

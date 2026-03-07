@@ -121,7 +121,7 @@ export function IntegrationsSettings() {
 
   const handleAddWebhook = async () => {
     if (!teamId || !newWebhookUrl) return
-    const res = await addWebhookAction(teamId, newWebhookUrl, newWebhookName || "Zapier", ['idea.approved', 'brief.ready'])
+    const res = await addWebhookAction(teamId, newWebhookUrl, newWebhookName || "Zapier", ['idea.approved', 'brief.ready', 'content.scheduled'])
     if (res.success) {
       toast.success("Webhook added!")
       setNewWebhookUrl("")

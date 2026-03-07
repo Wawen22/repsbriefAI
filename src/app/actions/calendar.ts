@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { triggerWebhooks } from '@/lib/integrations/webhooks'
 
 async function getActiveTeamId(supabase: any, userId: string) {
   const { data: profile } = await supabase
@@ -55,6 +56,15 @@ export async function scheduleIdeaAction({
     console.error('Failed to schedule idea:', error)
     return { error: 'Failed to add to calendar' }
   }
+
+  // TRIGGER WEBHOOK
+  await triggerWebhooks(teamId, 'content.scheduled', {
+    calendar_id: data.id,
+    title,
+    platform,
+    scheduled_date: scheduledDate,
+    idea_id: ideaId || null
+  })
 
   revalidatePath('/dashboard/calendar')
   return { success: true, calendarId: data.id }

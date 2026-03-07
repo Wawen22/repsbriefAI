@@ -1,52 +1,15 @@
 # 🚀 RepsBrief — Initialization Prompt for AI Agents
 
 ## 📋 Development Progress
-- [ ] **Phase 1: Foundation**
-    - [x] Project Scaffold & Structure
-    - [x] GitHub Repo Synced
-    - [x] AI Abstraction Layer
-    - [x] Niche Configuration & Types
-    - [x] Supabase Schema & Migrations
-- [ ] **Phase 2: Scrapers & Generator**
-    - [x] Scraper Orchestrator
-    - [x] Reddit Scraper
-    - [x] YouTube Scraper
-    - [x] Google Trends Scraper
-    - [x] RSS Scraper
-    - [x] Brief Generator (AI Layer Integration)
-    - [x] Brief Generator reliability hardening (JSON repair + chunked generation)
-    - [x] Azure Foundry GPT integration (endpoint compatibility + model fallback)
-    - [x] Generate-now speed optimization profile (Azure GPT-5 chunk-first)
-    - [x] Generate-now tuning v2 (adaptive retries + per-batch timing logs)
-- [x] **Phase 3: Automation & Delivery**
-    - [x] Weekly Cron Job
-    - [x] Resend Email Integration
-    - [x] Stripe Payment Integration
-    - [x] Stripe Checkout/Webhook hardening + Settings Upgrade CTA fix
-    - [x] README update: provider switch guide via `.env`
-- [x] **Phase 4: UI/UX**
-    - [x] Landing Page
-    - [x] User Dashboard
-    - [x] Niche Picker
-    - [x] Settings Page (NicheSwitcher, Plan, Stripe Portal)
-    - [x] Settings Brand Voice fix (server action export contract + response shape compatibility)
-    - [x] History Page (Accordion, savedHashes, badges)
-    - [x] Ideas Page (NicheFilterBar, count, empty states)
-    - [x] Generate Now Button (on-demand brief generation, rate limited)
-    - [x] Dashboard bug fix (week_date → most recent brief, new empty state)
-    - [x] briefGenerator resilience (fallback prompt, relaxed Zod, maxTokens 8192)
-    - [x] Gemini provider rewrite (systemInstruction, generateContent)
-    - [x] Save/Unsave ideas (saved column, RLS UPDATE policy, accurate star state)
-    - [x] Settings UI/UX refactor (nuova struttura pagina, migliore gerarchia sezioni e flusso operativo)
-    - [x] Settings UI/UX refactor v2 (navigazione a tab per feature)
-    - [x] Settings Brand Voice bugfix (permessi workspace + update affidabile su team)
-    - [x] Settings Brand Voice bugfix v2 (RPC SECURITY DEFINER per update/reset persona)
-    - [x] Settings Brand Voice bugfix v3 (fallback compatibilità schema team/profile)
-    - [x] StrategicBriefView bugfix (`exportAsMarkdown` definita + export BRIEF.MD funzionante)
-- [x] **Phase 5: Integrazioni & Ecosystem**
+- [x] **Phase 1: Foundation** (Completato)
+- [x] **Phase 2: Scrapers & Generator** (Completato)
+- [x] **Phase 3: Automation & Delivery** (Completato)
+- [x] **Phase 4: UI/UX** (Completato)
+- [ ] **Phase 5: Integrazioni & Ecosystem** (In Corso)
     - [x] Notion Integration: OAuth flow + Export diretto strategie (v2025-09-03).
-    - [ ] **Google Calendar:** Sincronizzazione del calendario editoriale.
-    - [ ] **Webhooks/Zapier:** Connessione universale tramite webhook in uscita.
-    - [ ] **Automation Logs:** Visualizzazione storico delle esportazioni.
+    - [x] Google Calendar: Sincronizzazione automatica e Bulk Sync del piano editoriale.
+    - [x] Webhooks/Zapier: Engine universale HMAC-signed con trigger automatici.
+    - [ ] Automation Logs UI: Visualizzazione storico dettagliato delle esportazioni.
+    - [ ] Slack/Discord: Canali di notifica pre-formattati per il team.
 
 ... (rest of file)

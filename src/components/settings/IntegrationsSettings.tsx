@@ -21,7 +21,7 @@ import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
 import { createClient } from "@/lib/supabase/client"
 import { toast } from "sonner"
-import { connectNotion, connectGoogle } from "@/app/actions/integrations"
+import { connectNotion, connectGoogle, connectSlack } from "@/app/actions/integrations"
 import { addWebhookAction, deleteWebhookAction, toggleWebhookAction, testWebhookAction } from "@/app/actions/webhooks"
 
 interface Integration {
@@ -195,9 +195,10 @@ export function IntegrationsSettings() {
     if (providerId === 'slack') {
       if (slackWebhooks.length > 0) {
         setShowSlack(true)
-      } else {
-        setShowSlack((prev) => !prev)
+        return
       }
+
+      await connectSlack()
       setShowWebhooks(false)
       return
     }

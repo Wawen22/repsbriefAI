@@ -23,6 +23,7 @@ RepsBrief è una web app `Next.js + Supabase` per generare, organizzare e distri
 - Billing: Stripe.
 - Mail: Resend.
 - Integrations: Notion, Google Calendar, Webhooks (Zapier/Make/custom endpoints).
+- Integration UX direction: OAuth-first per servizi user-facing; webhook/manual setup solo fallback tecnico.
 
 ## 4) Development Progress (Merged from INIT_PROMPT)
 
@@ -41,12 +42,13 @@ RepsBrief è una web app `Next.js + Supabase` per generare, organizzare e distri
   - [x] Integration Logs schema alignment (migration dedicata)
   - [x] Lint stabilization wave 1 (errori bloccanti risolti; warning debt aperto)
   - [x] Slack notification channel pre-formattato (riuso webhook engine + payload Slack blocks)
+  - [x] Slack OAuth integration (login Slack no-code + webhook bootstrap automatico)
   - [ ] Discord notification channel pre-formattato
 
 ## 5) Task Status Tracking
 
-- [x] **Current Task (completed):** Slack channel implementation (solo Slack) con migration + engine + UI + validazione (2026-03-07)
-- [ ] **Next Task:** decisione roadmap su Discord + lint warning cleanup wave 2
+- [x] **Current Task (completed):** Slack OAuth fast-path (connect from Settings + callback + auto-create webhook) (2026-03-07)
+- [ ] **Next Task:** OAuth-first blueprint per integrazioni future (Discord incluso) + lint warning cleanup wave 2
 
 ### Completed Milestones
 
@@ -77,6 +79,9 @@ RepsBrief è una web app `Next.js + Supabase` per generare, organizzare e distri
 - [x] ESLint error-level stabilization (`npm run lint` senza errori)
 - [x] Billing CTA fix (`UserProfileMenu` apre Stripe Customer Portal)
 - [x] Slack Notifications integration (Incoming Webhook + payload preformattato)
+- [x] Slack OAuth callback (`/api/auth/slack/callback`) con bootstrap webhook automatico
+- [x] Slack OAuth redirect hardening (usa `NEXT_PUBLIC_APP_URL` per evitare mismatch http/https)
+- [x] Slack OAuth mismatch fallback (authorize/token exchange senza `redirect_uri` esplicito)
 
 ## 6) Validation Snapshot (2026-03-07)
 
@@ -100,6 +105,8 @@ RepsBrief è una web app `Next.js + Supabase` per generare, organizzare e distri
 
 - Migration logs alignment applicata sull'ambiente corrente; se manca su altri ambienti (staging/prod), i log webhook possono fallire per vincolo `integration_id NOT NULL`.
 - Se la migration `add_channel_to_team_webhooks` non e' applicata in staging/prod, la creazione canali Slack fallisce (`column channel does not exist`).
+- Setup Slack via webhook funziona ma ha frizione per utenti non tecnici; prioritario introdurre OAuth Slack con UX guidata.
+- Slack OAuth richiede configurazione Redirect URL corretta in Slack App (`/api/auth/slack/callback`) su ogni ambiente.
 - Lint warning debt ancora aperto (`118` warning), soprattutto unused vars/import, `react-hooks/exhaustive-deps` e `no-img-element`.
 - Il warning Next su convenzione `middleware -> proxy` resta aperto.
 - `supabaseAdmin` ora fa fallback su anon key se `SUPABASE_SERVICE_ROLE_KEY` manca: evita errori runtime/TS ma può ridurre privilegi nei path admin/cron.
@@ -108,5 +115,6 @@ RepsBrief è una web app `Next.js + Supabase` per generare, organizzare e distri
 
 1. Verificare migration Supabase anche su staging/production (se non già allineati).
 2. Validare Slack end-to-end su workspace reale (aggiunta webhook, test, evento reale, log Automation).
-3. Allineare roadmap Discord (specifiche payload/UX) prima di implementazione.
-4. Eseguire lint warning cleanup wave 2 (`unused-vars`, `exhaustive-deps`, `no-img-element`).
+3. Definire standard OAuth-first per nuove integrazioni (scopes minimi, revoke/reconnect, gestione token).
+4. Allineare roadmap Discord (preferenza OAuth-first) prima di implementazione.
+5. Eseguire lint warning cleanup wave 2 (`unused-vars`, `exhaustive-deps`, `no-img-element`).

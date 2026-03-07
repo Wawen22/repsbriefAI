@@ -83,7 +83,8 @@ export const createCalendarEvent = async (teamId: string, event: {
 
   if (error || !integration) throw new Error('Google Calendar non connesso')
 
-  let { access_token, refresh_token, expiry_date } = integration.encrypted_credentials
+  let { access_token, expiry_date } = integration.encrypted_credentials
+  const { refresh_token } = integration.encrypted_credentials
 
   // 2. Controllo se il token è scaduto (o scadrà a breve)
   if (Date.now() >= expiry_date - 60000) {

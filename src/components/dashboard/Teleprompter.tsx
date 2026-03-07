@@ -37,7 +37,6 @@ export function Teleprompter({ title, script, onClose }: TeleprompterProps) {
   const requestRef = useRef<number | null>(null)
   const lastTimeRef = useRef<number | null>(null)
   const scrollPosRef = useRef<number>(0)
-  const [isMounted, setIsMounted] = useState(false)
 
   function animate(time: number) {
     if (lastTimeRef.current !== null && isPlaying && scrollRef.current) {
@@ -51,7 +50,6 @@ export function Teleprompter({ title, script, onClose }: TeleprompterProps) {
   }
 
   useEffect(() => {
-    setIsMounted(true)
     // Hide Command Palette indicator when prompter is active
     const cmdPill = document.getElementById('command-palette-indicator')
     if (cmdPill) cmdPill.style.display = 'none'
@@ -98,7 +96,7 @@ export function Teleprompter({ title, script, onClose }: TeleprompterProps) {
     }
   }
 
-  if (!isMounted) return null
+  if (typeof window === 'undefined') return null
 
   return createPortal(
     <div className="fixed inset-0 z-[20000] bg-black flex flex-col animate-in slide-in-from-right duration-500 overflow-hidden">

@@ -47,12 +47,18 @@ interface StrategicBriefViewProps {
   ideaId: string
 }
 
+type IdeaWorkflowMeta = IdeaObject & {
+  approval_status?: 'draft' | 'pending' | 'approved' | 'rejected'
+  feedback_notes?: string
+}
+
 import { exportStrategyToNotionAction } from "@/app/actions/notion-export"
 
 export function StrategicBriefView({ 
   idea, 
   ideaId
 }: StrategicBriefViewProps) {
+  const ideaMeta = idea as IdeaWorkflowMeta
   const supabase = createClient()
   const [isPrompterOpen, setIsPrompterOpen] = useState(false)
   const [isScheduleOpen, setIsScheduleOpen] = useState(false)
@@ -63,8 +69,8 @@ export function StrategicBriefView({
   const [userRole, setUserRole] = useState<'owner' | 'admin' | 'member' | null>(null)
   const [teamId, setTeamId] = useState<string | null>(null)
   const [userPlan, setUserPlan] = useState<string | null>(null)
-  const [approvalStatus, setApprovalStatus] = useState<string>((idea as any).approval_status || 'draft')
-  const [feedbackNotes, setFeedbackNotes] = useState<string>((idea as any).feedback_notes || '')
+  const [approvalStatus, setApprovalStatus] = useState<string>(ideaMeta.approval_status || 'draft')
+  const [feedbackNotes, setFeedbackNotes] = useState<string>(ideaMeta.feedback_notes || '')
   const [isSubmittingApproval, setIsSubmittingApproval] = useState(false)
   const [isNotionConnected, setIsNotionConnected] = useState(false)
   const [isGoogleConnected, setIsGoogleConnected] = useState(false)
@@ -104,7 +110,7 @@ export function StrategicBriefView({
           .eq('user_id', user.id)
           .eq('team_id', profile.current_team_id)
           .single()
-        setUserRole(member?.role as any)
+        setUserRole((member?.role as 'owner' | 'admin' | 'member' | undefined) || null)
       }
     }
     getContext()

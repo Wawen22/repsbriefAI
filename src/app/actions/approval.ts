@@ -4,7 +4,9 @@ import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { triggerWebhooks } from '@/lib/integrations/webhooks'
 
-async function getUserRole(supabase: any, userId: string, teamId: string) {
+type ServerSupabaseClient = Awaited<ReturnType<typeof createClient>>
+
+async function getUserRole(supabase: ServerSupabaseClient, userId: string, teamId: string) {
   const { data } = await supabase
     .from('team_members')
     .select('role')

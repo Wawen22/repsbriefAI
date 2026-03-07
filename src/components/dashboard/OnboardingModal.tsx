@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { 
   Dialog, 
   DialogContent, 
@@ -32,15 +32,9 @@ interface OnboardingModalProps {
 }
 
 export function OnboardingModal({ userName }: OnboardingModalProps) {
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(true)
   const [step, setStep] = useState(1)
   const router = useRouter()
-
-  useEffect(() => {
-    // We check if it should open based on a prop or a local state 
-    // passed from the parent which fetched the DB flag.
-    setIsOpen(true)
-  }, [])
 
   const handleClose = async () => {
     setIsOpen(false)

@@ -4,7 +4,14 @@ import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { IdeaObject } from '@/types/niche'
 
-async function getCurrentTeamId(supabase: any, userId: string) {
+type ServerSupabaseClient = Awaited<ReturnType<typeof createClient>>
+
+type IdeaHistoryUpdate = {
+  status: string
+  published_at?: string
+}
+
+async function getCurrentTeamId(supabase: ServerSupabaseClient, userId: string) {
   const { data } = await supabase.from('profiles').select('current_team_id').eq('id', userId).single()
   return data?.current_team_id
 }
@@ -128,7 +135,7 @@ export async function updateIdeaStatusAction(ideaId: string, status: string) {
 
   const teamId = await getCurrentTeamId(supabase, user.id)
 
-  const updateData: any = { status }
+  const updateData: IdeaHistoryUpdate = { status }
   if (status === 'published') {
     updateData.published_at = new Date().toISOString()
   }

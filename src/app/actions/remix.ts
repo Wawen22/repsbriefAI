@@ -57,7 +57,7 @@ Return ONLY a JSON object:
       { role: 'user', content: prompt }
     ], { jsonMode: true })
 
-    let cleanText = res.text.replace(/```json|```/gi, '').trim()
+    const cleanText = res.text.replace(/```json|```/gi, '').trim()
     try {
       const data = JSON.parse(jsonrepair(cleanText))
       return { success: true, data }

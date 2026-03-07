@@ -1,10 +1,10 @@
 // src/app/join/[token]/page.tsx
 
 import { createClient } from "@/lib/supabase/server"
-import { notFound, redirect } from "next/navigation"
+import { redirect } from "next/navigation"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Users, ArrowRight, Orbit, CheckCircle2, ShieldAlert } from "lucide-react"
+import { ArrowRight, Orbit, CheckCircle2, ShieldAlert } from "lucide-react"
 import Link from "next/link"
 import { acceptInvitationAction } from "@/app/actions/team"
 
@@ -45,7 +45,8 @@ export default async function JoinTeamPage({ params }: { params: Promise<{ token
     )
   }
 
-  const teamName = (invite.teams as any)?.name || 'a workspace'
+  const inviteTeam = invite.teams as { name?: string } | null
+  const teamName = inviteTeam?.name || 'a workspace'
 
   return (
     <div className="min-h-screen bg-[#050505] text-white font-sans flex items-center justify-center p-6 overflow-hidden">

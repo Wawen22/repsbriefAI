@@ -1,7 +1,23 @@
 // src/app/api/scraper/googleTrends.ts
 
-const googleTrends = require('google-trends-api')
+import googleTrends from 'google-trends-api'
 import { NicheConfig, TrendItem } from '@/types/niche'
+
+type RankedKeyword = {
+  query: string
+  value: string
+  formattedValue: string
+}
+
+type RankedListItem = {
+  rankedKeyword?: RankedKeyword[]
+}
+
+type RelatedQueriesResponse = {
+  default?: {
+    rankedList?: RankedListItem[]
+  }
+}
 
 export async function scrapeGoogleTrends(niche: NicheConfig): Promise<TrendItem[]> {
   const { googleTrendsKeywords } = niche
@@ -15,23 +31,25 @@ export async function scrapeGoogleTrends(niche: NicheConfig): Promise<TrendItem[
         startTime: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // last 7 days
       })
 
-      const data = JSON.parse(result)
+      const data = JSON.parse(result) as RelatedQueriesResponse
       const rankedList = data.default?.rankedList || []
       
-      const risingQueries = rankedList.find((rl: any) => rl.rankedKeyword?.[0]?.formattedValue === 'Rising')?.rankedKeyword || []
+      const risingQueries =
+        rankedList.find((rankedItem) => rankedItem.rankedKeyword?.[0]?.formattedValue === 'Rising')
+          ?.rankedKeyword || []
 
-      const trends: TrendItem[] = risingQueries.map((q: any) => ({
-        id: `gt-${keyword}-${q.query}`,
+      const trends: TrendItem[] = risingQueries.map((query) => ({
+        id: `gt-${keyword}-${query.query}`,
         source: 'google-trends',
-        title: q.query,
-        url: `https://trends.google.com/trends/explore?q=${encodeURIComponent(q.query)}&geo=IT`,
-        content: `Google Trends rising query for "${keyword}": ${q.query}`,
-        score: parseInt(q.value) || 0,
+        title: query.query,
+        url: `https://trends.google.com/trends/explore?q=${encodeURIComponent(query.query)}&geo=IT`,
+        content: `Google Trends rising query for "${keyword}": ${query.query}`,
+        score: parseInt(query.value) || 0,
         timestamp: new Date().toISOString(),
         metadata: {
           keyword: keyword,
-          value: q.value,
-          formattedValue: q.formattedValue,
+          value: query.value,
+          formattedValue: query.formattedValue,
         }
       }))
 

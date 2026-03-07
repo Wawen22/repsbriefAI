@@ -215,7 +215,7 @@ export async function updateTeamBrandingAction(logoUrl?: string, primaryColor?: 
   }
 
   // 2. Update team
-  const updateData: any = {}
+  const updateData: { logo_url?: string; primary_color?: string } = {}
   if (logoUrl !== undefined) updateData.logo_url = logoUrl
   if (primaryColor !== undefined) updateData.primary_color = primaryColor
 

@@ -74,7 +74,7 @@ export async function GET(req: NextRequest) {
 
     // Redirect con successo
     return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/dashboard/settings?tab=integrations&success=notion_connected`)
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Error in Notion callback:", err)
     return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/dashboard/settings?tab=integrations&error=notion_setup_error`)
   }

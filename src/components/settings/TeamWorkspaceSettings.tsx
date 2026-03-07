@@ -139,8 +139,9 @@ export function TeamWorkspaceSettings() {
 
       setLogoUrl(publicUrl)
       toast.success("Logo uploaded!", { id: tid })
-    } catch (error: any) {
-      toast.error(`Upload failed: ${error.message}`, { id: tid })
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Unknown upload error"
+      toast.error(`Upload failed: ${message}`, { id: tid })
     } finally {
       setIsUploading(false)
     }

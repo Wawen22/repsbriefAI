@@ -47,6 +47,8 @@ type CalendarEntry = {
   idea_id?: string;
 }
 
+type CalendarPlatform = 'instagram' | 'tiktok' | 'linkedin' | 'youtube'
+
 export function CalendarView({ initialEntries }: { initialEntries: CalendarEntry[] }) {
   const [currentDate, setCurrentDate] = useState(new Date())
   const [entries] = useState(initialEntries)
@@ -161,7 +163,7 @@ export function CalendarView({ initialEntries }: { initialEntries: CalendarEntry
           hook: selectedEntry.hook,
           script: selectedEntry.script_draft,
           date: new Date(selectedEntry.scheduled_date),
-          platform: selectedEntry.platform as any,
+          platform: selectedEntry.platform as CalendarPlatform,
           notes: selectedEntry.notes
         } : (selectedDate ? { title: '', date: selectedDate } : undefined)} 
       />

@@ -19,7 +19,7 @@ export interface TrendItem {
   content?: string
   score?: number
   timestamp: string
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 }
 
 export interface IdeaObject {

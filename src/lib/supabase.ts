@@ -10,6 +10,4 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 // Admin client for backend/cron jobs/bypass RLS
-export const supabaseAdmin = supabaseServiceKey 
-  ? createClient(supabaseUrl, supabaseServiceKey) 
-  : null as any
+export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey ?? supabaseAnonKey)

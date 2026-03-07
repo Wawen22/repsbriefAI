@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import {
   Popover,
@@ -9,7 +8,6 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { Button } from '@/components/ui/button'
 import {
   Crown,
   CreditCard,
@@ -33,6 +31,7 @@ export function UserProfileMenu({ email, fullName, plan }: UserProfileMenuProps)
   const [isOpen, setIsOpen] = useState(false)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
   const [isUpgrading, setIsUpgrading] = useState(false)
+  const [isOpeningBilling, setIsOpeningBilling] = useState(false)
   const router = useRouter()
   const supabase = createClient()
 
@@ -84,6 +83,35 @@ export function UserProfileMenu({ email, fullName, plan }: UserProfileMenuProps)
       console.error('Upgrade error:', error)
     } finally {
       setIsUpgrading(false)
+    }
+  }
+
+  const handleBilling = async () => {
+    try {
+      setIsOpeningBilling(true)
+      const res = await fetch('/api/stripe/portal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      })
+
+      if (!res.ok) {
+        const errorBody = await res.json().catch(() => ({}))
+        throw new Error(errorBody?.error || 'Unable to open billing portal')
+      }
+
+      const session = await res.json()
+      if (session?.url) {
+        window.location.href = session.url
+        return
+      }
+
+      throw new Error('Missing billing portal URL')
+    } catch (error) {
+      console.error('Billing portal error:', error)
+      toast.error('Unable to open billing portal')
+    } finally {
+      setIsOpeningBilling(false)
+      setIsOpen(false)
     }
   }
 
@@ -159,15 +187,21 @@ export function UserProfileMenu({ email, fullName, plan }: UserProfileMenuProps)
         {/* Menu Items */}
         <div className="p-1.5">
           {hasPaidPlan ? (
-            <Link href="/dashboard/settings" onClick={() => setIsOpen(false)}>
-              <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/[0.04] transition-colors cursor-pointer">
+            <button
+              onClick={handleBilling}
+              disabled={isOpeningBilling}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/[0.04] transition-colors disabled:opacity-60"
+            >
+              {isOpeningBilling ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
                 <CreditCard className="w-4 h-4" />
-                <span className="text-[13px] font-medium">Billing</span>
-                <span className="ml-auto text-[10px] font-bold text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded-full uppercase">
-                  {planLabel}
-                </span>
-              </div>
-            </Link>
+              )}
+              <span className="text-[13px] font-medium">Billing</span>
+              <span className="ml-auto text-[10px] font-bold text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded-full uppercase">
+                {planLabel}
+              </span>
+            </button>
           ) : (
             <button
               onClick={handleUpgrade}

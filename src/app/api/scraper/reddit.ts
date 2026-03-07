@@ -3,6 +3,22 @@
 import axios from 'axios'
 import { NicheConfig, TrendItem } from '@/types/niche'
 
+type RedditPostData = {
+  id: string
+  ups: number
+  title: string
+  permalink: string
+  selftext: string
+  created_utc: number
+  subreddit: string
+  num_comments: number
+  link_flair_text?: string | null
+}
+
+type RedditPost = {
+  data: RedditPostData
+}
+
 export async function scrapeReddit(niche: NicheConfig): Promise<TrendItem[]> {
   const { subreddits } = niche
   let allTrends: TrendItem[] = []
@@ -16,11 +32,11 @@ export async function scrapeReddit(niche: NicheConfig): Promise<TrendItem[]> {
         }
       })
 
-      const posts = response.data.data.children
+      const posts = (response.data.data.children || []) as RedditPost[]
 
       const trends: TrendItem[] = posts
-        .filter((post: any) => post.data.ups >= 500) // Filter by minimum upvotes as per PROJECT_CONTEXT.md
-        .map((post: any) => ({
+        .filter((post) => post.data.ups >= 500) // Filter by minimum upvotes as per PROJECT_CONTEXT.md
+        .map((post) => ({
           id: post.data.id,
           source: 'reddit',
           title: post.data.title,

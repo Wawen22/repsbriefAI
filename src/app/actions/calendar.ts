@@ -4,7 +4,17 @@ import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { triggerWebhooks } from '@/lib/integrations/webhooks'
 
-async function getActiveTeamId(supabase: any, userId: string) {
+type ServerSupabaseClient = Awaited<ReturnType<typeof createClient>>
+
+type CalendarEntryUpdate = {
+  title?: string
+  platform?: string
+  scheduled_date?: string
+  notes?: string
+  metadata?: Record<string, unknown>
+}
+
+async function getActiveTeamId(supabase: ServerSupabaseClient, userId: string) {
   const { data: profile } = await supabase
     .from('profiles')
     .select('current_team_id')
@@ -70,7 +80,7 @@ export async function scheduleIdeaAction({
   return { success: true, calendarId: data.id }
 }
 
-export async function getCalendarEntriesAction(month?: number, year?: number) {
+export async function getCalendarEntriesAction(_month?: number, _year?: number) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { data: [] }
@@ -92,7 +102,7 @@ export async function getCalendarEntriesAction(month?: number, year?: number) {
   return { data }
 }
 
-export async function updateCalendarEntryAction(id: string, updates: any) {
+export async function updateCalendarEntryAction(id: string, updates: CalendarEntryUpdate) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Unauthorized' }

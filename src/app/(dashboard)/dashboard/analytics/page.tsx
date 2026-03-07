@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { IdeaObject } from "@/types/niche"
+import type { ComponentType, SVGProps } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -28,7 +29,7 @@ import Link from "next/link"
 
 export const dynamic = 'force-dynamic'
 
-const FORMAT_ICONS: Record<string, any> = {
+const FORMAT_ICONS: Record<string, ComponentType<SVGProps<SVGSVGElement>>> = {
   'Reel': Video,
   'Carousel': Layers,
   'Thread': Hash,
@@ -36,7 +37,7 @@ const FORMAT_ICONS: Record<string, any> = {
   'Idea': LightbulbIcon
 }
 
-function LightbulbIcon(props: any) {
+function LightbulbIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}
@@ -86,7 +87,7 @@ export default async function AnalyticsPage() {
     : 0
 
   // Aggregate by format
-  const formatStats = ideas.reduce((acc: any, curr) => {
+  const formatStats = ideas.reduce((acc: Record<string, { count: number; views: number; score: number }>, curr) => {
     const data = curr.idea_data as IdeaObject
     const format = data?.format || 'Idea'
     if (!acc[format]) {
@@ -267,7 +268,8 @@ export default async function AnalyticsPage() {
                  <div className="flex items-center gap-4">
                     <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center shrink-0">
                        {(() => {
-                         const Icon = FORMAT_ICONS[(idea.idea_data as any)?.format] || LayoutGrid
+                         const ideaData = idea.idea_data as Partial<IdeaObject> | null
+                         const Icon = FORMAT_ICONS[ideaData?.format || ''] || LayoutGrid
                          return <Icon className="w-5 h-5 text-slate-500" />
                        })()}
                     </div>

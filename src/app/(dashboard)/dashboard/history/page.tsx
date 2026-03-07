@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { BriefList } from "@/components/brief/BriefList"
+import type { ComponentType, SVGProps } from "react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { 
@@ -38,7 +39,7 @@ const NICHE_ICON_MAP: Record<string, string> = {
   tech_ai: '🤖',
 }
 
-const formatIcons: Record<string, any> = {
+const formatIcons: Record<string, ComponentType<SVGProps<SVGSVGElement>>> = {
   Reel: Video,
   Carousel: Layers,
   Thread: Hash,
@@ -148,8 +149,10 @@ export default async function HistoryPage() {
               const nicheIcon = NICHE_ICON_MAP[brief.niche] || '📌'
               
               // Group ideas by format for summary
-              const formats = (brief.ideas || []).reduce((acc: any, curr: any) => {
-                acc[curr.format] = (acc[curr.format] || 0) + 1
+              const formats = (brief.ideas || []).reduce((acc: Record<string, number>, curr: unknown) => {
+                const idea = curr as { format?: string }
+                const format = idea.format || 'Idea'
+                acc[format] = (acc[format] || 0) + 1
                 return acc
               }, {})
 
@@ -185,7 +188,7 @@ export default async function HistoryPage() {
                       </div>
 
                       <div className="flex flex-wrap items-center gap-3 lg:justify-end text-left">
-                         {Object.entries(formats).map(([format, count]: [any, any]) => {
+                         {(Object.entries(formats) as Array<[string, number]>).map(([format, count]) => {
                            const Icon = formatIcons[format] || Sparkles
                            return (
                              <div key={format} className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/5 border border-white/5 text-slate-400 text-left">

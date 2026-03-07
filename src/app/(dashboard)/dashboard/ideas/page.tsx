@@ -8,6 +8,20 @@ import { Suspense } from "react"
 
 export const dynamic = 'force-dynamic'
 
+type KanbanIdeaRecord = {
+  id: string
+  idea_title: string
+  idea_data: {
+    title: string
+    format: 'Reel' | 'Carousel' | 'Thread' | 'Newsletter' | 'Idea'
+    hook: string
+    description: string
+    whyItWorks: string
+  }
+  status: string
+  niche: string
+}
+
 export default async function MyIdeasPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -33,7 +47,7 @@ export default async function MyIdeasPage() {
   const userPlan = profile?.plan || 'starter'
 
   // Stats for the header
-  const stats = (allIdeas || []).reduce((acc: any, curr: any) => {
+  const stats = (allIdeas || []).reduce((acc: Record<string, number>, curr) => {
     const status = curr.status || 'backlog'
     acc[status] = (acc[status] || 0) + 1
     return acc
@@ -100,7 +114,7 @@ export default async function MyIdeasPage() {
         </div>
       ) : (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000 text-left">
-          <KanbanBoard initialIdeas={allIdeas as any} plan={userPlan} />
+          <KanbanBoard initialIdeas={(allIdeas || []) as KanbanIdeaRecord[]} plan={userPlan} />
         </div>
       )}
     </div>

@@ -5,9 +5,8 @@ import { notFound } from "next/navigation"
 import { IdeaObject } from "@/types/niche"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Zap, FileText, ArrowRight, Star, Orbit, ArrowUpRight, Sparkles } from "lucide-react"
+import { Zap, FileText, ArrowRight, Orbit, ArrowUpRight, Sparkles } from "lucide-react"
 import Link from "next/link"
-import { cn } from "@/lib/utils"
 
 export const dynamic = 'force-dynamic'
 
@@ -34,7 +33,7 @@ export default async function SharedStrategyPage({ params }: { params: Promise<{
   }
 
   const idea = share.idea_data as IdeaObject
-  const team = share.teams as any
+  const team = share.teams as { name?: string; logo_url?: string; primary_color?: string } | null
   const brandColor = team?.primary_color || '#3b82f6' // Default blue-500
   const agencyLogo = team?.logo_url
   const agencyName = team?.name || 'RepsBrief Studio'

@@ -39,13 +39,13 @@ RepsBrief è una web app `Next.js + Supabase` per generare, organizzare e distri
   - [x] Build stabilization (TypeScript/build bloccanti risolti)
   - [x] Automation Logs UI (tab Settings + filtri + storico eventi)
   - [x] Integration Logs schema alignment (migration dedicata)
-  - [ ] Lint stabilization completa (debt ancora aperto)
+  - [x] Lint stabilization wave 1 (errori bloccanti risolti; warning debt aperto)
   - [ ] Slack/Discord notification channels pre-formattati
 
 ## 5) Task Status Tracking
 
-- [x] **Current Task (completed):** Stabilizzazione build/typecheck + Automation Logs + schema logs alignment (2026-03-07)
-- [ ] **Next Task:** Lint debt burn-down (prima wave: errori bloccanti) + Slack/Discord channels
+- [x] **Current Task (completed):** Lint stabilization wave 1 (errori ESLint bloccanti risolti) + validazione app (2026-03-07)
+- [ ] **Next Task:** Slack/Discord notification channels (riuso webhook engine) + lint warning cleanup wave 2
 
 ### Completed Milestones
 
@@ -73,12 +73,14 @@ RepsBrief è una web app `Next.js + Supabase` per generare, organizzare e distri
 - [x] TypeScript/build blocking fixes
 - [x] Automation Logs UI (Settings)
 - [x] Migration `team_integration_logs` alignment
+- [x] ESLint error-level stabilization (`npm run lint` senza errori)
+- [x] Billing CTA fix (`UserProfileMenu` apre Stripe Customer Portal)
 
 ## 6) Validation Snapshot (2026-03-07)
 
 - [x] `npx tsc --noEmit` passes.
 - [x] `npm run build` passes.
-- [ ] `npm run lint` fails (`74 errors`, `125 warnings`): debt storico non ancora chiuso.
+- [x] `npm run lint` passes con `0 errors`, `119 warnings` (warning debt aperto).
 
 ## 7) DB / Migrations Recenti
 
@@ -90,12 +92,13 @@ RepsBrief è una web app `Next.js + Supabase` per generare, organizzare e distri
 
 ## 8) Open Risks & Notes
 
-- Fino a quando la migration nuova non è applicata, i log webhook su DB legacy possono fallire per vincolo `integration_id NOT NULL`.
-- Lint non verde: qualità statica parziale; build e typecheck però sono verdi.
+- Migration logs alignment applicata sull'ambiente corrente; se manca su altri ambienti (staging/prod), i log webhook possono fallire per vincolo `integration_id NOT NULL`.
+- Lint warning debt ancora aperto (`119` warning), soprattutto unused vars/import, `react-hooks/exhaustive-deps` e `no-img-element`.
 - Il warning Next su convenzione `middleware -> proxy` resta aperto.
+- `supabaseAdmin` ora fa fallback su anon key se `SUPABASE_SERVICE_ROLE_KEY` manca: evita errori runtime/TS ma può ridurre privilegi nei path admin/cron.
 
 ## 9) Immediate Execution Plan
 
-1. Applicare migration Supabase in tutti gli ambienti.
-2. Completare cleanup ESLint (soprattutto `no-explicit-any`, `require()` e rule React nuove).
-3. Implementare Slack/Discord channels come integrazioni notifiche preconfigurate (riuso engine webhook).
+1. Verificare migration Supabase anche su staging/production (se non già allineati).
+2. Implementare Slack/Discord channels come integrazioni notifiche preconfigurate (riuso engine webhook).
+3. Eseguire lint warning cleanup wave 2 (`unused-vars`, `exhaustive-deps`, `no-img-element`).

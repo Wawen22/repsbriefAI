@@ -3,7 +3,6 @@
 
 import { createClient } from "@/lib/supabase/server"
 import { exportToNotion } from "@/lib/integrations/notion"
-import { revalidatePath } from "next/cache"
 
 export async function exportStrategyToNotionAction(briefContent: string, title: string) {
   try {
@@ -49,8 +48,9 @@ export async function exportStrategyToNotionAction(briefContent: string, title: 
     }
 
     return { success: true, url: result.url }
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Unknown Notion export error"
     console.error("Export to Notion failed:", error)
-    return { success: false, error: error.message }
+    return { success: false, error: message }
   }
 }

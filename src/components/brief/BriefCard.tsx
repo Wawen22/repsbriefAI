@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { type ComponentType, type SVGProps, useState } from 'react'
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -26,7 +26,7 @@ import {
 
 // Simple helper for Source Icons
 const SourceBadge = ({ source }: { source: string }) => {
-  const configs: Record<string, { icon: any, color: string, label: string, bg: string }> = {
+  const configs: Record<string, { icon: ComponentType<SVGProps<SVGSVGElement>>; color: string; label: string; bg: string }> = {
     'reddit': { icon: Zap, color: 'text-orange-500', bg: 'bg-orange-500/10', label: 'Reddit' },
     'youtube': { icon: Youtube, color: 'text-red-500', bg: 'bg-red-500/10', label: 'YouTube' },
     'google-trends': { icon: TrendingUp, color: 'text-blue-500', bg: 'bg-blue-500/10', label: 'Trends' },
@@ -63,6 +63,12 @@ interface BriefCardProps {
   variant?: 'default' | 'compact'
 }
 
+type IdeaWithMeta = IdeaObject & {
+  id?: string
+  dbId?: string
+  approval_status?: 'draft' | 'pending' | 'approved' | 'rejected'
+}
+
 // Map formats to specific colors for better UI/UX
 const FORMAT_COLORS: Record<string, { bg: string, text: string, border: string }> = {
   'Reel': { bg: 'bg-pink-500/10', text: 'text-pink-400', border: 'border-pink-500/20' },
@@ -81,15 +87,16 @@ export function BriefCard({
   plan,
   variant = 'default' 
 }: BriefCardProps) {
+  const ideaWithMeta = idea as IdeaWithMeta
   const router = useRouter()
   const [isDeleting, setIsDeleting] = useState(false)
   const [isScheduleOpen, setIsScheduleOpen] = useState(false)
   const [isPerformanceOpen, setIsPerformanceOpen] = useState(false)
 
-  const ideaId = dbId || (idea as any).id || (idea as any).dbId
+  const ideaId = dbId || ideaWithMeta.id || ideaWithMeta.dbId
   const format = idea.format || 'Idea'
   const colors = FORMAT_COLORS[format] || FORMAT_COLORS['Strategy']
-  const approvalStatus = (idea as any).approval_status || 'draft'
+  const approvalStatus = ideaWithMeta.approval_status || 'draft'
 
   const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation()

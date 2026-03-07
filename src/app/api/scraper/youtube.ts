@@ -40,24 +40,29 @@ export async function scrapeYouTube(niche: NicheConfig): Promise<TrendItem[]> {
 
       const videoStats = statsResponse.data.items || []
 
-      const trends: TrendItem[] = videos.map((v, index) => {
-        const stats = videoStats.find(vs => vs.id === v.id?.videoId)
-        return {
-          id: v.id?.videoId!,
+      const trends: TrendItem[] = []
+      for (const video of videos) {
+        const videoId = video.id?.videoId
+        const snippet = video.snippet
+        if (!videoId || !snippet?.title || !snippet.publishedAt) continue
+
+        const stats = videoStats.find((videoStat) => videoStat.id === videoId)
+        trends.push({
+          id: videoId,
           source: 'youtube',
-          title: v.snippet?.title!,
-          url: `https://youtube.com/watch?v=${v.id?.videoId}`,
-          content: v.snippet?.description!,
+          title: snippet.title,
+          url: `https://youtube.com/watch?v=${videoId}`,
+          content: snippet.description || '',
           score: parseInt(stats?.statistics?.viewCount || '0'),
-          timestamp: v.snippet?.publishedAt!,
+          timestamp: snippet.publishedAt,
           metadata: {
-            channelTitle: v.snippet?.channelTitle,
+            channelTitle: snippet.channelTitle,
             tags: stats?.snippet?.tags,
             viewCount: stats?.statistics?.viewCount,
             likeCount: stats?.statistics?.likeCount,
           }
-        }
-      })
+        })
+      }
 
       allTrends = [...allTrends, ...trends]
     } catch (err) {

@@ -40,8 +40,9 @@ export default function SignupPage() {
       if (data?.user) {
         setSuccess(true)
       }
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Signup failed"
+      setError(message)
     } finally {
       setLoading(false)
     }
@@ -54,7 +55,7 @@ export default function SignupPage() {
           <CardHeader>
              <CheckCircle2 className="w-16 h-16 text-emerald-500 mx-auto mb-4" />
              <CardTitle className="text-2xl font-bold italic">Check your inbox!</CardTitle>
-             <CardDescription className="text-slate-400">We've sent a verification link to your email.</CardDescription>
+             <CardDescription className="text-slate-400">We&apos;ve sent a verification link to your email.</CardDescription>
           </CardHeader>
           <CardFooter className="flex justify-center">
              <Button variant="ghost" asChild>

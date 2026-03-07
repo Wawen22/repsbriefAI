@@ -1,0 +1,45 @@
+import { NextResponse } from 'next/server'
+import { stripe } from '@/lib/stripe'
+import { createClient } from '@/lib/supabase/server'
+
+function getAppBaseUrl(req: Request) {
+  if (process.env.NEXT_PUBLIC_APP_URL) return process.env.NEXT_PUBLIC_APP_URL
+  const reqUrl = new URL(req.url)
+  return `${reqUrl.protocol}//${reqUrl.host}`
+}
+
+export async function POST(req: Request) {
+  try {
+    const supabase = await createClient()
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser()
+
+    if (userError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('stripe_customer_id')
+      .eq('id', user.id)
+      .single()
+
+    if (!profile?.stripe_customer_id) {
+      return NextResponse.json({ error: 'No active billing profile found' }, { status: 400 })
+    }
+
+    const appBaseUrl = getAppBaseUrl(req)
+    const session = await stripe.billingPortal.sessions.create({
+      customer: profile.stripe_customer_id,
+      return_url: `${appBaseUrl}/dashboard/settings?tab=account`,
+    })
+
+    return NextResponse.json({ url: session.url })
+  } catch (err: unknown) {
+    const errorMessage = err instanceof Error ? err.message : 'Billing portal creation failed'
+    console.error('[Stripe Portal] Error:', err)
+    return NextResponse.json({ error: errorMessage }, { status: 500 })
+  }
+}

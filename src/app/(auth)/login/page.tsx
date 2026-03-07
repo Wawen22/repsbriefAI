@@ -33,8 +33,9 @@ export default function LoginPage() {
 
       if (error) throw error
       router.push("/dashboard")
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Login failed"
+      setError(message)
     } finally {
       setLoading(false)
     }
@@ -89,7 +90,7 @@ export default function LoginPage() {
               {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : "Sign In"}
             </Button>
             <p className="text-sm text-slate-500">
-              Don't have an account? <Link href="/signup" className="text-blue-500 hover:text-blue-400">Sign Up</Link>
+              Don&apos;t have an account? <Link href="/signup" className="text-blue-500 hover:text-blue-400">Sign Up</Link>
             </p>
           </CardFooter>
         </form>

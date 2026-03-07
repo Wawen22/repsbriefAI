@@ -10,15 +10,21 @@ interface BriefListProps {
   plan?: string
 }
 
+type IdeaWithMeta = IdeaObject & {
+  id?: string
+  idea_hash?: string
+}
+
 export function BriefList({ ideas, savedHashes, savedIdsMap, plan }: BriefListProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {ideas.map((idea, idx) => {
-        const hash = (idea as any).idea_hash || Buffer.from(idea.title.trim()).toString('base64').substring(0, 64)
+        const ideaWithMeta = idea as IdeaWithMeta
+        const hash = ideaWithMeta.idea_hash || Buffer.from(idea.title.trim()).toString('base64').substring(0, 64)
         const isSaved = savedHashes?.has(hash)
         
         // Use the mapped ID from history if available
-        const dbId = (idea as any).id || savedIdsMap?.get(hash)
+        const dbId = ideaWithMeta.id || savedIdsMap?.get(hash)
         
         return (
           <BriefCard 

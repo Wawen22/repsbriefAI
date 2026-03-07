@@ -25,6 +25,8 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
+type SourceIcon = React.ComponentType<React.SVGProps<SVGSVGElement>>
+
 const SAMPLE_IDEAS = [
   {
     title: "Why 10K Steps Is a Scam (And What Actually Works)",
@@ -94,7 +96,7 @@ const FORMAT_COLORS: Record<string, { bg: string, text: string, border: string }
 }
 
 const SourceBadge = ({ source }: { source: string }) => {
-  const configs: any = {
+  const configs: Record<string, { icon: SourceIcon; color: string; bg: string; label: string }> = {
     'reddit': { icon: Zap, color: 'text-orange-500', bg: 'bg-orange-500/10', label: 'Reddit' },
     'youtube': { icon: Youtube, color: 'text-red-500', bg: 'bg-red-500/10', label: 'YouTube' },
     'google-trends': { icon: TrendingUp, color: 'text-blue-500', bg: 'bg-blue-500/10', label: 'Trends' },

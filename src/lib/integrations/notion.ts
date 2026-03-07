@@ -6,6 +6,14 @@ const NOTION_CLIENT_SECRET = process.env.NOTION_CLIENT_SECRET
 const REDIRECT_URI = `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/notion/callback`
 const NOTION_VERSION = "2025-09-03"
 
+type NotionProperty = {
+  type?: string
+}
+
+type NotionParent =
+  | { type: "data_source_id"; data_source_id: string }
+  | { type: "page_id"; page_id: string }
+
 export const exchangeCodeForToken = async (code: string) => {
   const auth = Buffer.from(`${NOTION_CLIENT_ID}:${NOTION_CLIENT_SECRET}`).toString("base64")
 
@@ -84,7 +92,7 @@ export const getTitlePropertyName = async (accessToken: string, dataSourceId: st
   const data = await response.json()
   if (data.properties) {
     for (const [key, value] of Object.entries(data.properties)) {
-      if ((value as any).type === 'title') return key
+      if ((value as NotionProperty).type === 'title') return key
     }
   }
   return "title" // Fallback standard
@@ -107,7 +115,7 @@ export const exportToNotion = async (teamId: string, briefContent: string, title
 
   const { access_token } = integration.encrypted_credentials
   
-  let parent: any = null
+  let parent: NotionParent | null = null
   let titleProperty = "title"
 
   // 1. Identifichiamo il parent (Data Source o Page)
@@ -118,9 +126,11 @@ export const exportToNotion = async (teamId: string, briefContent: string, title
   } else {
     const firstAvailable = await findFirstAvailableParent(access_token)
     if (firstAvailable) {
-      parent = { type: firstAvailable.type, [firstAvailable.type]: firstAvailable.id }
       if (firstAvailable.type === 'data_source_id') {
+        parent = { type: 'data_source_id', data_source_id: firstAvailable.id }
         titleProperty = await getTitlePropertyName(access_token, firstAvailable.id)
+      } else {
+        parent = { type: 'page_id', page_id: firstAvailable.id }
       }
     }
   }

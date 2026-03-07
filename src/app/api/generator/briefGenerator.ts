@@ -116,16 +116,19 @@ function normalizeIdeaCandidate(candidate: unknown): IdeaObject | null {
 
   // Normalize sources
   let sources: ('reddit' | 'youtube' | 'google-trends' | 'rss')[] | undefined
+  const allowedSources = ['reddit', 'youtube', 'google-trends', 'rss'] as const
+  const isAllowedSource = (value: string): value is (typeof allowedSources)[number] =>
+    allowedSources.includes(value as (typeof allowedSources)[number])
   const rawSources = record.sources ?? record.source_list ?? record.sourceTrend
   if (Array.isArray(rawSources)) {
     sources = rawSources
       .filter((s): s is string => typeof s === 'string')
-      .map((s) => s.toLowerCase() as any)
-      .filter((s) => ['reddit', 'youtube', 'google-trends', 'rss'].includes(s))
+      .map((s) => s.toLowerCase())
+      .filter(isAllowedSource)
   } else if (typeof rawSources === 'string') {
     const s = rawSources.toLowerCase()
-    if (['reddit', 'youtube', 'google-trends', 'rss'].includes(s)) {
-      sources = [s as any]
+    if (isAllowedSource(s)) {
+      sources = [s]
     }
   }
 

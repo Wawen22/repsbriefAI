@@ -5,6 +5,9 @@ import { NICHES } from '@/config/niches'
 import { scrapeNiche } from '../../scraper'
 import { generateBrief } from '../../generator/briefGenerator'
 import { supabaseAdmin } from '@/lib/supabase'
+import { triggerWebhooks } from '@/lib/integrations/webhooks'
+import { sendBrief } from '../../email/sendBrief'
+import type { NicheConfig, TrendItem } from '@/types/niche'
 
 export const dynamic = 'force-dynamic'
 
@@ -20,12 +23,12 @@ export async function POST(req: Request) {
     totalNiches: 0,
     totalUsers: 0,
     success: 0,
-    failures: [] as any[],
+    failures: [] as Array<{ userId: string; error: string }>,
   }
 
   try {
     // 2. Get active niches
-    const activeNiches = Object.values(NICHES).filter(n => n.active)
+    const activeNiches = Object.values(NICHES).filter((niche): niche is NicheConfig => niche.active)
     results.totalNiches = activeNiches.length
 
     // 3. For each niche: scrape → cache
@@ -57,7 +60,7 @@ export async function POST(req: Request) {
 
         if (trendsError) throw trendsError
 
-        const allTrends = trends?.flatMap((t: { data: unknown[] }) => t.data) || []
+        const allTrends = (trends?.flatMap((trendRow: { data: TrendItem[] }) => trendRow.data) || []) as TrendItem[]
         
         // Get user's idea history
         const { data: history } = await supabaseAdmin
@@ -93,7 +96,6 @@ export async function POST(req: Request) {
         if (briefError) throw briefError
 
         // TRIGGER WEBHOOK
-        const { triggerWebhooks } = require('@/lib/integrations/webhooks')
         if (user.current_team_id) {
           await triggerWebhooks(user.current_team_id, 'brief.ready', {
             week_date: weekDate,
@@ -104,7 +106,6 @@ export async function POST(req: Request) {
 
         // 6. Send email via Resend
         if (process.env.RESEND_API_KEY) {
-          const { sendBrief } = require('../../email/sendBrief')
           // Recuperiamo il nome utente se disponibile (metadata di auth o tabella profiles)
           const userName = user.full_name || 'Creator'
           await sendBrief(user.email, briefData, niche, userName)
@@ -124,15 +125,17 @@ export async function POST(req: Request) {
         )
 
         results.success++
-      } catch (userErr: any) {
+      } catch (userErr: unknown) {
+        const message = userErr instanceof Error ? userErr.message : 'Unknown user processing error'
         console.error(`[Cron] Failure for user ${user.id}:`, userErr)
-        results.failures.push({ userId: user.id, error: userErr.message })
+        results.failures.push({ userId: user.id, error: message })
       }
     }
 
     return NextResponse.json(results)
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Unknown cron error'
     console.error(`[Cron] Global failure:`, err)
-    return NextResponse.json({ error: err.message }, { status: 500 })
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }

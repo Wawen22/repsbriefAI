@@ -24,5 +24,6 @@
   - [x] Google Calendar Integration: OAuth flow + Bulk Sync + Studio Integration.
   - [x] Webhooks Engine: Zapier/Make compatible system with HMAC signatures.
   - [x] Strategic Studio: Added Save as PDF, Markdown and Export to Integrations.
+  - [x] Settings Integrations UX Fix: Zapier/Webhooks "Connected" status now reflects real team webhooks, with improved management visibility.
 
 ... (rest of file)

@@ -1,8 +1,8 @@
 // src/components/settings/IntegrationsSettings.tsx
 'use client'
 
-import { useState, useEffect } from "react"
-import { Calendar, CheckCircle2, Circle, ExternalLink, Globe, Layout, Link2, MoreHorizontal, Plus, AlertCircle, Settings } from "lucide-react"
+import { useState, useEffect, useMemo, useCallback } from "react"
+import { Calendar, Globe, Layout, Link2, Plus, AlertCircle, Settings } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card } from "@/components/ui/card"
@@ -13,7 +13,16 @@ interface Integration {
   id: string
   provider: string
   status: 'active' | 'error' | 'expired'
-  settings: any
+  settings: Record<string, unknown> | null
+  updated_at: string
+}
+
+interface TeamWebhook {
+  id: string
+  name: string | null
+  url: string
+  events: string[]
+  active: boolean
   updated_at: string
 }
 
@@ -52,20 +61,14 @@ import { Trash2, Send } from "lucide-react"
 
 export function IntegrationsSettings() {
   const [integrations, setIntegrations] = useState<Integration[]>([])
-  const [webhooks, setWebhooks] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
+  const [webhooks, setWebhooks] = useState<TeamWebhook[]>([])
   const [showWebhooks, setShowWebhooks] = useState(false)
   const [newWebhookUrl, setNewWebhookUrl] = useState("")
   const [newWebhookName, setNewWebhookName] = useState("")
   const [teamId, setTeamId] = useState<string | null>(null)
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
-  useEffect(() => {
-    fetchIntegrations()
-    fetchWebhooks()
-  }, [])
-
-  const fetchIntegrations = async () => {
+  const fetchIntegrations = useCallback(async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
@@ -88,24 +91,34 @@ export function IntegrationsSettings() {
       setIntegrations(data || [])
     } catch (error) {
       console.error('Error fetching integrations:', error)
-    } finally {
-      setLoading(false)
     }
-  }
+  }, [supabase])
 
-  const fetchWebhooks = async () => {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
-    const { data: profile } = await supabase.from('profiles').select('current_team_id').eq('id', user.id).single()
-    if (!profile?.current_team_id) return
+  const fetchWebhooks = useCallback(async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+      const { data: profile } = await supabase.from('profiles').select('current_team_id').eq('id', user.id).single()
+      if (!profile?.current_team_id) return
+      setTeamId(profile.current_team_id)
 
-    const { data } = await supabase
-      .from('team_webhooks')
-      .select('*')
-      .eq('team_id', profile.current_team_id)
-    
-    setWebhooks(data || [])
-  }
+      const { data } = await supabase
+        .from('team_webhooks')
+        .select('*')
+        .eq('team_id', profile.current_team_id)
+      
+      const hooks = (data || []) as TeamWebhook[]
+      setWebhooks(hooks)
+      setShowWebhooks(hooks.length > 0)
+    } catch (error) {
+      console.error('Error fetching webhooks:', error)
+    }
+  }, [supabase])
+
+  useEffect(() => {
+    fetchIntegrations()
+    fetchWebhooks()
+  }, [fetchIntegrations, fetchWebhooks])
 
   const handleConnect = async (providerId: string) => {
     if (providerId === 'notion') {
@@ -113,7 +126,11 @@ export function IntegrationsSettings() {
     } else if (providerId === 'google_calendar') {
       await connectGoogle()
     } else if (providerId === 'zapier') {
-      setShowWebhooks(!showWebhooks)
+      if (webhooks.length > 0) {
+        setShowWebhooks(true)
+        return
+      }
+      setShowWebhooks((prev) => !prev)
     } else {
       toast.info(`L'integrazione con ${providerId} sarà disponibile a breve.`)
     }
@@ -149,14 +166,30 @@ export function IntegrationsSettings() {
     if (!teamId) return
     const tid = toast.loading("Sending test payload...")
     const res = await testWebhookAction(teamId, id)
-    toast.success("Test sent!", { id: tid })
+    if (res?.success) {
+      toast.success("Test sent!", { id: tid })
+      return
+    }
+
+    toast.error(res?.error || "Unable to send test payload", { id: tid })
   }
+
+  const activeWebhooksCount = webhooks.filter((webhook) => webhook.active).length
 
   return (
     <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-2">
         {AVAILABLE_PROVIDERS.map((provider) => {
-          const connected = integrations.find(i => i.provider === provider.id)
+          const integration = integrations.find(i => i.provider === provider.id)
+          const isWebhookProvider = provider.id === "zapier"
+          const connected = isWebhookProvider ? webhooks.length > 0 : Boolean(integration)
+          const lastSyncLabel = isWebhookProvider
+            ? connected
+              ? `${activeWebhooksCount}/${webhooks.length} webhook attivi`
+              : "Not connected"
+            : integration
+              ? `Ultimo sync: ${new Date(integration.updated_at).toLocaleDateString()}`
+              : "Not connected"
           const Icon = provider.icon
 
           return (
@@ -167,32 +200,31 @@ export function IntegrationsSettings() {
                     <Icon className={`h-6 w-6 ${provider.color}`} />
                   </div>
                   <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-bold text-white">{provider.name}</h3>
-                      {connected && (
-                        <Badge className="bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30">
-                          Connected
-                        </Badge>
-                      )}
-                    </div>
-                    <p className="text-sm text-slate-400 leading-relaxed">
-                      {provider.description}
-                    </p>
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-bold text-white">{provider.name}</h3>
+                    {connected && !isWebhookProvider && (
+                      <Badge className="bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30">
+                        Connected
+                      </Badge>
+                    )}
+                    {connected && isWebhookProvider && (
+                      <Badge className="bg-orange-500/20 text-orange-300 hover:bg-orange-500/30">
+                        {webhooks.length} webhook{webhooks.length > 1 ? "s" : ""}
+                      </Badge>
+                    )}
+                  </div>
+                  <p className="text-sm text-slate-400 leading-relaxed">
+                    {provider.description}
+                  </p>
                   </div>
                 </div>
               </div>
 
               <div className="mt-6 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  {connected ? (
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
-                      Ultimo sync: {new Date(connected.updated_at).toLocaleDateString()}
-                    </span>
-                  ) : (
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
-                      Not connected
-                    </span>
-                  )}
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                    {lastSyncLabel}
+                  </span>
                 </div>
                 
                 <Button
@@ -204,7 +236,7 @@ export function IntegrationsSettings() {
                   {connected ? (
                     <>
                       <Settings className="mr-2 h-4 w-4" />
-                      Manage
+                      {isWebhookProvider && !showWebhooks ? "View" : "Manage"}
                     </>
                   ) : (
                     <>
@@ -215,10 +247,10 @@ export function IntegrationsSettings() {
                 </Button>
               </div>
 
-              {connected?.status === 'error' && (
+              {integration?.status === 'error' && (
                 <div className="mt-4 flex items-center gap-2 rounded-xl border border-red-500/20 bg-red-500/10 p-3 text-xs text-red-400">
                   <AlertCircle className="h-4 w-4" />
-                  <span>Errore di autenticazione. Riconnetti l'account.</span>
+                  <span>Errore di autenticazione. Riconnetti l&apos;account.</span>
                 </div>
               )}
             </Card>
@@ -304,7 +336,7 @@ export function IntegrationsSettings() {
           <div className="rounded-xl bg-purple-500/10 p-2">
             <Link2 className="h-5 w-5 text-purple-400" />
           </div>
-          <h3 className="text-lg font-bold text-white">Richiedi un'integrazione</h3>
+          <h3 className="text-lg font-bold text-white">Richiedi un&apos;integrazione</h3>
         </div>
         <p className="text-sm text-slate-400 mb-6">
           Il tuo team usa un tool che non è ancora in lista? Faccelo sapere e lo aggiungeremo alla roadmap.

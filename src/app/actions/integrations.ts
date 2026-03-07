@@ -3,7 +3,6 @@
 
 import { getNotionAuthUrl } from "@/lib/integrations/notion-client"
 import { getGoogleAuthUrl } from "@/lib/integrations/google-client"
-import { getSlackAuthUrl } from "@/lib/integrations/slack-client"
 import { createClient } from "@/lib/supabase/client"
 import { toast } from "sonner"
 
@@ -84,11 +83,6 @@ export async function connectSlack() {
     return
   }
 
-  try {
-    const authUrl = getSlackAuthUrl(profile.current_team_id)
-    window.location.href = authUrl
-  } catch (error) {
-    console.error("Slack OAuth setup error:", error)
-    toast.error("Slack OAuth non configurato correttamente.")
-  }
+  const startUrl = `/api/auth/slack/start?team_id=${encodeURIComponent(profile.current_team_id)}`
+  window.location.href = startUrl
 }

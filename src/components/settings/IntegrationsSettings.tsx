@@ -43,6 +43,7 @@ interface TeamWebhook {
 }
 
 type WebhookChannel = 'generic' | 'slack'
+type TeamRole = 'owner' | 'admin' | 'member'
 
 const DEFAULT_EVENTS = ['idea.approved', 'brief.ready', 'content.scheduled']
 
@@ -95,52 +96,72 @@ export function IntegrationsSettings() {
   const [newSlackWebhookUrl, setNewSlackWebhookUrl] = useState("")
   const [newSlackWebhookName, setNewSlackWebhookName] = useState("")
   const [teamId, setTeamId] = useState<string | null>(null)
+  const [canManageIntegrations, setCanManageIntegrations] = useState<boolean | null>(null)
   const supabase = useMemo(() => createClient(), [])
+
+  const resolveTeamContext = useCallback(async () => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return null
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('current_team_id')
+      .eq('id', user.id)
+      .single()
+
+    if (!profile?.current_team_id) return null
+    setTeamId(profile.current_team_id)
+
+    const { data: membership } = await supabase
+      .from('team_members')
+      .select('role')
+      .eq('team_id', profile.current_team_id)
+      .eq('user_id', user.id)
+      .maybeSingle()
+
+    const role = membership?.role as TeamRole | undefined
+    const canManage = role === 'owner' || role === 'admin'
+    setCanManageIntegrations(canManage)
+
+    return { teamId: profile.current_team_id, canManage }
+  }, [supabase])
 
   const fetchIntegrations = useCallback(async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
-
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('current_team_id')
-        .eq('id', user.id)
-        .single()
-
-      if (!profile?.current_team_id) return
-      setTeamId(profile.current_team_id)
+      const context = await resolveTeamContext()
+      if (!context) return
+      if (!context.canManage) {
+        setIntegrations([])
+        return
+      }
 
       const { data, error } = await supabase
         .from('team_integrations')
-        .select('*')
-        .eq('team_id', profile.current_team_id)
+        .select('id, provider, status, settings, updated_at')
+        .eq('team_id', context.teamId)
 
       if (error) throw error
       setIntegrations(data || [])
     } catch (error) {
       console.error('Error fetching integrations:', error)
     }
-  }, [supabase])
+  }, [resolveTeamContext, supabase])
 
   const fetchWebhooks = useCallback(async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
-
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('current_team_id')
-        .eq('id', user.id)
-        .single()
-
-      if (!profile?.current_team_id) return
-      setTeamId(profile.current_team_id)
+      const context = await resolveTeamContext()
+      if (!context) return
+      if (!context.canManage) {
+        setWebhooks([])
+        setShowWebhooks(false)
+        setShowSlack(false)
+        return
+      }
 
       const { data } = await supabase
         .from('team_webhooks')
-        .select('*')
-        .eq('team_id', profile.current_team_id)
+        .select('id, name, url, events, active, channel, updated_at')
+        .eq('team_id', context.teamId)
 
       const hooks = (data || []) as TeamWebhook[]
       const hasGeneric = hooks.some((hook) => normalizeWebhookChannel(hook.channel) === 'generic')
@@ -152,7 +173,7 @@ export function IntegrationsSettings() {
     } catch (error) {
       console.error('Error fetching webhooks:', error)
     }
-  }, [supabase])
+  }, [resolveTeamContext, supabase])
 
   useEffect(() => {
     fetchIntegrations()
@@ -172,6 +193,11 @@ export function IntegrationsSettings() {
   const activeSlackWebhooksCount = slackWebhooks.filter((webhook) => webhook.active).length
 
   const handleConnect = async (providerId: string) => {
+    if (canManageIntegrations === false) {
+      toast.error("Solo owner/admin possono gestire integrazioni.")
+      return
+    }
+
     if (providerId === 'notion') {
       await connectNotion()
       return
@@ -207,6 +233,10 @@ export function IntegrationsSettings() {
   }
 
   const handleAddWebhook = async () => {
+    if (canManageIntegrations === false) {
+      toast.error("Solo owner/admin possono gestire integrazioni.")
+      return
+    }
     if (!teamId || !newWebhookUrl) return
 
     const res = await addWebhookAction(
@@ -229,6 +259,10 @@ export function IntegrationsSettings() {
   }
 
   const handleAddSlackWebhook = async () => {
+    if (canManageIntegrations === false) {
+      toast.error("Solo owner/admin possono gestire integrazioni.")
+      return
+    }
     if (!teamId || !newSlackWebhookUrl) return
 
     const res = await addWebhookAction(
@@ -251,6 +285,10 @@ export function IntegrationsSettings() {
   }
 
   const handleDeleteWebhook = async (id: string, channel: WebhookChannel) => {
+    if (canManageIntegrations === false) {
+      toast.error("Solo owner/admin possono gestire integrazioni.")
+      return
+    }
     const res = await deleteWebhookAction(id)
     if (res.success) {
       const label = channel === 'slack' ? 'Slack channel' : 'Webhook'
@@ -260,11 +298,19 @@ export function IntegrationsSettings() {
   }
 
   const handleToggleWebhook = async (id: string, active: boolean) => {
+    if (canManageIntegrations === false) {
+      toast.error("Solo owner/admin possono gestire integrazioni.")
+      return
+    }
     const res = await toggleWebhookAction(id, active)
     if (res.success) fetchWebhooks()
   }
 
   const handleTestWebhook = async (id: string, channel: WebhookChannel) => {
+    if (canManageIntegrations === false) {
+      toast.error("Solo owner/admin possono gestire integrazioni.")
+      return
+    }
     if (!teamId) return
     const tid = toast.loading(channel === 'slack' ? "Sending Slack test..." : "Sending test payload...")
     const res = await testWebhookAction(teamId, id)
@@ -279,6 +325,12 @@ export function IntegrationsSettings() {
 
   return (
     <div className="space-y-6">
+      {canManageIntegrations === false && (
+        <Card className="border-amber-500/20 bg-amber-500/10 p-4 text-sm text-amber-100">
+          Solo owner/admin del workspace possono collegare o modificare integrazioni.
+        </Card>
+      )}
+
       <div className="grid gap-4 md:grid-cols-2">
         {AVAILABLE_PROVIDERS.map((provider) => {
           const integration = integrations.find((item) => item.provider === provider.id)
@@ -347,6 +399,7 @@ export function IntegrationsSettings() {
                   variant={connected ? "outline" : "default"}
                   size="sm"
                   onClick={() => handleConnect(provider.id)}
+                  disabled={canManageIntegrations === false}
                   className={connected ? "border-white/10 bg-white/5 hover:bg-white/10" : "bg-white text-black hover:bg-slate-200"}
                 >
                   {connected ? (

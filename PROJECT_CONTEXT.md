@@ -43,11 +43,13 @@ RepsBrief è una web app `Next.js + Supabase` per generare, organizzare e distri
   - [x] Lint stabilization wave 1 (errori bloccanti risolti; warning debt aperto)
   - [x] Slack notification channel pre-formattato (riuso webhook engine + payload Slack blocks)
   - [x] Slack OAuth integration (login Slack no-code + webhook bootstrap automatico)
+  - [x] Slack OAuth security hardening (`state` nonce cookie + start route server-side)
+  - [x] Integrations/Webhooks hardening (RLS admin-only + guard server actions)
   - [ ] Discord notification channel pre-formattato
 
 ## 5) Task Status Tracking
 
-- [x] **Current Task (completed):** Slack OAuth fast-path (connect from Settings + callback + auto-create webhook) (2026-03-07)
+- [x] **Current Task (completed):** Slack integration security hardening (OAuth CSRF protection + RBAC tightening) (2026-03-07)
 - [ ] **Next Task:** OAuth-first blueprint per integrazioni future (Discord incluso) + lint warning cleanup wave 2
 
 ### Completed Milestones
@@ -82,6 +84,8 @@ RepsBrief è una web app `Next.js + Supabase` per generare, organizzare e distri
 - [x] Slack OAuth callback (`/api/auth/slack/callback`) con bootstrap webhook automatico
 - [x] Slack OAuth redirect hardening (usa `NEXT_PUBLIC_APP_URL` per evitare mismatch http/https)
 - [x] Slack OAuth mismatch fallback (authorize/token exchange senza `redirect_uri` esplicito)
+- [x] Slack OAuth start route (`/api/auth/slack/start`) con nonce HttpOnly anti-CSRF
+- [x] Webhook actions con role-check esplicito owner/admin
 
 ## 6) Validation Snapshot (2026-03-07)
 
@@ -100,6 +104,10 @@ RepsBrief è una web app `Next.js + Supabase` per generare, organizzare e distri
   - aggiunge `channel` su `team_webhooks` (`generic` | `slack`)
   - backfill `generic` su record esistenti
   - check constraint e indice su `(team_id, channel, active)`
+- Added: `supabase/migrations/20260307183000_harden_integrations_webhooks_rls.sql`
+  - rimuove lettura member-wide su `team_integrations`
+  - impone policy admin-only su `team_integrations` e `team_webhooks`
+  - aggiunge `WITH CHECK` esplicito per create/update sicuri
 
 ## 8) Open Risks & Notes
 
@@ -107,6 +115,7 @@ RepsBrief è una web app `Next.js + Supabase` per generare, organizzare e distri
 - Se la migration `add_channel_to_team_webhooks` non e' applicata in staging/prod, la creazione canali Slack fallisce (`column channel does not exist`).
 - Setup Slack via webhook funziona ma ha frizione per utenti non tecnici; prioritario introdurre OAuth Slack con UX guidata.
 - Slack OAuth richiede configurazione Redirect URL corretta in Slack App (`/api/auth/slack/callback`) su ogni ambiente.
+- Le chiavi Slack condivise durante setup vanno ruotate dopo il test (igiene segreti).
 - Lint warning debt ancora aperto (`118` warning), soprattutto unused vars/import, `react-hooks/exhaustive-deps` e `no-img-element`.
 - Il warning Next su convenzione `middleware -> proxy` resta aperto.
 - `supabaseAdmin` ora fa fallback su anon key se `SUPABASE_SERVICE_ROLE_KEY` manca: evita errori runtime/TS ma può ridurre privilegi nei path admin/cron.

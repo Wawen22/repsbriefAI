@@ -20,10 +20,6 @@ type SlackOAuthResponse = {
   }
 }
 
-export function getSlackRedirectUri(baseUrl: string) {
-  return `${baseUrl}/api/auth/slack/callback`
-}
-
 export async function exchangeCodeForSlackToken(code: string, redirectUri?: string) {
   if (!SLACK_CLIENT_ID || !SLACK_CLIENT_SECRET) {
     throw new Error("Slack OAuth env vars mancanti.")

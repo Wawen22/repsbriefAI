@@ -40,6 +40,9 @@ export async function exportStrategyToNotionAction(briefContent: string, title: 
       await supabase.from('team_integration_logs').insert({
         team_id: profile.current_team_id,
         integration_id: integration.id,
+        provider: 'notion',
+        action: 'export_success',
+        status: 'success',
         event_type: 'export_success',
         details: { page_id: result.id, title }
       })

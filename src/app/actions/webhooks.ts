@@ -2,7 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
-import { triggerWebhooks, WebhookEvent } from "@/lib/integrations/webhooks"
+import { triggerWebhooks } from "@/lib/integrations/webhooks"
 
 export async function addWebhookAction(teamId: string, url: string, name: string, events: string[]) {
   const supabase = await createClient()
@@ -54,10 +54,16 @@ export async function testWebhookAction(teamId: string, webhookId: string) {
     triggered_at: new Date().toISOString()
   }
 
-  // Chiamiamo direttamente l'engine per questo specifico webhook
-  // Per semplicità usiamo triggerWebhooks filtrando per ID se volessimo, 
-  // ma qui facciamo un invio secco per il test.
-  
-  // Riutilizziamo la logica di triggerWebhooks ma per un singolo URL
-  return await triggerWebhooks(teamId, 'idea.approved', testPayload)
+  const deliveries = await triggerWebhooks(teamId, 'idea.approved', testPayload, webhookId)
+  if (!deliveries.length) return { success: false, error: "Nessun webhook attivo da testare" }
+
+  const hasSuccess = deliveries.some(
+    (result) => result.status === 'fulfilled' && result.value === true
+  )
+
+  if (!hasSuccess) {
+    return { success: false, error: "Test fallito: endpoint non raggiungibile o risposta non valida" }
+  }
+
+  return { success: true }
 }

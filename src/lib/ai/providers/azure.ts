@@ -112,9 +112,13 @@ export class AzureProvider implements AIProvider {
 
   private async requestCompletion(modelName: string, messages: AIMessage[], options?: AIOptions) {
     const isGpt5 = this.isGpt5Model(modelName)
-    const payload: Record<string, unknown> = {
+    const payload: OpenAI.Chat.ChatCompletionCreateParamsNonStreaming = {
       model: modelName,
-      messages,
+      stream: false,
+      messages: messages.map((message) => ({
+        role: message.role,
+        content: message.content,
+      })),
     }
 
     if (isGpt5) {
@@ -129,16 +133,12 @@ export class AzureProvider implements AIProvider {
     }
 
     try {
-      return await this.client.chat.completions.create(
-        payload as OpenAI.Chat.ChatCompletionCreateParams
-      )
+      return await this.client.chat.completions.create(payload)
     } catch (error) {
       if (this.isUnsupportedParameterError(error, 'response_format') && options?.jsonMode) {
         const retryPayload = { ...payload }
         delete retryPayload.response_format
-        return await this.client.chat.completions.create(
-          retryPayload as OpenAI.Chat.ChatCompletionCreateParams
-        )
+        return await this.client.chat.completions.create(retryPayload)
       }
       throw error
     }
@@ -146,7 +146,7 @@ export class AzureProvider implements AIProvider {
 
   async complete(messages: AIMessage[], options?: AIOptions): Promise<AIResponse> {
     let usedModel = this.model
-    let response
+    let response: OpenAI.Chat.ChatCompletion
 
     try {
       response = await this.requestCompletion(usedModel, messages, options)

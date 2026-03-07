@@ -20,8 +20,16 @@ import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
 
+interface TeamSummary {
+  id: string
+  name: string
+  logo_url?: string | null
+  primary_color?: string | null
+  role?: string
+}
+
 export function TeamSwitcher() {
-  const [teams, setTeams] = useState<any[]>([])
+  const [teams, setTeams] = useState<TeamSummary[]>([])
   const [currentTeamId, setCurrentTeamId] = useState<string | null>(null)
   const [isOpen, setIsOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
@@ -29,7 +37,7 @@ export function TeamSwitcher() {
   useEffect(() => {
     async function load() {
       const res = await getUserTeamsAction()
-      setTeams(res.teams)
+      setTeams(res.teams ?? [])
       setCurrentTeamId(res.currentTeamId)
       setIsLoading(false)
     }

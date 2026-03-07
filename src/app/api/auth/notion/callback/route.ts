@@ -64,6 +64,9 @@ export async function GET(req: NextRequest) {
       await supabase.from('team_integration_logs').insert({
         team_id: state,
         integration_id: integration.id,
+        provider: 'notion',
+        action: 'auth_success',
+        status: 'success',
         event_type: 'auth_success',
         details: { workspace_name }
       })

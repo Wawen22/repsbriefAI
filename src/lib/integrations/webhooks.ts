@@ -9,18 +9,29 @@ export type WebhookEvent = 'brief.ready' | 'idea.approved' | 'content.scheduled'
 /**
  * Funzione core per scatenare i Webhooks di un team per un determinato evento
  */
-export const triggerWebhooks = async (teamId: string, event: WebhookEvent, payload: any) => {
+export const triggerWebhooks = async (
+  teamId: string,
+  event: WebhookEvent,
+  payload: unknown,
+  webhookId?: string
+) => {
   const supabase = await createClient()
 
   // 1. Recupero i webhooks attivi per questo team che ascoltano questo evento
-  const { data: webhooks, error } = await supabase
+  let query = supabase
     .from('team_webhooks')
     .select('*')
     .eq('team_id', teamId)
     .eq('active', true)
     .contains('events', [event])
 
-  if (error || !webhooks || webhooks.length === 0) return
+  if (webhookId) {
+    query = query.eq('id', webhookId)
+  }
+
+  const { data: webhooks, error } = await query
+
+  if (error || !webhooks || webhooks.length === 0) return []
 
   // 2. Invio asincrono a tutti gli endpoint
   const results = await Promise.allSettled(webhooks.map(async (webhook) => {
@@ -56,22 +67,25 @@ export const triggerWebhooks = async (teamId: string, event: WebhookEvent, paylo
         provider: 'webhook',
         action: event,
         status: response.ok ? 'success' : 'error',
-        details: { 
-          url: webhook.url, 
+        event_type: event,
+        details: {
+          url: webhook.url,
           status_code: response.status,
           webhook_id: webhook.id
         }
       })
 
       return response.ok
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Unknown webhook delivery error'
       console.error(`Webhook delivery failed for ${webhook.url}:`, err)
       await supabase.from('team_integration_logs').insert({
         team_id: teamId,
         provider: 'webhook',
         action: event,
         status: 'error',
-        details: { url: webhook.url, error: err.message, webhook_id: webhook.id }
+        event_type: event,
+        details: { url: webhook.url, error: message, webhook_id: webhook.id }
       })
       return false
     }

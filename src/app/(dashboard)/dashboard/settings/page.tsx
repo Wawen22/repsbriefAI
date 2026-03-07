@@ -1,11 +1,12 @@
 // src/app/(dashboard)/dashboard/settings/page.tsx
 
 import { redirect } from "next/navigation"
-import { Fingerprint, Settings, ShieldCheck, Target, Users, User, Link2 } from "lucide-react"
+import { Fingerprint, ShieldCheck, Target, Users, User, Link2, Activity } from "lucide-react"
 import { BrandVoiceSettings } from "@/components/settings/BrandVoiceSettings"
 import { NicheSwitcher } from "@/components/settings/NicheSwitcher"
 import { TeamWorkspaceSettings } from "@/components/settings/TeamWorkspaceSettings"
 import { IntegrationsSettings } from "@/components/settings/IntegrationsSettings"
+import { AutomationLogsSettings } from "@/components/settings/AutomationLogsSettings"
 import { LogoutButton } from "@/components/ui/LogoutButton"
 import { UpgradeToProButton } from "@/components/settings/UpgradeToProButton"
 import { Badge } from "@/components/ui/badge"
@@ -123,6 +124,10 @@ export default async function SettingsPage({
             <Link2 className="h-4 w-4" />
             Integrations
           </TabsTrigger>
+          <TabsTrigger value="automation-logs" className={triggerClasses}>
+            <Activity className="h-4 w-4" />
+            Automation Logs
+          </TabsTrigger>
         </TabsList>
 
         {/* ─── Account ─── */}
@@ -224,6 +229,20 @@ export default async function SettingsPage({
             </p>
           </div>
           <IntegrationsSettings />
+        </TabsContent>
+
+        {/* ─── Automation Logs ─── */}
+        <TabsContent value="automation-logs" className="mt-5 rounded-3xl border border-white/[0.06] bg-white/[0.02] p-6 md:p-8">
+          <div className="mb-6 space-y-1">
+            <div className="flex items-center gap-2 text-slate-300">
+              <Activity className="h-4 w-4 text-blue-400" />
+              <h2 className="text-lg font-semibold text-white">Automation Logs</h2>
+            </div>
+            <p className="text-sm text-slate-500">
+              Monitora tutte le esportazioni e notifiche inviate dal tuo workspace.
+            </p>
+          </div>
+          <AutomationLogsSettings />
         </TabsContent>
       </Tabs>
     </div>

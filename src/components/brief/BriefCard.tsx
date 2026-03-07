@@ -84,6 +84,7 @@ export function BriefCard({
   const router = useRouter()
   const [isDeleting, setIsDeleting] = useState(false)
   const [isScheduleOpen, setIsScheduleOpen] = useState(false)
+  const [isPerformanceOpen, setIsPerformanceOpen] = useState(false)
 
   const ideaId = dbId || (idea as any).id || (idea as any).dbId
   const format = idea.format || 'Idea'
@@ -120,13 +121,13 @@ export function BriefCard({
     }
   }
 
-  // Helper for approval indicator
-  const ApprovalIndicator = () => {
-    if (approvalStatus === 'approved') return <ShieldCheck className="w-3 h-3 text-emerald-400" />
-    if (approvalStatus === 'pending') return <Clock className="w-3 h-3 text-amber-400 animate-pulse" />
-    if (approvalStatus === 'rejected') return <AlertCircle className="w-3 h-3 text-rose-400" />
-    return null
-  }
+  const approvalIndicator = approvalStatus === 'approved'
+    ? <ShieldCheck className="w-3 h-3 text-emerald-400" />
+    : approvalStatus === 'pending'
+      ? <Clock className="w-3 h-3 text-amber-400 animate-pulse" />
+      : approvalStatus === 'rejected'
+        ? <AlertCircle className="w-3 h-3 text-rose-400" />
+        : null
 
   // --- COMPACT VARIANT (For Kanban/Saved Ideas) ---
   if (variant === 'compact') {
@@ -142,10 +143,22 @@ export function BriefCard({
                 {format}
               </Badge>
               {idea.sources?.map(s => <SourceBadge key={s} source={s} />)}
-              <ApprovalIndicator />
+              {approvalIndicator}
             </div>
             <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-               <PerformanceModal idea={idea} />
+               {ideaId && (
+                 <Button
+                   variant="ghost"
+                   size="icon"
+                   className="h-6 w-6 rounded-md text-slate-600 hover:text-emerald-400 hover:bg-emerald-500/10"
+                   onClick={(e) => {
+                     e.stopPropagation()
+                     setIsPerformanceOpen(true)
+                   }}
+                 >
+                   <Star className="w-3 h-3" />
+                 </Button>
+               )}
                <Button 
                   variant="ghost" 
                   size="icon" 
@@ -209,6 +222,14 @@ export function BriefCard({
           script: idea.scriptDraft
         }}
       />
+      {ideaId && (
+        <PerformanceModal
+          ideaId={ideaId}
+          title={idea.title}
+          isOpen={isPerformanceOpen}
+          onClose={() => setIsPerformanceOpen(false)}
+        />
+      )}
       
       <Card className="group bg-white/[0.03] border-white/5 hover:border-white/10 transition-all duration-500 rounded-[2.5rem] overflow-hidden text-left flex flex-col h-full relative">
         <CardContent className="p-0 text-left flex-1 flex flex-col">
@@ -239,7 +260,19 @@ export function BriefCard({
                       <Trash2 className="w-4 h-4" />
                     </Button>
                  )}
-                 {ideaId && <PerformanceModal idea={idea} />}
+                 {ideaId && (
+                   <Button
+                     variant="ghost"
+                     size="icon"
+                     className="h-8 w-8 rounded-full text-slate-500 hover:text-emerald-400 hover:bg-emerald-500/10"
+                     onClick={(e) => {
+                       e.stopPropagation()
+                       setIsPerformanceOpen(true)
+                     }}
+                   >
+                     <Star className="w-4 h-4" />
+                   </Button>
+                 )}
               </div>
             </div>
             {/* Title: Now clickable to navigate to Studio */}

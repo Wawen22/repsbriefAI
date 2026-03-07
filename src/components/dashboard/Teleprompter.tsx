@@ -34,10 +34,21 @@ export function Teleprompter({ title, script, onClose }: TeleprompterProps) {
   const [speed, setSpeed] = useState(30) // 1-100
   const [fontSize, setFontSize] = useState(42) // px
   const scrollRef = useRef<HTMLDivElement>(null)
-  const requestRef = useRef<number>(null)
-  const lastTimeRef = useRef<number>(null)
+  const requestRef = useRef<number | null>(null)
+  const lastTimeRef = useRef<number | null>(null)
   const scrollPosRef = useRef<number>(0)
   const [isMounted, setIsMounted] = useState(false)
+
+  function animate(time: number) {
+    if (lastTimeRef.current !== null && isPlaying && scrollRef.current) {
+      const deltaTime = time - lastTimeRef.current
+      const increment = (speed / 40) * (deltaTime / 16.67)
+      scrollPosRef.current += increment
+      scrollRef.current.scrollTop = scrollPosRef.current
+    }
+    lastTimeRef.current = time
+    requestRef.current = requestAnimationFrame(animate)
+  }
 
   useEffect(() => {
     setIsMounted(true)
@@ -47,22 +58,11 @@ export function Teleprompter({ title, script, onClose }: TeleprompterProps) {
 
     requestRef.current = requestAnimationFrame(animate)
     return () => {
-      if (requestRef.current) cancelAnimationFrame(requestRef.current)
+      if (requestRef.current !== null) cancelAnimationFrame(requestRef.current)
       // Restore Command Palette indicator
       if (cmdPill) cmdPill.style.display = 'block'
     }
   }, [isPlaying, speed])
-
-  const animate = (time: number) => {
-    if (lastTimeRef.current !== undefined && isPlaying && scrollRef.current) {
-      const deltaTime = time - lastTimeRef.current
-      const increment = (speed / 40) * (deltaTime / 16.67) 
-      scrollPosRef.current += increment
-      scrollRef.current.scrollTop = scrollPosRef.current
-    }
-    lastTimeRef.current = time
-    requestRef.current = requestAnimationFrame(animate)
-  }
 
   const startWithCountdown = () => {
     if (isPlaying) {

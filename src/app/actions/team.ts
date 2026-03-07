@@ -39,7 +39,7 @@ export async function switchTeamAction(teamId: string) {
 export async function getUserTeamsAction() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { data: [], currentTeamId: null }
+  if (!user) return { teams: [], currentTeamId: null, plan: 'starter' }
 
   const { data: profile } = await supabase
     .from('profiles')
@@ -52,10 +52,22 @@ export async function getUserTeamsAction() {
     .select('team_id, role, teams(id, name, owner_id, logo_url, primary_color)')
     .eq('user_id', user.id)
 
-  const teams = memberships?.map(m => ({
-    ...m.teams,
-    role: m.role
-  })) || []
+  const teams =
+    memberships
+      ?.map((membership) => {
+        const rawTeam = Array.isArray(membership.teams) ? membership.teams[0] : membership.teams
+        if (!rawTeam) return null
+
+        return {
+          id: rawTeam.id,
+          name: rawTeam.name,
+          owner_id: rawTeam.owner_id,
+          logo_url: rawTeam.logo_url,
+          primary_color: rawTeam.primary_color,
+          role: membership.role,
+        }
+      })
+      .filter((team): team is NonNullable<typeof team> => Boolean(team)) || []
 
   return {
     teams,
@@ -220,4 +232,3 @@ export async function updateTeamBrandingAction(logoUrl?: string, primaryColor?: 
   revalidatePath('/dashboard/settings')
   return { success: true }
 }
-

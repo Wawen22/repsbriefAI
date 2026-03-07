@@ -28,7 +28,7 @@ export async function saveIdeaAction(
 
   const { data: existing } = await supabase
     .from('idea_history')
-    .select('id, status')
+    .select('id, status, approval_status')
     .eq('team_id', teamId)
     .eq('idea_hash', hash)
     .maybeSingle()

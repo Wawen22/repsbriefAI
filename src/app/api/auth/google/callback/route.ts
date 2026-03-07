@@ -55,6 +55,25 @@ export async function GET(req: NextRequest) {
 
     if (dbError) throw dbError
 
+    const { data: integration } = await supabase
+      .from('team_integrations')
+      .select('id')
+      .eq('team_id', state)
+      .eq('provider', 'google_calendar')
+      .single()
+
+    if (integration) {
+      await supabase.from('team_integration_logs').insert({
+        team_id: state,
+        integration_id: integration.id,
+        provider: 'google_calendar',
+        action: 'auth_success',
+        status: 'success',
+        event_type: 'auth_success',
+        details: { email: userInfo.email, name: userInfo.name }
+      })
+    }
+
     return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/dashboard/settings?tab=integrations&success=google_connected`)
 
   } catch (err) {

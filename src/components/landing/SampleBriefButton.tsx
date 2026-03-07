@@ -18,7 +18,10 @@ import {
   Star,
   ChevronRight,
   Maximize2,
-  CalendarDays
+  CalendarDays,
+  Zap,
+  Youtube,
+  Rss
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 

@@ -4,12 +4,43 @@ import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 import { triggerWebhooks } from "@/lib/integrations/webhooks"
 
-export async function addWebhookAction(teamId: string, url: string, name: string, events: string[]) {
+type WebhookChannel = "generic" | "slack"
+
+function normalizeChannel(channel: string): WebhookChannel {
+  return channel === "slack" ? "slack" : "generic"
+}
+
+function isValidHttpUrl(value: string) {
+  try {
+    const parsed = new URL(value)
+    return parsed.protocol === "https:" || parsed.protocol === "http:"
+  } catch {
+    return false
+  }
+}
+
+export async function addWebhookAction(
+  teamId: string,
+  url: string,
+  name: string,
+  events: string[],
+  channel: WebhookChannel = "generic"
+) {
   const supabase = await createClient()
+  const normalizedChannel = normalizeChannel(channel)
+  const normalizedUrl = url.trim()
+  const normalizedName = name.trim() || (normalizedChannel === "slack" ? "Slack Notifications" : "Webhook")
+
+  if (!teamId) return { success: false, error: "Team non valido" }
+  if (!isValidHttpUrl(normalizedUrl)) return { success: false, error: "URL non valido" }
+  if (events.length === 0) return { success: false, error: "Seleziona almeno un evento" }
+  if (normalizedChannel === "slack" && !normalizedUrl.startsWith("https://hooks.slack.com/services/")) {
+    return { success: false, error: "URL Slack non valido. Usa un Incoming Webhook Slack." }
+  }
   
   const { data, error } = await supabase
     .from('team_webhooks')
-    .insert({ team_id: teamId, url, name, events })
+    .insert({ team_id: teamId, url: normalizedUrl, name: normalizedName, events, channel: normalizedChannel })
     .select()
     .single()
 

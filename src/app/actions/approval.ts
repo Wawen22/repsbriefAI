@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { triggerWebhooks } from '@/lib/integrations/webhooks'
 
 async function getUserRole(supabase: any, userId: string, teamId: string) {
   const { data } = await supabase
@@ -42,7 +43,7 @@ export async function approveIdeaAction(ideaId: string, teamId: string) {
     return { error: 'Only owners or admins can approve content' }
   }
 
-  const { error } = await supabase
+  const { data: idea, error } = await supabase
     .from('idea_history')
     .update({ 
       approval_status: 'approved',
@@ -50,8 +51,19 @@ export async function approveIdeaAction(ideaId: string, teamId: string) {
       updated_at: new Date().toISOString() 
     })
     .eq('id', ideaId)
+    .select('*')
+    .single()
 
   if (error) return { error: 'Failed to approve idea' }
+
+  // TRIGGER WEBHOOK
+  await triggerWebhooks(teamId, 'idea.approved', {
+    idea_id: idea.id,
+    title: idea.idea_title,
+    data: idea.idea_data,
+    approved_by: user.id,
+    approved_at: idea.updated_at
+  })
 
   revalidatePath(`/dashboard/strategy/${ideaId}`)
   revalidatePath('/dashboard/ideas')

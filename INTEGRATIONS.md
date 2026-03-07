@@ -12,51 +12,44 @@ Questo documento traccia lo stato delle integrazioni esterne (Plugins/Connection
 
 ## 🗺️ Roadmap delle Integrazioni
 
-### Fase 1: Produttività & CMS (Corrente)
+### Fase 1: Produttività & Calendario (Completata/Corrente)
 | Integrazione | Stato | Funzionalità | Priorità |
 | :--- | :--- | :--- | :--- |
-| **Notion API** | ✅ Completato | Export diretto delle strategie in un database o pagina Notion. | 🔥 Alta |
-| **Google Calendar** | 📅 In Planning | Sincronizzazione del calendario editoriale di RepsBrief con GCal. | 🔥 Alta |
-| **Webhooks (Zapier/Make)** | 🔗 Backlog | Invio dati a URL esterni per automazioni custom. | 🟡 Media |
+| **Notion API** | ✅ Completato | Export diretto delle strategie in database o pagine Notion. | 🔥 Alta |
+| **Google Calendar** | ✅ Completato | Sync automatico e bulk degli eventi editoriali. | 🔥 Alta |
+| **Webhooks (Zapier/Make)** | 🏗️ In Corso | Connessione universale per automazioni esterne. | 🔥 Alta |
 
-### Fase 2: Task Management
+### Fase 2: Collaborazione & Task Management (Next)
 | Integrazione | Stato | Funzionalità | Priorità |
 | :--- | :--- | :--- | :--- |
-| **Trello** | 📋 Backlog | Creazione automatica di card da idee approvate. | 🟡 Media |
-| **Asana** | 📋 Backlog | Creazione di task nel workspace del team. | 🟢 Bassa |
+| **Slack / Discord** | 📅 Backlog | Notifiche istantanee per approvazioni e nuovi brief. | 🟡 Media |
+| **Trello / ClickUp** | 📋 Backlog | Creazione automatica di card/task per il team. | 🟡 Media |
 
-### Fase 3: Social Publishing (Direct)
+### Fase 3: Publishing & Content Hub (Brainstorming)
 | Integrazione | Stato | Funzionalità | Priorità |
 | :--- | :--- | :--- | :--- |
-| **LinkedIn** | 📄 Backlog | Scheduling e posting diretto di post testuali/caroselli. | 🟡 Media |
-| **X (Twitter)** | 🐦 Backlog | Pubblicazione di thread generati dall'AI. | 🟢 Bassa |
+| **WordPress / Ghost** | 📄 Backlog | Esportazione script come bozze articolo/newsletter. | 🟢 Bassa |
+| **Cloud Storage** | ☁️ Backlog | Cartelle automatiche (Drive/Dropbox) per asset video. | 🟢 Bassa |
+| **Social API** | 📱 R&D | Pubblicazione diretta (LinkedIn/X) o Drafts (IG/TikTok). | 🟡 Media |
 
 ---
 
 ## 🛠️ Architettura Tecnica
 
 ### 1. Database Schema
-Le integrazioni sono salvate nella tabella `team_integrations`:
-- `id`: UUID (Primary Key)
-- `team_id`: UUID (Foreign Key -> teams)
-- `provider`: String (es: 'notion', 'google_calendar')
-- `encrypted_credentials`: JSONB (AccessToken, RefreshToken, Expiry)
-- `settings`: JSONB (ID del database Notion, ID del Calendario, ecc.)
-- `status`: String ('active', 'error', 'expired')
-
-### 2. Sicurezza (Best Practices)
-- **Encryption:** I token saranno crittografati a riposo.
-- **RLS (Row Level Security):** Solo i membri del team con permessi di admin possono gestire le integrazioni.
-- **OAuth 2.0:** Utilizzo esclusivo di flussi OAuth standard per non gestire mai le password degli utenti.
+- `team_integrations`: Gestione token OAuth (Notion, Google).
+- `team_webhooks`: Configurazione URL e eventi per Zapier/Make.
+- `team_integration_logs`: Storico tentativi di invio e successi.
 
 ---
 
 ## 📑 Log delle Implementazioni
 
+### [2026-03-06] - Integrazione Google Calendar Completata
+- Implementato OAuth 2.0 con gestione automatica del Refresh Token.
+- Aggiunta funzione **Bulk Sync** per allineare eventi passati/manuali.
+- Integrazione nello **Studio** e nel **CalendarView**.
+
 ### [2026-03-06] - Integrazione Notion API Completata
-- Implementato flusso OAuth 2.0 (Client & Server side).
-- Supporto per **Notion API v2025-09-03** (Multi-source databases / Data Sources).
-- Implementato **Dynamic Title Detection**: l'app rileva automaticamente il nome della colonna titolo nel database Notion dell'utente.
-- Aggiunta Server Action `exportStrategyToNotionAction` per esportazione asincrona.
-- UI Aggiornata: Tasto "SEND TO NOTION" con stato di caricamento e link diretto alla pagina creata.
-- Aggiunta Tab "Integrations" in Settings.
+- Supporto Notion API v2025-09-03 (Data Sources).
+- Implementato **Dynamic Title Detection**.

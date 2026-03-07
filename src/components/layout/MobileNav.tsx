@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button"
 import { DashboardSidebar } from "./DashboardSidebar"
 import { useState } from "react"
 
-export function MobileNav({ plan }: { plan: string }) {
+export function MobileNav({ plan, userEmail, userFullName }: { plan: string; userEmail: string; userFullName: string | null }) {
   const [open, setOpen] = useState(false)
 
   return (
@@ -38,7 +38,7 @@ export function MobileNav({ plan }: { plan: string }) {
         <SheetContent side="left" className="p-0 bg-black border-r border-white/5 w-72">
           {/* We reuse the sidebar but without the 'hidden lg:flex' classes */}
           <div className="h-full flex flex-col">
-             <DashboardSidebar plan={plan} isMobile />
+             <DashboardSidebar plan={plan} isMobile userEmail={userEmail} userFullName={userFullName} />
           </div>
         </SheetContent>
       </Sheet>

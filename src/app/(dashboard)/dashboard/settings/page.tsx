@@ -74,69 +74,59 @@ export default async function SettingsPage({
   const currentWorkspace = team?.name || 'Personal Workspace'
   const initials = user.email?.[0]?.toUpperCase() || 'U'
 
+  const triggerClasses = "h-9 shrink-0 rounded-xl border border-transparent bg-transparent px-4 text-slate-400 hover:bg-white/[0.04] hover:text-white data-[state=active]:border-white/10 data-[state=active]:bg-white/[0.07] data-[state=active]:text-white transition-all"
+
   return (
     <div className="mx-auto max-w-5xl space-y-6 pb-16 text-white">
-      <header className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03] p-6 md:p-8">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.2),transparent_45%)]" />
-        <div className="relative space-y-5">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <div className="rounded-2xl border border-blue-500/20 bg-blue-500/10 p-2.5">
-                <Settings className="h-5 w-5 text-blue-400" />
-              </div>
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-slate-400">Settings Hub</p>
-                <p className="text-sm text-slate-300">Organizzato per feature, con flusso a tab.</p>
-              </div>
-            </div>
-            <Badge variant="outline" className="border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-emerald-300">
-              {planLabel} Plan
-            </Badge>
-          </div>
-
-          <h1 className="text-4xl font-black tracking-tight md:text-5xl">
-            Settings
-          </h1>
-
-          <div className="flex flex-wrap gap-2">
-            <Badge variant="outline" className="border-white/15 bg-black/30 text-slate-300">
-              Workspace: {currentWorkspace}
-            </Badge>
-            <Badge variant="outline" className="border-white/15 bg-black/30 text-slate-300">
-              Niche: {activeNicheLabel}
-            </Badge>
-            <Badge variant="outline" className="border-white/15 bg-black/30 text-slate-300">
-              Persona: {brandVoice ? 'Configured' : 'Not configured'}
-            </Badge>
-          </div>
+      {/* Compact Header */}
+      <header className="flex flex-wrap items-center justify-between gap-4">
+        <div className="space-y-1">
+          <h1 className="text-2xl font-bold tracking-tight md:text-3xl">Settings</h1>
+          <p className="text-sm text-slate-500">Manage your account, content strategy, and workspace.</p>
         </div>
+        <Badge variant="outline" className="border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-emerald-300">
+          {planLabel} Plan
+        </Badge>
       </header>
 
-      <Tabs defaultValue={defaultTab} className="gap-5">
-        <TabsList className="h-auto w-full justify-start gap-2 overflow-x-auto overflow-y-hidden rounded-2xl border border-white/10 bg-white/[0.03] p-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-          <TabsTrigger value="account" className="h-9 shrink-0 rounded-xl border border-white/10 bg-white/[0.04] px-4 text-slate-300 hover:bg-white/[0.08] hover:text-white data-[state=active]:border-white/20 data-[state=active]:bg-white data-[state=active]:text-black">
+      <Tabs defaultValue={defaultTab} className="gap-0">
+        {/* Tab Navigation — grouped with separators */}
+        <TabsList className="h-auto w-full justify-start gap-0 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-1.5 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden overflow-x-auto overflow-y-hidden">
+          {/* Personal */}
+          <TabsTrigger value="account" className={triggerClasses}>
             <User className="h-4 w-4" />
             Account
           </TabsTrigger>
-          <TabsTrigger value="workspace" className="h-9 shrink-0 rounded-xl border border-white/10 bg-white/[0.04] px-4 text-slate-300 hover:bg-white/[0.08] hover:text-white data-[state=active]:border-white/20 data-[state=active]:bg-white data-[state=active]:text-black">
-            <Users className="h-4 w-4" />
-            Workspace
-          </TabsTrigger>
-          <TabsTrigger value="integrations" className="h-9 shrink-0 rounded-xl border border-white/10 bg-white/[0.04] px-4 text-slate-300 hover:bg-white/[0.08] hover:text-white data-[state=active]:border-white/20 data-[state=active]:bg-white data-[state=active]:text-black">
-            <Link2 className="h-4 w-4" />
-            Integrations
-          </TabsTrigger>
-          <TabsTrigger value="niche" className="h-9 shrink-0 rounded-xl border border-white/10 bg-white/[0.04] px-4 text-slate-300 hover:bg-white/[0.08] hover:text-white data-[state=active]:border-white/20 data-[state=active]:bg-white data-[state=active]:text-black">
+
+          {/* Separator */}
+          <div className="mx-1.5 hidden h-5 w-px shrink-0 bg-white/[0.08] sm:block" aria-hidden />
+
+          {/* Content */}
+          <TabsTrigger value="niche" className={triggerClasses}>
             <Target className="h-4 w-4" />
             Niche
           </TabsTrigger>
-          <TabsTrigger value="voice" className="h-9 shrink-0 rounded-xl border border-white/10 bg-white/[0.04] px-4 text-slate-300 hover:bg-white/[0.08] hover:text-white data-[state=active]:border-white/20 data-[state=active]:bg-white data-[state=active]:text-black">
+          <TabsTrigger value="voice" className={triggerClasses}>
             <Fingerprint className="h-4 w-4" />
             Brand Voice
           </TabsTrigger>
+
+          {/* Separator */}
+          <div className="mx-1.5 hidden h-5 w-px shrink-0 bg-white/[0.08] sm:block" aria-hidden />
+
+          {/* Workspace & Connections */}
+          <TabsTrigger value="workspace" className={triggerClasses}>
+            <Users className="h-4 w-4" />
+            Workspace
+          </TabsTrigger>
+          <TabsTrigger value="integrations" className={triggerClasses}>
+            <Link2 className="h-4 w-4" />
+            Integrations
+          </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="account" className="mt-0 rounded-3xl border border-white/10 bg-white/[0.03] p-6 md:p-8">
+        {/* ─── Account ─── */}
+        <TabsContent value="account" className="mt-5 rounded-3xl border border-white/[0.06] bg-white/[0.02] p-6 md:p-8">
           <div className="space-y-6">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
               <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 text-xl font-black text-white">
@@ -152,11 +142,11 @@ export default async function SettingsPage({
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2">
-              <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
+              <div className="rounded-2xl border border-white/[0.06] bg-black/30 p-4">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Current Workspace</p>
                 <p className="mt-1 text-sm font-semibold text-white">{currentWorkspace}</p>
               </div>
-              <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
+              <div className="rounded-2xl border border-white/[0.06] bg-black/30 p-4">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Active Niche</p>
                 <p className="mt-1 text-sm font-semibold text-white">{activeNicheLabel}</p>
               </div>
@@ -169,39 +159,14 @@ export default async function SettingsPage({
               </div>
             )}
 
-            <div className="border-t border-white/10 pt-4">
+            <div className="border-t border-white/[0.06] pt-4">
               <LogoutButton />
             </div>
           </div>
         </TabsContent>
 
-        <TabsContent value="workspace" className="mt-0 rounded-3xl border border-white/10 bg-white/[0.03] p-6 md:p-8">
-          <div className="mb-6 space-y-1">
-            <div className="flex items-center gap-2 text-slate-300">
-              <Users className="h-4 w-4 text-blue-400" />
-              <h2 className="text-lg font-semibold text-white">Workspace Management</h2>
-            </div>
-            <p className="text-sm text-slate-500">
-              Cambia workspace, gestisci branding e controlla i permessi del team.
-            </p>
-          </div>
-          <TeamWorkspaceSettings />
-        </TabsContent>
-
-        <TabsContent value="integrations" className="mt-0 rounded-3xl border border-white/10 bg-white/[0.03] p-6 md:p-8">
-          <div className="mb-6 space-y-1">
-            <div className="flex items-center gap-2 text-slate-300">
-              <Link2 className="h-4 w-4 text-blue-400" />
-              <h2 className="text-lg font-semibold text-white">Connections & Plugins</h2>
-            </div>
-            <p className="text-sm text-slate-500">
-              Collega RepsBrief ai tuoi strumenti di lavoro preferiti.
-            </p>
-          </div>
-          <IntegrationsSettings />
-        </TabsContent>
-
-        <TabsContent value="niche" className="mt-0 rounded-3xl border border-white/10 bg-white/[0.03] p-6 md:p-8">
+        {/* ─── Niche ─── */}
+        <TabsContent value="niche" className="mt-5 rounded-3xl border border-white/[0.06] bg-white/[0.02] p-6 md:p-8">
           <div className="mb-6 space-y-1">
             <div className="flex items-center gap-2 text-slate-300">
               <Target className="h-4 w-4 text-blue-400" />
@@ -216,7 +181,8 @@ export default async function SettingsPage({
           </div>
         </TabsContent>
 
-        <TabsContent value="voice" className="mt-0 rounded-3xl border border-white/10 bg-white/[0.03] p-6 md:p-8">
+        {/* ─── Brand Voice ─── */}
+        <TabsContent value="voice" className="mt-5 rounded-3xl border border-white/[0.06] bg-white/[0.02] p-6 md:p-8">
           <div className="mb-6 space-y-1">
             <div className="flex items-center gap-2 text-slate-300">
               <Fingerprint className="h-4 w-4 text-purple-400" />
@@ -230,6 +196,34 @@ export default async function SettingsPage({
             currentAnalysis={brandVoice}
             canEdit={canEditBrandVoice}
           />
+        </TabsContent>
+
+        {/* ─── Workspace ─── */}
+        <TabsContent value="workspace" className="mt-5 rounded-3xl border border-white/[0.06] bg-white/[0.02] p-6 md:p-8">
+          <div className="mb-6 space-y-1">
+            <div className="flex items-center gap-2 text-slate-300">
+              <Users className="h-4 w-4 text-blue-400" />
+              <h2 className="text-lg font-semibold text-white">Workspace Management</h2>
+            </div>
+            <p className="text-sm text-slate-500">
+              Cambia workspace, gestisci branding e controlla i permessi del team.
+            </p>
+          </div>
+          <TeamWorkspaceSettings />
+        </TabsContent>
+
+        {/* ─── Integrations ─── */}
+        <TabsContent value="integrations" className="mt-5 rounded-3xl border border-white/[0.06] bg-white/[0.02] p-6 md:p-8">
+          <div className="mb-6 space-y-1">
+            <div className="flex items-center gap-2 text-slate-300">
+              <Link2 className="h-4 w-4 text-blue-400" />
+              <h2 className="text-lg font-semibold text-white">Connections & Plugins</h2>
+            </div>
+            <p className="text-sm text-slate-500">
+              Collega RepsBrief ai tuoi strumenti di lavoro preferiti.
+            </p>
+          </div>
+          <IntegrationsSettings />
         </TabsContent>
       </Tabs>
     </div>

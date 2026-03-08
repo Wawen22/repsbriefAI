@@ -1,6 +1,6 @@
 # RepsBrief — PROJECT_CONTEXT (Single Source of Truth)
 
-Last update: 2026-03-07
+Last update: 2026-03-08
 Owner context: AI agents + team dev
 
 ## 1) Product Scope
@@ -48,12 +48,12 @@ RepsBrief è una web app `Next.js + Supabase` per generare, organizzare e distri
   - [x] Lint warning cleanup wave 2 (`0 warnings` on `npm run lint`)
   - [x] OAuth-first blueprint per integrazioni future (Discord incluso)
   - [x] Migrazione Next.js `middleware -> proxy`
-  - [ ] Discord notification channel pre-formattato
+  - [x] Discord notification channel pre-formattato (OAuth-first MVP)
 
 ## 5) Task Status Tracking
 
-- [x] **Current Task (completed):** OAuth-first blueprint integrazioni + migrazione `middleware -> proxy` (2026-03-07)
-- [ ] **Next Task:** Implementazione Discord OAuth-first (start/callback/actions + Settings UX + test send)
+- [x] **Current Task (completed):** Implementazione Discord OAuth-first MVP (start/callback/actions + Settings UX + test/disconnect) (2026-03-08)
+- [ ] **Next Task:** Provisioning env Discord + apply migration + QA end-to-end staging/production
 
 ### Completed Milestones
 
@@ -93,8 +93,11 @@ RepsBrief è una web app `Next.js + Supabase` per generare, organizzare e distri
 - [x] Lint warning cleanup wave 2 (`npm run lint` con `0 warning`)
 - [x] OAuth-first blueprint documentato (`INTEGRATIONS.md`)
 - [x] Migrazione runtime routing da `src/middleware.ts` a `src/proxy.ts`
+- [x] Discord OAuth start/callback (`/api/auth/discord/start`, `/api/auth/discord/callback`)
+- [x] Discord webhook channel support (`team_webhooks.channel='discord'` + payload formatter)
+- [x] Discord Settings UX (connect/manage/test/disconnect)
 
-## 6) Validation Snapshot (2026-03-07)
+## 6) Validation Snapshot (2026-03-08)
 
 - [x] `npx tsc --noEmit` passes.
 - [x] `npm run build` passes.
@@ -115,6 +118,9 @@ RepsBrief è una web app `Next.js + Supabase` per generare, organizzare e distri
   - rimuove lettura member-wide su `team_integrations`
   - impone policy admin-only su `team_integrations` e `team_webhooks`
   - aggiunge `WITH CHECK` esplicito per create/update sicuri
+- Added: `supabase/migrations/20260308100000_add_discord_channel_to_team_webhooks.sql`
+  - estende `team_webhooks_channel_check` a `discord`
+  - mantiene indice `(team_id, channel, active)`
 
 ## 8) Open Risks & Notes
 
@@ -123,12 +129,14 @@ RepsBrief è una web app `Next.js + Supabase` per generare, organizzare e distri
 - Setup Slack via webhook funziona ma ha frizione per utenti non tecnici; prioritario introdurre OAuth Slack con UX guidata.
 - Slack OAuth richiede configurazione Redirect URL corretta in Slack App (`/api/auth/slack/callback`) su ogni ambiente.
 - Le chiavi Slack condivise durante setup vanno ruotate dopo il test (igiene segreti).
+- Discord OAuth richiede configurazione Redirect URL corretta in Discord App (`/api/auth/discord/callback`) su ogni ambiente.
+- Se la migration `20260308100000_add_discord_channel_to_team_webhooks` non è applicata in staging/prod, bootstrap Discord fallisce per constraint `team_webhooks_channel_check`.
 - `supabaseAdmin` ora fa fallback su anon key se `SUPABASE_SERVICE_ROLE_KEY` manca: evita errori runtime/TS ma può ridurre privilegi nei path admin/cron.
 
 ## 9) Immediate Execution Plan
 
-1. Verificare migration Supabase anche su staging/production (se non già allineati).
-2. Validare Slack end-to-end su workspace reale (aggiunta webhook, test, evento reale, log Automation).
-3. Implementare Discord OAuth-first seguendo blueprint (`start`, `callback`, persist token team-level, logs).
-4. Integrare reconnect/disconnect/test send in Settings per Discord.
-5. Validare end-to-end su workspace reale + controllo log automazioni.
+1. Applicare migration Discord channel su staging/production.
+2. Configurare env Discord (`DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET`) e Redirect URL per ambiente.
+3. Validare Discord end-to-end su workspace reale (connect, test, delivery reale, disconnect/reconnect).
+4. Verificare Automation Logs per provider `discord` su eventi `brief.ready`, `idea.approved`, `content.scheduled`.
+5. Hardening finale UX (feedback query `success/error` da callback Discord in Settings).

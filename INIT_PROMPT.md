@@ -1,6 +1,6 @@
 # RepsBrief — INIT_PROMPT
 
-Last update: 2026-03-07
+Last update: 2026-03-08
 
 ## Development Progress
 
@@ -24,12 +24,12 @@ Last update: 2026-03-07
   - [x] Slack notifications channel + Slack OAuth
   - [x] Slack OAuth security hardening (`state` nonce + start route)
   - [x] Integrations/Webhooks hardening (admin-only RLS + action guards)
-  - [ ] Discord notification channel (OAuth-first)
+  - [x] Discord notification channel (OAuth-first MVP)
 
 ## Task Status Tracking
 
-- [x] **Current Task (completed):** OAuth-first blueprint + `middleware -> proxy` migration (2026-03-07)
-- [ ] **Next Task:** Discord OAuth-first implementation (start/callback/actions + settings UX + test send)
+- [x] **Current Task (completed):** Discord OAuth-first MVP implementation (start/callback/actions + settings UX + test/disconnect) (2026-03-08)
+- [ ] **Next Task:** Provisioning Discord env + apply migration + staging/prod E2E validation
 
 ## Validation Snapshot
 

@@ -4,10 +4,11 @@ import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 import { triggerWebhooks } from "@/lib/integrations/webhooks"
 
-type WebhookChannel = "generic" | "slack"
+type WebhookChannel = "generic" | "slack" | "discord"
 type TeamRole = "owner" | "admin" | "member"
 
 function normalizeChannel(channel: string): WebhookChannel {
+  if (channel === "discord") return "discord"
   return channel === "slack" ? "slack" : "generic"
 }
 
@@ -55,6 +56,13 @@ export async function addWebhookAction(
   if (events.length === 0) return { success: false, error: "Seleziona almeno un evento" }
   if (normalizedChannel === "slack" && !normalizedUrl.startsWith("https://hooks.slack.com/services/")) {
     return { success: false, error: "URL Slack non valido. Usa un Incoming Webhook Slack." }
+  }
+  if (
+    normalizedChannel === "discord" &&
+    !normalizedUrl.startsWith("https://discord.com/api/webhooks/") &&
+    !normalizedUrl.startsWith("https://discordapp.com/api/webhooks/")
+  ) {
+    return { success: false, error: "URL Discord non valido. Usa un Incoming Webhook Discord." }
   }
   
   const { data, error } = await supabase
@@ -149,5 +157,60 @@ export async function testWebhookAction(teamId: string, webhookId: string) {
     return { success: false, error: "Test fallito: endpoint non raggiungibile o risposta non valida" }
   }
 
+  return { success: true }
+}
+
+export async function disconnectChannelAction(teamId: string, channel: Exclude<WebhookChannel, "generic">) {
+  const supabase = await createClient()
+  const { data: auth } = await supabase.auth.getUser()
+  if (!auth.user) return { success: false, error: "Unauthorized" }
+
+  const canManage = await ensureTeamAdmin(supabase, teamId, auth.user.id)
+  if (!canManage) return { success: false, error: "Solo owner/admin possono disconnettere integrazioni" }
+
+  const provider = channel === "slack" ? "slack" : "discord"
+
+  const { data: integration } = await supabase
+    .from("team_integrations")
+    .select("id")
+    .eq("team_id", teamId)
+    .eq("provider", provider)
+    .maybeSingle()
+
+  const { error: webhookError } = await supabase
+    .from("team_webhooks")
+    .delete()
+    .eq("team_id", teamId)
+    .eq("channel", channel)
+
+  if (webhookError) return { success: false, error: webhookError.message }
+
+  const { error: integrationError } = await supabase
+    .from("team_integrations")
+    .update({
+      encrypted_credentials: {},
+      settings: {},
+      status: "expired",
+    })
+    .eq("team_id", teamId)
+    .eq("provider", provider)
+
+  if (integrationError) return { success: false, error: integrationError.message }
+
+  if (integration?.id) {
+    await supabase.from("team_integration_logs").insert({
+      team_id: teamId,
+      integration_id: integration.id,
+      provider,
+      action: "disconnect",
+      status: "success",
+      event_type: "disconnect",
+      details: {
+        channel,
+      },
+    })
+  }
+
+  revalidatePath('/dashboard/settings')
   return { success: true }
 }

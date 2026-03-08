@@ -86,3 +86,30 @@ export async function connectSlack() {
   const startUrl = `/api/auth/slack/start?team_id=${encodeURIComponent(profile.current_team_id)}`
   window.location.href = startUrl
 }
+
+/**
+ * Inizia il flusso di autenticazione Discord OAuth
+ */
+export async function connectDiscord() {
+  const supabase = createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    toast.error("Devi essere loggato per connettere Discord.")
+    return
+  }
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('current_team_id')
+    .eq('id', user.id)
+    .single()
+
+  if (!profile?.current_team_id) {
+    toast.error("Nessun team attivo trovato.")
+    return
+  }
+
+  const startUrl = `/api/auth/discord/start?team_id=${encodeURIComponent(profile.current_team_id)}`
+  window.location.href = startUrl
+}

@@ -6,7 +6,7 @@ import crypto from "crypto"
  */
 export type WebhookEvent = 'brief.ready' | 'idea.approved' | 'content.scheduled'
 
-type WebhookChannel = 'generic' | 'slack'
+type WebhookChannel = 'generic' | 'slack' | 'discord'
 
 type WebhookRow = {
   id: string
@@ -26,8 +26,15 @@ type SlackPayload = {
   blocks: Array<Record<string, unknown>>
 }
 
+type DiscordPayload = {
+  content: string
+  embeds: Array<Record<string, unknown>>
+}
+
 function normalizeChannel(channel: string | null | undefined): WebhookChannel {
-  return channel === 'slack' ? 'slack' : 'generic'
+  if (channel === 'slack') return 'slack'
+  if (channel === 'discord') return 'discord'
+  return 'generic'
 }
 
 function asRecord(payload: unknown): Record<string, unknown> {
@@ -125,6 +132,67 @@ function buildSlackPayload(
   }
 }
 
+function buildDiscordPayload(
+  event: WebhookEvent,
+  teamId: string,
+  payload: unknown,
+  timestamp: string
+): DiscordPayload {
+  const data = asRecord(payload)
+  let title = eventLabel(event)
+  let description = `Nuovo evento automation: **${eventLabel(event)}**.`
+
+  const fields: Array<{ name: string; value: string; inline?: boolean }> = []
+
+  if (event === 'brief.ready') {
+    const niche = readString(data.niche) ?? 'N/A'
+    const weekDate = readString(data.week_date) ?? 'N/A'
+    const ideasCount = readString(data.ideas_count) ?? 'N/A'
+    title = 'Brief Ready'
+    description = `Il brief settimanale e' pronto per la nicchia **${niche}**.`
+    fields.push({ name: 'Niche', value: niche, inline: true })
+    fields.push({ name: 'Week Date', value: weekDate, inline: true })
+    fields.push({ name: 'Ideas', value: ideasCount, inline: true })
+  } else if (event === 'idea.approved') {
+    const ideaTitle = readString(data.title) ?? 'Untitled idea'
+    const approvedAt = readString(data.approved_at) ?? 'N/A'
+    title = 'Idea Approved'
+    description = `Un contenuto e' stato approvato: **${ideaTitle}**.`
+    fields.push({ name: 'Title', value: ideaTitle })
+    fields.push({ name: 'Approved At', value: approvedAt, inline: true })
+  } else if (event === 'content.scheduled') {
+    const contentTitle = readString(data.title) ?? 'Untitled content'
+    const platform = readString(data.platform) ?? 'N/A'
+    const scheduledDate = readString(data.scheduled_date) ?? 'N/A'
+    title = 'Content Scheduled'
+    description = `Nuovo contenuto schedulato: **${contentTitle}**.`
+    fields.push({ name: 'Platform', value: platform, inline: true })
+    fields.push({ name: 'Scheduled For', value: scheduledDate, inline: true })
+  }
+
+  const sentAt = Number(timestamp)
+  const sentAtLabel = Number.isFinite(sentAt)
+    ? new Date(sentAt).toLocaleString('it-IT')
+    : new Date().toLocaleString('it-IT')
+
+  return {
+    content: `[RepsBrief] ${title}`,
+    embeds: [
+      {
+        title: `RepsBrief · ${title}`,
+        description,
+        color: 5793266,
+        fields: [
+          ...fields,
+          { name: 'Event', value: `\`${event}\``, inline: true },
+          { name: 'Team', value: `\`${teamId}\``, inline: true },
+          { name: 'Sent', value: sentAtLabel, inline: false },
+        ],
+      },
+    ],
+  }
+}
+
 /**
  * Funzione core per scatenare i Webhooks di un team per un determinato evento
  */
@@ -155,16 +223,19 @@ export const triggerWebhooks = async (
   // 2. Invio asincrono a tutti gli endpoint
   const results = await Promise.allSettled((webhooks as WebhookRow[]).map(async (webhook) => {
     const channel = normalizeChannel(webhook.channel)
-    const provider = channel === 'slack' ? 'slack' : 'webhook'
+    const provider = channel === 'slack' ? 'slack' : channel === 'discord' ? 'discord' : 'webhook'
     const timestamp = Date.now().toString()
-    const formattedPayload = channel === 'slack'
-      ? buildSlackPayload(event, teamId, payload, timestamp)
-      : {
-          event,
-          team_id: teamId,
-          timestamp,
-          payload,
-        }
+    const formattedPayload =
+      channel === 'slack'
+        ? buildSlackPayload(event, teamId, payload, timestamp)
+        : channel === 'discord'
+          ? buildDiscordPayload(event, teamId, payload, timestamp)
+          : {
+              event,
+              team_id: teamId,
+              timestamp,
+              payload,
+            }
     const body = JSON.stringify(formattedPayload)
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',

@@ -21,6 +21,7 @@ function providerLabel(provider: string | null): string {
   if (!provider) return 'Unknown'
   if (provider === 'google_calendar') return 'Google Calendar'
   if (provider === 'slack') return 'Slack'
+  if (provider === 'discord') return 'Discord'
   if (provider === 'webhook') return 'Webhook'
   return provider
 }

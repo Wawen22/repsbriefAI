@@ -23,7 +23,7 @@ Questo documento traccia lo stato delle integrazioni esterne (Plugins/Connection
 | Integrazione | Stato | Funzionalità | Priorità |
 | :--- | :--- | :--- | :--- |
 | **Slack OAuth** | ✅ Completato | Connessione no-code + bootstrap webhook automatico + hardening state nonce. | 🔥 Alta |
-| **Discord OAuth** | 📅 Backlog | Notifiche istantanee in canali server con setup guidato OAuth-first. | 🟡 Media |
+| **Discord OAuth** | 🛠 In progress | OAuth one-click + webhook bootstrap + test send + disconnect/reconnect in Settings. | 🔥 Alta |
 | **Trello / ClickUp** | 📋 Backlog | Creazione automatica di card/task per il team. | 🟡 Media |
 
 ### Fase 3: Publishing & Content Hub (Brainstorming)
@@ -87,6 +87,24 @@ Il sistema supporta l'invio asincrono di payload JSON con firma di sicurezza:
 ---
 
 ## 📑 Log delle Implementazioni
+
+### [2026-03-08] - Discord OAuth-first (MVP) Implementato
+- Aggiunte route OAuth:
+  - `GET /api/auth/discord/start`
+  - `GET /api/auth/discord/callback`
+- Implementato exchange token Discord (`src/lib/integrations/discord.ts`) con supporto a `webhook.incoming`.
+- Bootstrap automatico:
+  - Upsert `team_integrations` (`provider=discord`)
+  - Upsert webhook canale `discord` in `team_webhooks`
+  - Log `auth_success` in `team_integration_logs`
+- Esteso engine webhook per `channel=discord` con payload preformattato (embeds Discord).
+- Estesa UI Settings:
+  - Nuovo provider "Discord Notifications"
+  - Gestione canali Discord (view/test/toggle/delete)
+  - Pulsante `Disconnect` (cleanup webhook + credentials/reset status integrazione)
+- Aggiunta migration `20260308100000_add_discord_channel_to_team_webhooks.sql`
+  - estende check constraint `team_webhooks_channel_check` a `discord`.
+- Aggiornato `.env.example` con `DISCORD_CLIENT_ID` / `DISCORD_CLIENT_SECRET`.
 
 ### [2026-03-06] - Integrazione Webhooks (Zapier/Make) Completata
 - Creata tabella `team_webhooks` con supporto a multipli endpoint.

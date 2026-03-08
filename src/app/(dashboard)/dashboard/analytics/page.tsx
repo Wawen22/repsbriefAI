@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button"
 import { 
   BarChart3, 
   TrendingUp, 
-  Users, 
   Video, 
   Layers, 
   Hash, 
@@ -20,7 +19,6 @@ import {
   Clock,
   Eye,
   CheckCircle2,
-  AlertCircle,
   LayoutGrid,
   ChevronRight
 } from "lucide-react"

@@ -45,12 +45,15 @@ RepsBrief è una web app `Next.js + Supabase` per generare, organizzare e distri
   - [x] Slack OAuth integration (login Slack no-code + webhook bootstrap automatico)
   - [x] Slack OAuth security hardening (`state` nonce cookie + start route server-side)
   - [x] Integrations/Webhooks hardening (RLS admin-only + guard server actions)
+  - [x] Lint warning cleanup wave 2 (`0 warnings` on `npm run lint`)
+  - [x] OAuth-first blueprint per integrazioni future (Discord incluso)
+  - [x] Migrazione Next.js `middleware -> proxy`
   - [ ] Discord notification channel pre-formattato
 
 ## 5) Task Status Tracking
 
-- [x] **Current Task (completed):** Slack integration security hardening (OAuth CSRF protection + RBAC tightening) (2026-03-07)
-- [ ] **Next Task:** OAuth-first blueprint per integrazioni future (Discord incluso) + lint warning cleanup wave 2
+- [x] **Current Task (completed):** OAuth-first blueprint integrazioni + migrazione `middleware -> proxy` (2026-03-07)
+- [ ] **Next Task:** Implementazione Discord OAuth-first (start/callback/actions + Settings UX + test send)
 
 ### Completed Milestones
 
@@ -86,12 +89,16 @@ RepsBrief è una web app `Next.js + Supabase` per generare, organizzare e distri
 - [x] Slack OAuth mismatch fallback (authorize/token exchange senza `redirect_uri` esplicito)
 - [x] Slack OAuth start route (`/api/auth/slack/start`) con nonce HttpOnly anti-CSRF
 - [x] Webhook actions con role-check esplicito owner/admin
+- [x] `INIT_PROMPT.md` restore (state tracking checklist riallineata)
+- [x] Lint warning cleanup wave 2 (`npm run lint` con `0 warning`)
+- [x] OAuth-first blueprint documentato (`INTEGRATIONS.md`)
+- [x] Migrazione runtime routing da `src/middleware.ts` a `src/proxy.ts`
 
 ## 6) Validation Snapshot (2026-03-07)
 
 - [x] `npx tsc --noEmit` passes.
 - [x] `npm run build` passes.
-- [x] `npm run lint` passes con `0 errors`, `118 warnings` (warning debt aperto).
+- [x] `npm run lint` passes con `0 errors`, `0 warnings`.
 
 ## 7) DB / Migrations Recenti
 
@@ -116,14 +123,12 @@ RepsBrief è una web app `Next.js + Supabase` per generare, organizzare e distri
 - Setup Slack via webhook funziona ma ha frizione per utenti non tecnici; prioritario introdurre OAuth Slack con UX guidata.
 - Slack OAuth richiede configurazione Redirect URL corretta in Slack App (`/api/auth/slack/callback`) su ogni ambiente.
 - Le chiavi Slack condivise durante setup vanno ruotate dopo il test (igiene segreti).
-- Lint warning debt ancora aperto (`118` warning), soprattutto unused vars/import, `react-hooks/exhaustive-deps` e `no-img-element`.
-- Il warning Next su convenzione `middleware -> proxy` resta aperto.
 - `supabaseAdmin` ora fa fallback su anon key se `SUPABASE_SERVICE_ROLE_KEY` manca: evita errori runtime/TS ma può ridurre privilegi nei path admin/cron.
 
 ## 9) Immediate Execution Plan
 
 1. Verificare migration Supabase anche su staging/production (se non già allineati).
 2. Validare Slack end-to-end su workspace reale (aggiunta webhook, test, evento reale, log Automation).
-3. Definire standard OAuth-first per nuove integrazioni (scopes minimi, revoke/reconnect, gestione token).
-4. Allineare roadmap Discord (preferenza OAuth-first) prima di implementazione.
-5. Eseguire lint warning cleanup wave 2 (`unused-vars`, `exhaustive-deps`, `no-img-element`).
+3. Implementare Discord OAuth-first seguendo blueprint (`start`, `callback`, persist token team-level, logs).
+4. Integrare reconnect/disconnect/test send in Settings per Discord.
+5. Validare end-to-end su workspace reale + controllo log automazioni.

@@ -15,18 +15,10 @@ import {
   Sparkles, 
   TrendingUp, 
   Smartphone, 
-  Layout, 
   Copy, 
-  Check, 
   CalendarDays,
-  Share2,
   X,
-  Zap,
   Lightbulb,
-  FileText,
-  Download,
-  ExternalLink,
-  MessageSquare,
   ChevronLeft,
   Wand2,
   Loader2,
@@ -35,13 +27,11 @@ import {
 import { useState } from "react"
 import { toast } from "sonner"
 import { Teleprompter } from "@/components/dashboard/Teleprompter"
-import { cn } from "@/lib/utils"
 import { shareIdeaAction } from "@/app/actions/ideas"
 import { remixScriptAction } from "@/app/actions/remix"
 
 interface StrategicBriefModalProps {
   idea: IdeaObject
-  ideaId?: string
   isOpen: boolean
   onOpenChange: (open: boolean) => void
   onSchedule: () => void
@@ -49,7 +39,6 @@ interface StrategicBriefModalProps {
 
 export function StrategicBriefModal({ 
   idea, 
-  ideaId,
   isOpen, 
   onOpenChange,
   onSchedule
@@ -94,7 +83,7 @@ export function StrategicBriefModal({
       } else {
         toast.error("Failed to save strategy", { id: tid })
       }
-    } catch (err) {
+    } catch {
       toast.error("Error sharing strategy", { id: tid })
     } finally {
       setIsSharing(false)
@@ -119,7 +108,7 @@ export function StrategicBriefModal({
       } else {
         toast.error(res.error || "Failed to remix", { id: tid })
       }
-    } catch (err) {
+    } catch {
       toast.error("Error connecting to AI", { id: tid })
     } finally {
       setIsRemixing(false)
@@ -373,7 +362,6 @@ export function StrategicBriefModal({
         {/* Global Floating Teleprompter */}
         {isPrompterOpen && (
           <Teleprompter 
-            title={currentIdea.title} 
             script={currentIdea.scriptDraft || currentIdea.description} 
             onClose={() => setIsPrompterOpen(false)} 
           />

@@ -5,20 +5,13 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
 import { 
-  Video, 
-  Layers, 
-  Hash, 
-  Mail, 
   Sparkles, 
   ArrowRight, 
-  Lightbulb, 
   TrendingUp, 
   Info,
   Orbit,
   Star,
-  ChevronRight,
   Maximize2,
-  CalendarDays,
   Zap,
   Youtube,
   Rss

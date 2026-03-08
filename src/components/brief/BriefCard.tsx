@@ -6,14 +6,12 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { 
   Zap, 
-  Share2, 
   Sparkles, 
   Trash2, 
   CalendarDays,
   Star,
   ChevronRight,
   Maximize2,
-  ExternalLink,
   ShieldCheck,
   Clock,
   AlertCircle,
@@ -84,7 +82,6 @@ export function BriefCard({
   isHistory = false, 
   isSaved = false, 
   dbId, 
-  plan,
   variant = 'default' 
 }: BriefCardProps) {
   const ideaWithMeta = idea as IdeaWithMeta

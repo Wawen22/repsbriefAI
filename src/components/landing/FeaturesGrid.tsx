@@ -1,10 +1,9 @@
 'use client'
 
 import { 
-  Users, BrainCircuit, Workflow, Calendar, Maximize2, Share2, 
-  ShieldCheck, Smartphone, Target, Globe, Zap, Clock
+  Users, BrainCircuit, Workflow, Calendar, Maximize2, 
+  Globe, Clock
 } from "lucide-react"
-import { cn } from "@/lib/utils"
 
 const FEATURES = [
   {

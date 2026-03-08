@@ -1,8 +1,8 @@
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { 
-  Zap, Clock, Users, ArrowRight, Sparkles, BrainCircuit, 
-  LayoutGrid, Calendar, MousePointer2, Workflow, Share2, Globe, FileText
+  Zap, ArrowRight, Sparkles, BrainCircuit, 
+  LayoutGrid, Calendar, Globe, FileText
 } from "lucide-react"
 import Link from "next/link"
 import { HeroSection } from "@/components/landing/HeroSection"

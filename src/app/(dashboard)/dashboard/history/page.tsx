@@ -5,9 +5,6 @@ import type { ComponentType, SVGProps } from "react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { 
-  CalendarDays, 
-  FileText, 
-  Dumbbell, 
   History, 
   ChevronRight, 
   Clock, 
@@ -18,8 +15,7 @@ import {
   Layers,
   Video,
   Hash,
-  Mail,
-  Maximize2
+  Mail
 } from "lucide-react"
 import Link from "next/link"
 import {

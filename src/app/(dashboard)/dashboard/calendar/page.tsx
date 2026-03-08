@@ -2,7 +2,7 @@
 import { getCalendarEntriesAction } from "@/app/actions/calendar"
 import { CalendarView } from "@/components/calendar/CalendarView"
 import { Badge } from "@/components/ui/badge"
-import { Sparkles, CalendarDays } from "lucide-react"
+import { CalendarDays } from "lucide-react"
 
 export const dynamic = 'force-dynamic'
 

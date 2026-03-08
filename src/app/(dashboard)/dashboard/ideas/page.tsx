@@ -3,8 +3,7 @@ import { redirect } from "next/navigation"
 import { AddIdeaModal } from "@/components/ui/AddIdeaModal"
 import { KanbanBoard } from "@/components/dashboard/KanbanBoard"
 import { Badge } from "@/components/ui/badge"
-import { Lightbulb, Star, Filter, LayoutGrid, CheckCircle2, Video, PenTool } from "lucide-react"
-import { Suspense } from "react"
+import { Star, LayoutGrid, CheckCircle2, Video, PenTool } from "lucide-react"
 
 export const dynamic = 'force-dynamic'
 

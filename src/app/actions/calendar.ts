@@ -80,7 +80,7 @@ export async function scheduleIdeaAction({
   return { success: true, calendarId: data.id }
 }
 
-export async function getCalendarEntriesAction(_month?: number, _year?: number) {
+export async function getCalendarEntriesAction() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { data: [] }

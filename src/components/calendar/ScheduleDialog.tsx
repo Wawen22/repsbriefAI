@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { 
   Dialog, 
   DialogContent, 
@@ -18,8 +18,6 @@ import {
   Linkedin, 
   Youtube, 
   Calendar as CalendarIcon, 
-  Clock,
-  Sparkles,
   Loader2,
   Check,
   Trash2,
@@ -32,7 +30,6 @@ import { toast } from 'sonner'
 import { format } from 'date-fns'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
-import { useEffect } from 'react'
 
 type Platform = 'instagram' | 'tiktok' | 'linkedin' | 'youtube'
 
@@ -61,37 +58,37 @@ export function ScheduleDialog({ isOpen, onOpenChange, initialData }: ScheduleDi
   const [isGoogleConnected, setIsGoogleConnected] = useState(false)
   const [teamId, setTeamId] = useState<string | null>(null)
 
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
   useEffect(() => {
     if (isOpen) {
+      const checkGoogleConnection = async () => {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) return
+
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('current_team_id')
+          .eq('id', user.id)
+          .single()
+
+        if (profile?.current_team_id) {
+          setTeamId(profile.current_team_id)
+          const { data: integration } = await supabase
+            .from('team_integrations')
+            .select('id')
+            .eq('team_id', profile.current_team_id)
+            .eq('provider', 'google_calendar')
+            .eq('status', 'active')
+            .maybeSingle()
+
+          setIsGoogleConnected(!!integration)
+        }
+      }
+
       checkGoogleConnection()
     }
-  }, [isOpen])
-
-  const checkGoogleConnection = async () => {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
-
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('current_team_id')
-      .eq('id', user.id)
-      .single()
-
-    if (profile?.current_team_id) {
-      setTeamId(profile.current_team_id)
-      const { data: integration } = await supabase
-        .from('team_integrations')
-        .select('id')
-        .eq('team_id', profile.current_team_id)
-        .eq('provider', 'google_calendar')
-        .eq('status', 'active')
-        .maybeSingle()
-      
-      setIsGoogleConnected(!!integration)
-    }
-  }
+  }, [isOpen, supabase])
 
   const isEditing = !!initialData?.calendarId
 
@@ -159,7 +156,7 @@ export function ScheduleDialog({ isOpen, onOpenChange, initialData }: ScheduleDi
           toast.error(res.error || "Failed to schedule")
         }
       }
-    } catch (err) {
+    } catch {
       toast.error("An unexpected error occurred")
     } finally {
       setIsSubmitting(false)
@@ -178,7 +175,7 @@ export function ScheduleDialog({ isOpen, onOpenChange, initialData }: ScheduleDi
       } else {
         toast.error(res.error || "Failed to delete")
       }
-    } catch (err) {
+    } catch {
       toast.error("Error deleting entry")
     } finally {
       setIsDeleting(false)

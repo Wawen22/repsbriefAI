@@ -1,11 +1,9 @@
 'use client'
 
 import { Button } from "@/components/ui/button"
-import { Card, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { CheckCircle2, ShieldCheck, Lock, ArrowRight, Zap, Sparkles } from "lucide-react"
+import { CheckCircle2, ShieldCheck, Lock, Zap } from "lucide-react"
 import Link from "next/link"
-import { cn } from "@/lib/utils"
 
 export function PricingNexus() {
   return (

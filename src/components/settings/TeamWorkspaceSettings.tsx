@@ -1,7 +1,7 @@
 'use client'
+/* eslint-disable @next/next/no-img-element */
 
 import { useState, useEffect, useRef } from 'react'
-import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
@@ -14,11 +14,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { 
-  Users, 
   Crown, 
   ChevronRight, 
-  CheckCircle2, 
-  UserPlus, 
   Loader2, 
   Palette, 
   Image as ImageIcon,
@@ -27,9 +24,6 @@ import {
   Upload,
   Orbit,
   Zap,
-  FileText,
-  Star,
-  Sparkles,
   ArrowUpRight,
   ArrowRight
 } from "lucide-react"
@@ -97,7 +91,7 @@ export function TeamWorkspaceSettings() {
       } else {
         toast.error(res.error || "Failed to switch", { id: tid })
       }
-    } catch (e) {
+    } catch {
       toast.error("Something went wrong", { id: tid })
     } finally {
       setIsSwitching(null)
@@ -127,7 +121,7 @@ export function TeamWorkspaceSettings() {
       const fileExt = file.name.split('.').pop()
       const filePath = `${currentTeamId}/logo-${Math.random()}.${fileExt}`
 
-      const { data, error: uploadError } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from('logos')
         .upload(filePath, file, { upsert: true })
 
@@ -157,7 +151,7 @@ export function TeamWorkspaceSettings() {
       } else {
         toast.error(res.error || "Failed to update", { id: tid })
       }
-    } catch (e) {
+    } catch {
       toast.error("Something went wrong", { id: tid })
     } finally {
       setIsSavingBranding(false)

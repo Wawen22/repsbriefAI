@@ -1,9 +1,8 @@
 'use client'
 
 import { Button } from "@/components/ui/button"
-import { ArrowRight, Sparkles, Zap, TrendingUp, Users, Calendar, Layout } from "lucide-react"
+import { ArrowRight, Sparkles, Zap, Users, Calendar, Layout } from "lucide-react"
 import Link from "next/link"
-import { cn } from "@/lib/utils"
 
 export function HeroSection() {
   return (

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { 
   format, 
   startOfMonth, 
@@ -24,14 +24,12 @@ import {
   Youtube, 
   Clock,
   ExternalLink,
-  RefreshCw,
-  CheckCircle2
+  RefreshCw
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { ScheduleDialog } from './ScheduleDialog'
 import { createClient } from '@/lib/supabase/client'
-import { useEffect } from 'react'
 import { bulkSyncFutureEventsAction } from '@/app/actions/calendar-sync'
 import { toast } from 'sonner'
 
@@ -59,35 +57,35 @@ export function CalendarView({ initialEntries }: { initialEntries: CalendarEntry
   const [teamId, setTeamId] = useState<string | null>(null)
   const [isSyncing, setIsSyncing] = useState(false)
 
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
   useEffect(() => {
-    checkGoogleConnection()
-  }, [])
+    async function checkGoogleConnection() {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
 
-  const checkGoogleConnection = async () => {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('current_team_id')
+        .eq('id', user.id)
+        .single()
 
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('current_team_id')
-      .eq('id', user.id)
-      .single()
+      if (profile?.current_team_id) {
+        setTeamId(profile.current_team_id)
+        const { data: integration } = await supabase
+          .from('team_integrations')
+          .select('id')
+          .eq('team_id', profile.current_team_id)
+          .eq('provider', 'google_calendar')
+          .eq('status', 'active')
+          .maybeSingle()
 
-    if (profile?.current_team_id) {
-      setTeamId(profile.current_team_id)
-      const { data: integration } = await supabase
-        .from('team_integrations')
-        .select('id')
-        .eq('team_id', profile.current_team_id)
-        .eq('provider', 'google_calendar')
-        .eq('status', 'active')
-        .maybeSingle()
-      
-      setIsGoogleConnected(!!integration)
+        setIsGoogleConnected(!!integration)
+      }
     }
-  }
+
+    checkGoogleConnection()
+  }, [supabase])
 
   const handleBulkSync = async () => {
     if (!teamId || isSyncing) return
@@ -101,7 +99,7 @@ export function CalendarView({ initialEntries }: { initialEntries: CalendarEntry
       } else {
         toast.error(res.error || "Bulk sync failed", { id: tid })
       }
-    } catch (err) {
+    } catch {
       toast.error("An unexpected error occurred", { id: tid })
     } finally {
       setIsSyncing(false)

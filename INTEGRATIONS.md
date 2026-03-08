@@ -22,7 +22,8 @@ Questo documento traccia lo stato delle integrazioni esterne (Plugins/Connection
 ### Fase 2: Collaborazione & Task Management (In Arrivo)
 | Integrazione | Stato | Funzionalità | Priorità |
 | :--- | :--- | :--- | :--- |
-| **Slack / Discord** | 📅 Backlog | Notifiche istantanee per approvazioni e nuovi brief. | 🟡 Media |
+| **Slack OAuth** | ✅ Completato | Connessione no-code + bootstrap webhook automatico + hardening state nonce. | 🔥 Alta |
+| **Discord OAuth** | 📅 Backlog | Notifiche istantanee in canali server con setup guidato OAuth-first. | 🟡 Media |
 | **Trello / ClickUp** | 📋 Backlog | Creazione automatica di card/task per il team. | 🟡 Media |
 
 ### Fase 3: Publishing & Content Hub (Brainstorming)
@@ -48,6 +49,40 @@ Il sistema supporta l'invio asincrono di payload JSON con firma di sicurezza:
     - `brief.ready`: Scatenato quando un nuovo brief settimanale è disponibile.
     - `idea.approved`: Scatenato quando un admin approva un'idea nello Studio.
     - `content.scheduled`: Scatenato quando un post viene aggiunto al calendario editoriale.
+
+---
+
+## 🔐 OAuth-First Blueprint (2026-03-07)
+
+### Standard comune per nuove integrazioni
+- **Entry point server-side**: route `start` che genera `state` nonce, salva cookie `HttpOnly`, poi redirect al provider.
+- **Callback sicura**: validazione `state` + scambio codice su backend + nessun token in query/client.
+- **Token storage**: token per `team_id` in `team_integrations` (scope minimo, status lifecycle, metadata audit).
+- **RBAC**: connect/disconnect/reconnect solo owner/admin (allineato alle policy RLS correnti).
+- **Observability**: ogni connect/test/send scrive su `team_integration_logs`.
+- **Revoke/Reconnect UX**: pulsanti espliciti in Settings (clear token, reconnect, test send).
+- **Fallback tecnico**: mantenere webhook manuale come fallback solo per ambienti non OAuth-friendly.
+
+### Contract minimo provider (riusabile)
+- `GET /api/auth/<provider>/start`
+- `GET /api/auth/<provider>/callback`
+- `connect` action (persist token + status active)
+- `disconnect` action (status disconnected + cleanup token)
+- `test` action (invio evento sintetico + log)
+
+### Blueprint Discord (target immediato)
+- **Provider key**: `discord`.
+- **Scope iniziale**: `identify`, `guilds`, `webhook.incoming` (espandere solo se necessario).
+- **Flow UX**:
+  - Admin clicca `Connect Discord`.
+  - OAuth ritorna con selezione server/canale (o webhook target) guidata.
+  - RepsBrief salva integrazione team-level e abilita test immediato.
+- **Payload standard**: riuso formattazione eventi webhook già in uso (`brief.ready`, `idea.approved`, `content.scheduled`).
+- **Failure policy**: retry leggero + log dettagliato su `team_integration_logs` + stato visuale in Settings.
+- **Security checks**:
+  - Verifica `state` obbligatoria.
+  - No secret/token in client logs.
+  - Sanitizzazione metadata del callback prima del persist.
 
 ---
 

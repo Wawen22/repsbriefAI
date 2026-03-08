@@ -8,7 +8,6 @@ import {
   Sparkles, 
   TrendingUp, 
   Smartphone, 
-  Layout, 
   Copy, 
   CalendarDays,
   Share2,
@@ -39,7 +38,6 @@ import { submitForApprovalAction, approveIdeaAction, rejectIdeaAction } from "@/
 import Link from "next/link"
 import { ScheduleDialog } from "@/components/calendar/ScheduleDialog"
 import { createClient } from "@/lib/supabase/client"
-import html2canvas from "html2canvas"
 import jsPDF from "jspdf"
 
 interface StrategicBriefViewProps {
@@ -59,7 +57,6 @@ export function StrategicBriefView({
   ideaId
 }: StrategicBriefViewProps) {
   const ideaMeta = idea as IdeaWorkflowMeta
-  const supabase = createClient()
   const [isPrompterOpen, setIsPrompterOpen] = useState(false)
   const [isScheduleOpen, setIsScheduleOpen] = useState(false)
   const [isSharing, setIsSharing] = useState(false)
@@ -71,13 +68,14 @@ export function StrategicBriefView({
   const [userPlan, setUserPlan] = useState<string | null>(null)
   const [approvalStatus, setApprovalStatus] = useState<string>(ideaMeta.approval_status || 'draft')
   const [feedbackNotes, setFeedbackNotes] = useState<string>(ideaMeta.feedback_notes || '')
-  const [isSubmittingApproval, setIsSubmittingApproval] = useState(false)
+  const [, setIsSubmittingApproval] = useState(false)
   const [isNotionConnected, setIsNotionConnected] = useState(false)
   const [isGoogleConnected, setIsGoogleConnected] = useState(false)
   const [isExportingToNotion, setIsExportingToNotion] = useState(false)
 
   useEffect(() => {
     async function getContext() {
+      const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
 
@@ -142,7 +140,7 @@ export function StrategicBriefView({
         } else {
           toast.error(res.error || "Failed to export", { id: tid })
         }
-      } catch (err) {
+      } catch {
         toast.error("Network error", { id: tid })
       } finally {
         setIsExportingToNotion(false)
@@ -290,7 +288,7 @@ export function StrategicBriefView({
       } else {
         toast.error("Failed to share strategy", { id: tid })
       }
-    } catch (err) {
+    } catch {
       toast.error("Error sharing strategy", { id: tid })
     } finally {
       setIsSharing(false)
@@ -315,7 +313,7 @@ export function StrategicBriefView({
       } else {
         toast.error(res.error || "Failed to remix", { id: tid })
       }
-    } catch (err) {
+    } catch {
       toast.error("Error connecting to AI", { id: tid })
     } finally {
       setIsRemixing(false)
@@ -690,7 +688,6 @@ export function StrategicBriefView({
       {/* Global Floating Teleprompter */}
       {isPrompterOpen && (
         <Teleprompter 
-          title={currentIdea.title} 
           script={currentIdea.scriptDraft || currentIdea.description} 
           onClose={() => setIsPrompterOpen(false)} 
         />

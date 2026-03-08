@@ -1,6 +1,6 @@
 // src/app/api/scraper/index.ts
 
-import { NicheConfig, TrendItem } from '@/types/niche'
+import { NicheConfig } from '@/types/niche'
 import { supabaseAdmin } from '@/lib/supabase'
 import { scrapeReddit } from './reddit'
 import { scrapeYouTube } from './youtube'

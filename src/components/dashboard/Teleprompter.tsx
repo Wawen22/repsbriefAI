@@ -10,11 +10,8 @@ import {
   Minus, 
   Type, 
   Zap, 
-  Maximize2, 
   Camera,
   Smartphone,
-  ArrowRight,
-  Timer,
   ArrowLeft
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -23,12 +20,11 @@ import { cn } from '@/lib/utils'
 import { createPortal } from 'react-dom'
 
 interface TeleprompterProps {
-  title: string
   script: string
   onClose: () => void
 }
 
-export function Teleprompter({ title, script, onClose }: TeleprompterProps) {
+export function Teleprompter({ script, onClose }: TeleprompterProps) {
   const [isPlaying, setIsPlaying] = useState(false)
   const [countdown, setCountdown] = useState<number | null>(null)
   const [speed, setSpeed] = useState(30) // 1-100
@@ -38,18 +34,18 @@ export function Teleprompter({ title, script, onClose }: TeleprompterProps) {
   const lastTimeRef = useRef<number | null>(null)
   const scrollPosRef = useRef<number>(0)
 
-  function animate(time: number) {
-    if (lastTimeRef.current !== null && isPlaying && scrollRef.current) {
-      const deltaTime = time - lastTimeRef.current
-      const increment = (speed / 40) * (deltaTime / 16.67)
-      scrollPosRef.current += increment
-      scrollRef.current.scrollTop = scrollPosRef.current
-    }
-    lastTimeRef.current = time
-    requestRef.current = requestAnimationFrame(animate)
-  }
-
   useEffect(() => {
+    const animate = (time: number) => {
+      if (lastTimeRef.current !== null && isPlaying && scrollRef.current) {
+        const deltaTime = time - lastTimeRef.current
+        const increment = (speed / 40) * (deltaTime / 16.67)
+        scrollPosRef.current += increment
+        scrollRef.current.scrollTop = scrollPosRef.current
+      }
+      lastTimeRef.current = time
+      requestRef.current = requestAnimationFrame(animate)
+    }
+
     // Hide Command Palette indicator when prompter is active
     const cmdPill = document.getElementById('command-palette-indicator')
     if (cmdPill) cmdPill.style.display = 'none'
@@ -283,13 +279,5 @@ export function Teleprompter({ title, script, onClose }: TeleprompterProps) {
       </div>
     </div>,
     document.body
-  )
-}
-
-function Badge({ children, className }: { children: React.ReactNode, className?: string }) {
-  return (
-    <span className={cn("inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset", className)}>
-      {children}
-    </span>
   )
 }

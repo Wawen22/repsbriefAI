@@ -11,10 +11,9 @@ import {
   Preview,
   Section,
   Text,
-  render,
 } from '@react-email/components'
 import * as React from 'react'
-import { IdeaObject, NicheConfig } from '@/types/niche'
+import { IdeaObject } from '@/types/niche'
 
 interface WeeklyBriefEmailProps {
   nicheLabel: string

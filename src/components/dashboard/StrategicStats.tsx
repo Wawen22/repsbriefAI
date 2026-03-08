@@ -1,7 +1,7 @@
 'use client'
 
 import { IdeaObject } from "@/types/niche"
-import { BarChart3, TrendingUp, Zap, Target, PieChart, Activity } from "lucide-react"
+import { TrendingUp, Zap, Target, PieChart, Activity } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 
@@ -24,6 +24,7 @@ export function StrategicStats({ ideas, niche }: StrategicStatsProps) {
 
   // 2. Determine "Market Sentiment" (mock logic based on formats/niche for 2026 vibe)
   const isVideoHeavy = (formatCounts['Reel'] || 0) > total / 3
+  const readableNiche = niche.replaceAll('_', ' ')
   const sentiment = isVideoHeavy ? "High Engagement (Video)" : "Informational (Mixed)"
   const momentum = "+14% vs last week" // Simulated for UI/UX demonstration
 
@@ -69,7 +70,7 @@ export function StrategicStats({ ideas, niche }: StrategicStatsProps) {
            <h4 className="text-xl font-bold text-white tracking-tight leading-none">{sentiment}</h4>
         </div>
         <p className="text-[11px] text-emerald-400 font-bold flex items-center gap-1">
-           <TrendingUp className="w-3 h-3" /> {momentum}
+           <TrendingUp className="w-3 h-3" /> {momentum} on {readableNiche}
         </p>
       </div>
 

@@ -45,7 +45,7 @@ export function SaveIdeaButton({
       } else {
         toast.error(result?.error || 'Failed to save idea')
       }
-    } catch (e) {
+    } catch {
       toast.error('An unexpected error occurred while saving')
     } finally {
       setIsSaving(false)

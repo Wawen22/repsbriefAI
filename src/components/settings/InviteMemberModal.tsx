@@ -11,7 +11,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import { UserPlus, Mail, Loader2, Sparkles, Send } from 'lucide-react'
+import { UserPlus, Mail, Loader2, Send } from 'lucide-react'
 import { createTeamInvitationAction } from '@/app/actions/team'
 import { toast } from 'sonner'
 
@@ -37,7 +37,7 @@ export function InviteMemberModal() {
       } else {
         toast.error(res.error || "Failed to send invitation", { id: tid })
       }
-    } catch (err) {
+    } catch {
       toast.error("Something went wrong", { id: tid })
     } finally {
       setIsSending(false)

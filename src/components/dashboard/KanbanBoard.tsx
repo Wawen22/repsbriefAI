@@ -66,7 +66,7 @@ export function KanbanBoard({ initialIdeas, plan }: { initialIdeas: KanbanIdea[]
       const res = await updateIdeaStatusAction(draggableId, newStatus)
       if (res.error) throw new Error(res.error)
       toast.success(`Moved to ${newStatus}`)
-    } catch (err) {
+    } catch {
       setIdeas(previousIdeas)
       toast.error('Failed to move idea')
     }

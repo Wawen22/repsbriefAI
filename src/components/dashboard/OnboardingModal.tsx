@@ -12,16 +12,10 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { 
   Sparkles, 
-  Zap, 
   Orbit, 
   Video, 
   BrainCircuit, 
-  ArrowRight, 
-  ChevronRight,
-  LayoutGrid,
-  CheckCircle2,
-  Lock,
-  Star
+  ArrowRight
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { completeOnboardingAction } from "@/app/actions/profile"

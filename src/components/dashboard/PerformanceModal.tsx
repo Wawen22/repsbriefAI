@@ -10,7 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { Star, TrendingUp, MessageSquare, Save, X, Sparkles } from 'lucide-react'
+import { Star, TrendingUp, Save, Sparkles } from 'lucide-react'
 import { updatePerformanceAction } from '@/app/actions/ideas'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
@@ -41,7 +41,7 @@ export function PerformanceModal({ ideaId, title, isOpen, onClose }: Performance
         icon: <Sparkles className="w-4 h-4 text-emerald-400" />
       })
       onClose()
-    } catch (err) {
+    } catch {
       toast.error('Failed to save performance')
     } finally {
       setIsSaving(false)

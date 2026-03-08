@@ -18,7 +18,7 @@ export function DeleteIdeaButton({ id }: { id: string }) {
       } else {
         toast.success("Idea deleted")
       }
-    } catch (e) {
+    } catch {
       toast.error('An expected error occurred while deleting')
     } finally {
       setIsDeleting(false)

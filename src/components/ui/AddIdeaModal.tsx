@@ -11,7 +11,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import { Plus, Zap, Sparkles, X, ArrowRight, Lightbulb } from 'lucide-react'
+import { Plus, Zap, Sparkles, ArrowRight, Lightbulb } from 'lucide-react'
 import { saveIdeaAction } from '@/app/actions/ideas'
 import { Badge } from '@/components/ui/badge'
 import { toast } from 'sonner'

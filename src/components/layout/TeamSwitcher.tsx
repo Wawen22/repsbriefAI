@@ -1,14 +1,11 @@
 'use client'
+/* eslint-disable @next/next/no-img-element */
 
 import { useState, useEffect } from 'react'
 import { 
-  Users, 
   ChevronDown, 
   Check, 
-  PlusCircle, 
-  LayoutGrid,
-  Loader2,
-  Orbit
+  PlusCircle
 } from "lucide-react"
 import { getUserTeamsAction, switchTeamAction } from "@/app/actions/team"
 import { 
@@ -59,7 +56,7 @@ export function TeamSwitcher() {
       } else {
         toast.error(res.error || "Failed to switch", { id: tid })
       }
-    } catch (e) {
+    } catch {
       toast.error("Something went wrong", { id: tid })
     } finally {
       setIsOpen(false)

@@ -14,7 +14,7 @@ type NotionParent =
   | { type: "data_source_id"; data_source_id: string }
   | { type: "page_id"; page_id: string }
 
-export const exchangeCodeForToken = async (code: string) => {
+export const exchangeCodeForToken = async (code: string, redirectUri: string = REDIRECT_URI) => {
   const auth = Buffer.from(`${NOTION_CLIENT_ID}:${NOTION_CLIENT_SECRET}`).toString("base64")
 
   const response = await fetch("https://api.notion.com/v1/oauth/token", {
@@ -27,7 +27,7 @@ export const exchangeCodeForToken = async (code: string) => {
     body: JSON.stringify({
       grant_type: "authorization_code",
       code,
-      redirect_uri: REDIRECT_URI,
+      redirect_uri: redirectUri,
     }),
   })
 

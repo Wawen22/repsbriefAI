@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { headers } from 'next/headers'
 import { stripe } from '@/lib/stripe'
-import { supabaseAdmin } from '@/lib/supabase'
+import { getSupabaseAdmin } from '@/lib/supabase'
 import { resolvePlanFromPriceId } from '@/lib/billing'
 import type Stripe from 'stripe'
 
@@ -17,9 +17,7 @@ async function updateProfileFromSubscription(
   subscription: Stripe.Subscription,
   userIdFromEvent?: string
 ) {
-  if (!supabaseAdmin) {
-    throw new Error('SUPABASE_SERVICE_ROLE_KEY is not configured')
-  }
+  const supabaseAdmin = getSupabaseAdmin('api/stripe/webhook')
 
   const priceId = subscription.items.data[0]?.price?.id
   const metadataPlan = subscription.metadata?.plan

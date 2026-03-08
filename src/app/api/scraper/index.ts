@@ -1,13 +1,14 @@
 // src/app/api/scraper/index.ts
 
 import { NicheConfig } from '@/types/niche'
-import { supabaseAdmin } from '@/lib/supabase'
+import { getSupabaseAdmin } from '@/lib/supabase'
 import { scrapeReddit } from './reddit'
 import { scrapeYouTube } from './youtube'
 import { scrapeGoogleTrends } from './googleTrends'
 import { scrapeRSS } from './rss'
 
 export async function scrapeNiche(niche: NicheConfig): Promise<void> {
+  const supabaseAdmin = getSupabaseAdmin('api/scraper/index')
   const weekDate = new Date().toISOString().split('T')[0] // current date (YYYY-MM-DD)
 
   const sources = [

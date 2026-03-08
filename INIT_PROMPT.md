@@ -25,11 +25,14 @@ Last update: 2026-03-08
   - [x] Slack OAuth security hardening (`state` nonce + start route)
   - [x] Integrations/Webhooks hardening (admin-only RLS + action guards)
   - [x] Discord notification channel (OAuth-first MVP)
+  - [x] Hardening wave P0 (cron paid-plan filter + webhooks/logs runtime/RLS alignment)
+  - [x] OAuth hardening wave Notion/Google (`/start` routes + nonce state + RBAC callback)
+  - [x] `supabaseAdmin` fail-fast hardening su path admin/cron (production)
 
 ## Task Status Tracking
 
-- [x] **Current Task (completed):** Discord OAuth-first MVP implementation (start/callback/actions + settings UX + test/disconnect) (2026-03-08)
-- [ ] **Next Task:** Provisioning Discord env + apply migration + staging/prod E2E validation
+- [x] **Current Task (completed):** P1.2 `supabaseAdmin` fail-fast hardening su path admin/cron (2026-03-08)
+- [ ] **Next Task:** P2 baseline test/CI (`test` script + workflow lint/typecheck/build)
 
 ## Validation Snapshot
 

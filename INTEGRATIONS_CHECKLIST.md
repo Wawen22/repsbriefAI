@@ -74,6 +74,7 @@ Applicare tutte le migration integrazioni in ogni ambiente:
 - `20260307170000_add_channel_to_team_webhooks.sql`
 - `20260307183000_harden_integrations_webhooks_rls.sql`
 - `20260308100000_add_discord_channel_to_team_webhooks.sql`
+- `20260308143000_add_insert_policy_team_integration_logs.sql`
 
 Se mancano migration `channel`, Slack/Discord possono fallire su `team_webhooks`.
 

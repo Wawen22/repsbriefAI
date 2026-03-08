@@ -4,9 +4,10 @@ import { NextResponse } from 'next/server'
 import { NICHES } from '@/config/niches'
 import { scrapeNiche } from '../../scraper'
 import { generateBrief } from '../../generator/briefGenerator'
-import { supabaseAdmin } from '@/lib/supabase'
+import { getSupabaseAdmin } from '@/lib/supabase'
 import { triggerWebhooks } from '@/lib/integrations/webhooks'
 import { sendBrief } from '../../email/sendBrief'
+import { ACTIVE_PAID_PLANS } from '@/lib/billing'
 import type { NicheConfig, TrendItem } from '@/types/niche'
 
 export const dynamic = 'force-dynamic'
@@ -27,6 +28,8 @@ export async function POST(req: Request) {
   }
 
   try {
+    const supabaseAdmin = getSupabaseAdmin('api/cron/weeklyBrief')
+
     // 2. Get active niches
     const activeNiches = Object.values(NICHES).filter((niche): niche is NicheConfig => niche.active)
     results.totalNiches = activeNiches.length
@@ -36,11 +39,11 @@ export async function POST(req: Request) {
       await scrapeNiche(niche)
     }
 
-    // 4. Get all users with active subscriptions
+    // 4. Get all users with active paid plans
     const { data: users, error: usersError } = await supabaseAdmin
       .from('profiles')
       .select('*, id')
-      .not('plan', 'eq', 'free') 
+      .in('plan', ACTIVE_PAID_PLANS)
 
     if (usersError) throw usersError
     results.totalUsers = users?.length || 0

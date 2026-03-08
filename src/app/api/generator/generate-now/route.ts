@@ -3,7 +3,7 @@
 
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { supabaseAdmin } from '@/lib/supabase'
+import { getSupabaseAdmin } from '@/lib/supabase'
 import { NICHES } from '@/config/niches'
 import { scrapeNiche } from '../../scraper'
 import { generateBrief } from '../briefGenerator'
@@ -23,6 +23,8 @@ interface HistoryRow {
 
 export async function POST() {
   try {
+    const supabaseAdmin = getSupabaseAdmin('api/generator/generate-now')
+
     // 1. Auth — get current user via server client (respects RLS)
     const supabase = await createClient()
     const { data: { user }, error: authError } = await supabase.auth.getUser()

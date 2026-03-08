@@ -1,8 +1,6 @@
 // src/app/actions/integrations.ts
 'use client'
 
-import { getNotionAuthUrl } from "@/lib/integrations/notion-client"
-import { getGoogleAuthUrl } from "@/lib/integrations/google-client"
 import { createClient } from "@/lib/supabase/client"
 import { toast } from "sonner"
 
@@ -29,8 +27,8 @@ export async function connectNotion() {
     return
   }
 
-  const authUrl = getNotionAuthUrl(profile.current_team_id)
-  window.location.href = authUrl
+  const startUrl = `/api/auth/notion/start?team_id=${encodeURIComponent(profile.current_team_id)}`
+  window.location.href = startUrl
 }
 
 /**
@@ -56,8 +54,8 @@ export async function connectGoogle() {
     return
   }
 
-  const authUrl = getGoogleAuthUrl(profile.current_team_id)
-  window.location.href = authUrl
+  const startUrl = `/api/auth/google/start?team_id=${encodeURIComponent(profile.current_team_id)}`
+  window.location.href = startUrl
 }
 
 /**

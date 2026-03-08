@@ -11,3 +11,23 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 // Admin client for backend/cron jobs/bypass RLS
 export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey ?? supabaseAnonKey)
+
+let serviceRoleWarningShown = false
+
+export function getSupabaseAdmin(context: string) {
+  if (supabaseServiceKey) {
+    return supabaseAdmin
+  }
+
+  const message = `[SupabaseAdmin] SUPABASE_SERVICE_ROLE_KEY missing (${context}).`
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error(`${message} Refusing anon fallback in production.`)
+  }
+
+  if (!serviceRoleWarningShown) {
+    console.warn(`${message} Using anon fallback outside production.`)
+    serviceRoleWarningShown = true
+  }
+
+  return supabaseAdmin
+}

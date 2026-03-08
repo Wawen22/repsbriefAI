@@ -5,6 +5,9 @@ Questo documento traccia lo stato delle integrazioni esterne (Plugins/Connection
 Checklist operativa unica (dev/staging/prod):
 - [INTEGRATIONS_CHECKLIST.md](./INTEGRATIONS_CHECKLIST.md)
 
+Priorita' integrazioni raccomandate post-hardening (dopo fix P0/P1):
+- [TECHNICAL_FIXES_PLAN.md](./TECHNICAL_FIXES_PLAN.md)
+
 ## 🎯 Obiettivi Core
 - **Automazione:** Ridurre il "friction" tra la generazione della strategia e la sua esecuzione.
 - **Team-Centric:** Le integrazioni sono collegate al **Team Workspace**, non al singolo utente (dove possibile).
@@ -26,7 +29,7 @@ Checklist operativa unica (dev/staging/prod):
 | Integrazione | Stato | Funzionalità | Priorità |
 | :--- | :--- | :--- | :--- |
 | **Slack OAuth** | ✅ Completato | Connessione no-code + bootstrap webhook automatico + hardening state nonce. | 🔥 Alta |
-| **Discord OAuth** | 🛠 In progress | OAuth one-click + webhook bootstrap + test send + disconnect/reconnect in Settings. | 🔥 Alta |
+| **Discord OAuth** | ✅ Completato | OAuth one-click + webhook bootstrap + test send + disconnect/reconnect in Settings. | 🔥 Alta |
 | **Trello / ClickUp** | 📋 Backlog | Creazione automatica di card/task per il team. | 🟡 Media |
 
 ### Fase 3: Publishing & Content Hub (Brainstorming)
@@ -90,6 +93,16 @@ Il sistema supporta l'invio asincrono di payload JSON con firma di sicurezza:
 ---
 
 ## 📑 Log delle Implementazioni
+
+### [2026-03-08] - Hardening Wave P0/P1.1
+- Cron paid-plan filter allineato a `ACTIVE_PAID_PLANS` (`pro/team`) in `weeklyBrief`.
+- Webhooks engine allineato a percorso admin per delivery/log in runtime server.
+- Aggiunta migration `20260308143000_add_insert_policy_team_integration_logs.sql` (policy `INSERT` owner/admin su logs).
+- OAuth Notion/Google hardening:
+  - Nuove route server-side `GET /api/auth/google/start` e `GET /api/auth/notion/start`.
+  - Callback con validazione `state` (nonce cookie HttpOnly + TTL) e RBAC owner/admin.
+  - Redirect hardening basato su `NEXT_PUBLIC_APP_URL` (fallback `req.nextUrl.origin`).
+- Fail-fast production sui path critici che richiedono privilegi admin (`SUPABASE_SERVICE_ROLE_KEY`).
 
 ### [2026-03-08] - Discord OAuth-first (MVP) Implementato
 - Aggiunte route OAuth:

@@ -28,7 +28,7 @@ export const getGoogleAuthUrl = (teamId: string) => {
 /**
  * Scambia il codice per i token (Access & Refresh)
  */
-export const exchangeCodeForTokens = async (code: string) => {
+export const exchangeCodeForTokens = async (code: string, redirectUri: string = REDIRECT_URI) => {
   const response = await fetch("https://oauth2.googleapis.com/token", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -36,7 +36,7 @@ export const exchangeCodeForTokens = async (code: string) => {
       code,
       client_id: GOOGLE_CLIENT_ID!,
       client_secret: GOOGLE_CLIENT_SECRET!,
-      redirect_uri: REDIRECT_URI,
+      redirect_uri: redirectUri,
       grant_type: "authorization_code"
     })
   })

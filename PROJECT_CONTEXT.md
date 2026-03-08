@@ -49,11 +49,14 @@ RepsBrief è una web app `Next.js + Supabase` per generare, organizzare e distri
   - [x] OAuth-first blueprint per integrazioni future (Discord incluso)
   - [x] Migrazione Next.js `middleware -> proxy`
   - [x] Discord notification channel pre-formattato (OAuth-first MVP)
+  - [x] Hardening wave P0 (cron paid-plan filter + webhooks/logs runtime/RLS alignment)
+  - [x] OAuth hardening wave Notion/Google (`/start` routes + nonce state + RBAC callback)
+  - [x] `supabaseAdmin` fail-fast hardening su path admin/cron (production)
 
 ## 5) Task Status Tracking
 
-- [x] **Current Task (completed):** Implementazione Discord OAuth-first MVP (start/callback/actions + Settings UX + test/disconnect) (2026-03-08)
-- [ ] **Next Task:** Provisioning env Discord + apply migration + QA end-to-end staging/production
+- [x] **Current Task (completed):** P1.2 `supabaseAdmin` fail-fast hardening su path admin/cron (2026-03-08)
+- [ ] **Next Task:** P2 baseline test/CI (`test` + workflow lint/typecheck/build)
 
 ### Completed Milestones
 
@@ -96,6 +99,11 @@ RepsBrief è una web app `Next.js + Supabase` per generare, organizzare e distri
 - [x] Discord OAuth start/callback (`/api/auth/discord/start`, `/api/auth/discord/callback`)
 - [x] Discord webhook channel support (`team_webhooks.channel='discord'` + payload formatter)
 - [x] Discord Settings UX (connect/manage/test/disconnect)
+- [x] Project health audit #2 (security/runtime review + improvement backlog)
+- [x] P0.1 cron paid-plan filter allineato a `ACTIVE_PAID_PLANS` (`pro/team`)
+- [x] P0.2 trigger webhooks allineato a path admin + policy SQL `INSERT` su `team_integration_logs`
+- [x] P1.1 hardening OAuth Notion/Google (start route server-side + nonce state cookie + RBAC callback)
+- [x] P1.2 fail-fast `SUPABASE_SERVICE_ROLE_KEY` nei path critici (cron/scraper/generator/webhooks/stripe webhook)
 
 ## 6) Validation Snapshot (2026-03-08)
 
@@ -121,6 +129,9 @@ RepsBrief è una web app `Next.js + Supabase` per generare, organizzare e distri
 - Added: `supabase/migrations/20260308100000_add_discord_channel_to_team_webhooks.sql`
   - estende `team_webhooks_channel_check` a `discord`
   - mantiene indice `(team_id, channel, active)`
+- Added: `supabase/migrations/20260308143000_add_insert_policy_team_integration_logs.sql`
+  - aggiunge policy `INSERT` su `team_integration_logs` per owner/admin
+  - riallinea observability logs con hardening RLS integrazioni
 
 ## 8) Open Risks & Notes
 
@@ -131,12 +142,12 @@ RepsBrief è una web app `Next.js + Supabase` per generare, organizzare e distri
 - Le chiavi Slack condivise durante setup vanno ruotate dopo il test (igiene segreti).
 - Discord OAuth richiede configurazione Redirect URL corretta in Discord App (`/api/auth/discord/callback`) su ogni ambiente.
 - Se la migration `20260308100000_add_discord_channel_to_team_webhooks` non è applicata in staging/prod, bootstrap Discord fallisce per constraint `team_webhooks_channel_check`.
-- `supabaseAdmin` ora fa fallback su anon key se `SUPABASE_SERVICE_ROLE_KEY` manca: evita errori runtime/TS ma può ridurre privilegi nei path admin/cron.
+- `supabaseAdmin` mantiene fallback anon solo fuori production; in production i path critici ora vanno in fail-fast se `SUPABASE_SERVICE_ROLE_KEY` manca.
 
 ## 9) Immediate Execution Plan
 
-1. Applicare migration Discord channel su staging/production.
-2. Configurare env Discord (`DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET`) e Redirect URL per ambiente.
-3. Validare Discord end-to-end su workspace reale (connect, test, delivery reale, disconnect/reconnect).
-4. Verificare Automation Logs per provider `discord` su eventi `brief.ready`, `idea.approved`, `content.scheduled`.
-5. Hardening finale UX (feedback query `success/error` da callback Discord in Settings).
+1. Applicare migration `20260308143000_add_insert_policy_team_integration_logs.sql` su staging/production.
+2. Eseguire smoke test end-to-end delivery (`brief.ready`, `idea.approved`, `content.scheduled`) verificando endpoint + Automation Logs.
+3. Eseguire smoke test OAuth Notion/Google post-hardening (`/start` + callback con `state` validato + RBAC owner/admin).
+4. Implementare baseline CI/test (`npm test`, workflow GitHub Actions con lint/typecheck/build).
+5. Avviare refactor maintainability su `IntegrationsSettings` (split componenti + hook dedicati).

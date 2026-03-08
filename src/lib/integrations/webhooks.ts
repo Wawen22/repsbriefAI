@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
+import { getSupabaseAdmin } from "@/lib/supabase"
 import crypto from "crypto"
 
 /**
@@ -29,6 +30,48 @@ type SlackPayload = {
 type DiscordPayload = {
   content: string
   embeds: Array<Record<string, unknown>>
+}
+
+type IntegrationLogPayload = {
+  team_id: string
+  provider: string
+  action: string
+  status: 'success' | 'error'
+  event_type: string
+  details: Record<string, unknown>
+}
+
+let serviceRoleWarningShown = false
+
+async function getWebhookDbClient() {
+  if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    return getSupabaseAdmin('lib/integrations/webhooks')
+  }
+
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error(
+      "[Webhooks] SUPABASE_SERVICE_ROLE_KEY is missing. Refusing request-scoped fallback in production."
+    )
+  }
+
+  if (!serviceRoleWarningShown) {
+    console.warn(
+      "[Webhooks] SUPABASE_SERVICE_ROLE_KEY is missing. Falling back to request-scoped client; automation delivery may be limited by RLS."
+    )
+    serviceRoleWarningShown = true
+  }
+
+  return createClient()
+}
+
+async function insertIntegrationLog(
+  supabase: Awaited<ReturnType<typeof getWebhookDbClient>>,
+  payload: IntegrationLogPayload
+) {
+  const { error } = await supabase.from('team_integration_logs').insert(payload)
+  if (error) {
+    console.error('[Webhooks] Failed to persist integration log:', error)
+  }
 }
 
 function normalizeChannel(channel: string | null | undefined): WebhookChannel {
@@ -202,7 +245,7 @@ export const triggerWebhooks = async (
   payload: unknown,
   webhookId?: string
 ) => {
-  const supabase = await createClient()
+  const supabase = await getWebhookDbClient()
 
   // 1. Recupero i webhooks attivi per questo team che ascoltano questo evento
   let query = supabase
@@ -218,7 +261,12 @@ export const triggerWebhooks = async (
 
   const { data: webhooks, error } = await query
 
-  if (error || !webhooks || webhooks.length === 0) return []
+  if (error) {
+    console.error(`[Webhooks] Failed to load active webhooks for team ${teamId}:`, error)
+    return []
+  }
+
+  if (!webhooks || webhooks.length === 0) return []
 
   // 2. Invio asincrono a tutti gli endpoint
   const results = await Promise.allSettled((webhooks as WebhookRow[]).map(async (webhook) => {
@@ -260,7 +308,7 @@ export const triggerWebhooks = async (
       })
 
       // Log dell'invio (opzionale, ma utile per debug)
-      await supabase.from('team_integration_logs').insert({
+      await insertIntegrationLog(supabase, {
         team_id: teamId,
         provider,
         action: event,
@@ -279,7 +327,7 @@ export const triggerWebhooks = async (
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Unknown webhook delivery error'
       console.error(`Webhook delivery failed for ${webhook.url}:`, err)
-      await supabase.from('team_integration_logs').insert({
+      await insertIntegrationLog(supabase, {
         team_id: teamId,
         provider,
         action: event,

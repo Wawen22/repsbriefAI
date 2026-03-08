@@ -55,11 +55,13 @@ RepsBrief è una web app `Next.js + Supabase` per generare, organizzare e distri
   - [x] P2 baseline test/CI (`vitest` unit+smoke + scripts `typecheck/test/test:e2e` + GitHub Actions CI)
   - [x] P2 maintainability refactor `IntegrationsSettings` (split componenti + hook team/webhooks)
   - [x] P3 dependency/security maintenance wave (`npm audit fix` + regression checks full pipeline)
+  - [x] P4.1 Trello/ClickUp OAuth design spike (`TRELLO_CLICKUP_OAUTH_SPIKE.md`)
+  - [x] P4.2 ClickUp OAuth MVP (`start/callback` + connect/disconnect/test + Settings UI)
 
 ## 5) Task Status Tracking
 
-- [x] **Current Task (completed):** TECHNICAL_FIXES_PLAN closeout (`P0 -> P3` completati + regression checks full pipeline) (2026-03-08)
-- [ ] **Next Task:** Avvio integrazioni post-fix: Trello/ClickUp OAuth design + implementation spike
+- [x] **Current Task (completed):** P4.2 ClickUp OAuth MVP (2026-03-08)
+- [ ] **Next Task:** P4.2 Trello OAuth MVP (`start/callback` + connect/disconnect/test + Settings UI)
 
 ### Completed Milestones
 
@@ -111,6 +113,8 @@ RepsBrief è una web app `Next.js + Supabase` per generare, organizzare e distri
 - [x] P2 refactor UI integrations settings (componentizzazione + custom hook)
 - [x] P3 security maintenance (`npm audit fix`) con regressioni assenti su lint/typecheck/test/build
 - [x] TECHNICAL_FIXES_PLAN closeout con validazione completa (`lint`, `typecheck`, `test`, `test:e2e`, `build`, `npm audit`)
+- [x] P4.1 Trello/ClickUp OAuth design spike (contract, mapping schema, security checks, implementation plan)
+- [x] P4.2 ClickUp OAuth MVP (OAuth routes + actions + Settings panel + env/checklist updates)
 
 ## 6) Validation Snapshot (2026-03-08)
 
@@ -152,12 +156,14 @@ RepsBrief è una web app `Next.js + Supabase` per generare, organizzare e distri
 - Discord OAuth richiede configurazione Redirect URL corretta in Discord App (`/api/auth/discord/callback`) su ogni ambiente.
 - Se la migration `20260308100000_add_discord_channel_to_team_webhooks` non è applicata in staging/prod, bootstrap Discord fallisce per constraint `team_webhooks_channel_check`.
 - `supabaseAdmin` mantiene fallback anon solo fuori production; in production i path critici ora vanno in fail-fast se `SUPABASE_SERVICE_ROLE_KEY` manca.
-- Trello/ClickUp OAuth non ancora implementati: resta gap sul task-management team-first post-hardening.
+- Trello OAuth non ancora implementato: resta gap parziale sul task-management team-first post-hardening.
+- ClickUp OAuth MVP implementato; resta rollout checklist su staging/prod (redirect URI + env vars + smoke test).
 
 ## 9) Immediate Execution Plan
 
 1. Applicare migration `20260308143000_add_insert_policy_team_integration_logs.sql` su staging/production.
 2. Eseguire smoke test manuale UI integrations (connect/manage/test/disconnect su generic/slack/discord) con verifica `Automation Logs`.
-3. Avviare spike Trello/ClickUp OAuth team-first (schema provider metadata, route `start/callback`, actions connect/disconnect, UX Settings).
-4. Definire spike Queue/Jobs layer (`Inngest` o alternativa) per retry/dead-letter delivery webhook e cron tasks.
-5. Agganciare observability stack (Sentry + alerting) sui path critici: OAuth callback, webhook delivery, cron weekly.
+3. Implementare Trello MVP (`start/callback`, actions connect/disconnect/test, UI Settings, logging).
+4. Eseguire smoke test ClickUp OAuth su staging/prod (connect/test/disconnect + Automation Logs).
+5. Definire spike Queue/Jobs layer (`Inngest` o alternativa) per retry/dead-letter delivery webhook e cron tasks.
+6. Agganciare observability stack (Sentry + alerting) sui path critici: OAuth callback, webhook delivery, cron weekly.

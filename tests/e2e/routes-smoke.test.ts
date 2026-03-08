@@ -9,6 +9,8 @@ describe('api auth routes smoke imports', () => {
       import('@/app/api/auth/slack/callback/route'),
       import('@/app/api/auth/discord/start/route'),
       import('@/app/api/auth/discord/callback/route'),
+      import('@/app/api/auth/clickup/start/route'),
+      import('@/app/api/auth/clickup/callback/route'),
     ])
 
     for (const route of routes) {

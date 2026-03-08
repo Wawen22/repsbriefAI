@@ -6,11 +6,16 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { toast } from 'sonner'
 import {
+  connectClickUp,
   connectDiscord,
   connectGoogle,
   connectNotion,
   connectSlack,
 } from '@/app/actions/integrations'
+import {
+  disconnectClickUpIntegrationAction,
+  testClickUpIntegrationAction,
+} from '@/app/actions/clickup'
 import {
   addWebhookAction,
   deleteWebhookAction,
@@ -18,10 +23,12 @@ import {
   testWebhookAction,
   toggleWebhookAction,
 } from '@/app/actions/webhooks'
+import { ClickUpIntegrationSection } from '@/components/settings/integrations/ClickUpIntegrationSection'
 import { IntegrationsProvidersGrid } from '@/components/settings/integrations/IntegrationsProvidersGrid'
 import { WebhookChannelSection } from '@/components/settings/integrations/WebhookChannelSection'
 import {
   DEFAULT_EVENTS,
+  type Integration,
   normalizeWebhookChannel,
   type WebhookChannel,
 } from '@/components/settings/integrations/types'
@@ -40,9 +47,11 @@ export function IntegrationsSettings() {
   const [showWebhooks, setShowWebhooks] = useState(false)
   const [showSlack, setShowSlack] = useState(false)
   const [showDiscord, setShowDiscord] = useState(false)
+  const [showClickUp, setShowClickUp] = useState(false)
   const [hideGenericPanel, setHideGenericPanel] = useState(false)
   const [hideSlackPanel, setHideSlackPanel] = useState(false)
   const [hideDiscordPanel, setHideDiscordPanel] = useState(false)
+  const [hideClickUpPanel, setHideClickUpPanel] = useState(false)
 
   const [newWebhookUrl, setNewWebhookUrl] = useState('')
   const [newWebhookName, setNewWebhookName] = useState('')
@@ -67,12 +76,16 @@ export function IntegrationsSettings() {
   const activeGenericWebhooksCount = genericWebhooks.filter((webhook) => webhook.active).length
   const activeSlackWebhooksCount = slackWebhooks.filter((webhook) => webhook.active).length
   const activeDiscordWebhooksCount = discordWebhooks.filter((webhook) => webhook.active).length
+  const clickUpIntegration =
+    (integrations.find((integration) => integration.provider === 'clickup') as Integration | undefined) || null
 
   const isGenericPanelVisible =
     genericWebhooks.length > 0 ? !hideGenericPanel : showWebhooks
   const isSlackPanelVisible = slackWebhooks.length > 0 ? !hideSlackPanel : showSlack
   const isDiscordPanelVisible =
     discordWebhooks.length > 0 ? !hideDiscordPanel : showDiscord
+  const isClickUpPanelVisible =
+    clickUpIntegration ? !hideClickUpPanel : showClickUp
 
   const handleConnect = async (providerId: string) => {
     if (canManageIntegrations === false) {
@@ -98,6 +111,7 @@ export function IntegrationsSettings() {
       }
       setShowSlack(false)
       setShowDiscord(false)
+      setShowClickUp(false)
       return
     }
 
@@ -112,6 +126,7 @@ export function IntegrationsSettings() {
       await connectSlack()
       setShowWebhooks(false)
       setShowDiscord(false)
+      setShowClickUp(false)
       return
     }
 
@@ -126,6 +141,23 @@ export function IntegrationsSettings() {
       await connectDiscord()
       setShowWebhooks(false)
       setShowSlack(false)
+      setShowClickUp(false)
+      return
+    }
+
+    if (providerId === 'clickup') {
+      if (clickUpIntegration) {
+        setShowWebhooks(false)
+        setShowSlack(false)
+        setShowDiscord(false)
+        setHideClickUpPanel(false)
+        return
+      }
+
+      await connectClickUp()
+      setShowWebhooks(false)
+      setShowSlack(false)
+      setShowDiscord(false)
       return
     }
 
@@ -260,6 +292,44 @@ export function IntegrationsSettings() {
     toast.error(res.error || `Unable to disconnect ${label}`, { id: tid })
   }
 
+  const handleTestClickUp = async () => {
+    if (canManageIntegrations === false) {
+      toast.error('Solo owner/admin possono gestire integrazioni.')
+      return
+    }
+    if (!teamId) return
+
+    const tid = toast.loading('Testing ClickUp connection...')
+    const res = await testClickUpIntegrationAction(teamId)
+    if (res.success) {
+      toast.success(`ClickUp OK (${res.workspaceCount || 0} workspace)`, { id: tid })
+      await fetchIntegrations()
+      return
+    }
+
+    toast.error(res.error || 'ClickUp test failed', { id: tid })
+  }
+
+  const handleDisconnectClickUp = async () => {
+    if (canManageIntegrations === false) {
+      toast.error('Solo owner/admin possono gestire integrazioni.')
+      return
+    }
+    if (!teamId) return
+
+    const tid = toast.loading('Disconnecting ClickUp...')
+    const res = await disconnectClickUpIntegrationAction(teamId)
+    if (res.success) {
+      toast.success('ClickUp disconnected', { id: tid })
+      setShowClickUp(false)
+      setHideClickUpPanel(false)
+      await fetchIntegrations()
+      return
+    }
+
+    toast.error(res.error || 'Unable to disconnect ClickUp', { id: tid })
+  }
+
   return (
     <div className="space-y-6">
       {canManageIntegrations === false && (
@@ -281,6 +351,22 @@ export function IntegrationsSettings() {
         showDiscord={isDiscordPanelVisible}
         canManageIntegrations={canManageIntegrations}
         onConnect={handleConnect}
+      />
+
+      <ClickUpIntegrationSection
+        integration={clickUpIntegration}
+        isVisible={isClickUpPanelVisible}
+        canManageIntegrations={canManageIntegrations}
+        onClose={() => {
+          if (clickUpIntegration) {
+            setHideClickUpPanel(true)
+          } else {
+            setShowClickUp(false)
+          }
+        }}
+        onReconnect={connectClickUp}
+        onTest={handleTestClickUp}
+        onDisconnect={handleDisconnectClickUp}
       />
 
       <WebhookChannelSection

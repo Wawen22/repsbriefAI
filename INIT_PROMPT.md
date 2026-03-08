@@ -31,11 +31,13 @@ Last update: 2026-03-08
   - [x] P2 baseline test/CI (`vitest` + scripts + workflow GitHub Actions)
   - [x] P2 maintainability refactor `IntegrationsSettings` (split componenti + hook)
   - [x] P3 dependency/security maintenance wave (`npm audit fix` + full regression checks)
+  - [x] P4.1 Trello/ClickUp OAuth design spike (`TRELLO_CLICKUP_OAUTH_SPIKE.md`)
+  - [x] P4.2 ClickUp OAuth MVP (`start/callback` + connect/disconnect/test + Settings UI)
 
 ## Task Status Tracking
 
-- [x] **Current Task (completed):** TECHNICAL_FIXES_PLAN closeout (`P0 -> P3` completati + regression checks full pipeline) (2026-03-08)
-- [ ] **Next Task:** Start post-fix integrations: Trello/ClickUp OAuth design + implementation spike
+- [x] **Current Task (completed):** P4.2 ClickUp OAuth MVP (2026-03-08)
+- [ ] **Next Task:** P4.2 Trello OAuth MVP (`start/callback` + connect/disconnect/test + Settings UI)
 
 ## Validation Snapshot
 

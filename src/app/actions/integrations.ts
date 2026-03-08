@@ -111,3 +111,30 @@ export async function connectDiscord() {
   const startUrl = `/api/auth/discord/start?team_id=${encodeURIComponent(profile.current_team_id)}`
   window.location.href = startUrl
 }
+
+/**
+ * Inizia il flusso di autenticazione ClickUp OAuth
+ */
+export async function connectClickUp() {
+  const supabase = createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    toast.error("Devi essere loggato per connettere ClickUp.")
+    return
+  }
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('current_team_id')
+    .eq('id', user.id)
+    .single()
+
+  if (!profile?.current_team_id) {
+    toast.error("Nessun team attivo trovato.")
+    return
+  }
+
+  const startUrl = `/api/auth/clickup/start?team_id=${encodeURIComponent(profile.current_team_id)}`
+  window.location.href = startUrl
+}

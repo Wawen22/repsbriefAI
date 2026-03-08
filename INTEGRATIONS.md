@@ -31,7 +31,8 @@ Priorita' integrazioni raccomandate post-hardening (dopo fix P0/P1):
 | :--- | :--- | :--- | :--- |
 | **Slack OAuth** | ✅ Completato | Connessione no-code + bootstrap webhook automatico + hardening state nonce. | 🔥 Alta |
 | **Discord OAuth** | ✅ Completato | OAuth one-click + webhook bootstrap + test send + disconnect/reconnect in Settings. | 🔥 Alta |
-| **Trello / ClickUp** | 🧪 Spike pianificato | Creazione automatica di card/task per il team. | 🟡 Media |
+| **ClickUp OAuth** | ✅ MVP Completato | Connect/disconnect/test + persistenza team-level + pannello Settings dedicato. | 🟡 Media |
+| **Trello OAuth** | 🧪 Design spike completato | Creazione automatica di card/task per il team. | 🟡 Media |
 
 ### Fase 3: Publishing & Content Hub (Brainstorming)
 | Integrazione | Stato | Funzionalità | Priorità |
@@ -115,6 +116,42 @@ Il sistema supporta l'invio asincrono di payload JSON con firma di sicurezza:
   - eseguito `npm audit fix`,
   - stato dipendenze: `0 vulnerabilities`,
   - regression checks verdi (`lint`, `typecheck`, `test`, `test:e2e`, `build`).
+
+### [2026-03-08] - Trello/ClickUp OAuth Design Spike (P4.1) Completato
+- Definito contract OAuth-first per provider task-management:
+  - `GET /api/auth/<provider>/start`,
+  - `GET /api/auth/<provider>/callback`,
+  - action `connect/disconnect/test`.
+- Definito mapping `team_integrations`:
+  - provider values `trello`/`clickup`,
+  - schema base per `encrypted_credentials` e `settings`.
+- Definito piano implementativo sequenziale:
+  - ClickUp MVP prima, Trello subito dopo con adapter riusabile.
+- Definiti security/reliability guardrail:
+  - nonce `HttpOnly`, TTL, RBAC owner/admin, logging obbligatorio su `team_integration_logs`.
+- Artefatto tecnico:
+  - `TRELLO_CLICKUP_OAUTH_SPIKE.md`.
+
+### [2026-03-08] - ClickUp OAuth MVP (P4.2 phase A) Implementato
+- Aggiunte route OAuth:
+  - `GET /api/auth/clickup/start`
+  - `GET /api/auth/clickup/callback`
+- Hardening callback:
+  - validazione `state` (`teamId`, nonce, TTL),
+  - RBAC owner/admin prima del persist token,
+  - cleanup cookie nonce su successo/errore.
+- Persistenza integrazione:
+  - upsert `team_integrations` con `provider=clickup`,
+  - salvataggio credential/settings workspace team-level.
+- Settings UI:
+  - provider `ClickUp Tasks` nel grid integrazioni,
+  - pannello gestione con `Reconnect`, `Test Connection`, `Disconnect`.
+- Server actions:
+  - `testClickUpIntegrationAction` (verifica workspace API + log),
+  - `disconnectClickUpIntegrationAction` (revoca locale + log).
+- Checklist/env aggiornati:
+  - `.env.example` (`CLICKUP_CLIENT_ID`, `CLICKUP_CLIENT_SECRET`),
+  - `INTEGRATIONS_CHECKLIST.md` (redirect + env + smoke scope).
 
 ### [2026-03-08] - Discord OAuth-first (MVP) Implementato
 - Aggiunte route OAuth:

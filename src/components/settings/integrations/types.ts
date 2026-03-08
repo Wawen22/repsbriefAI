@@ -1,7 +1,7 @@
 'use client'
 
 import type { LucideIcon } from 'lucide-react'
-import { Calendar, Globe, Layout, MessageCircle, MessageSquare } from 'lucide-react'
+import { Calendar, Cable, Globe, Layout, MessageCircle, MessageSquare } from 'lucide-react'
 
 export interface Integration {
   id: string
@@ -67,6 +67,14 @@ export const AVAILABLE_PROVIDERS: ProviderConfig[] = [
     icon: MessageCircle,
     color: 'text-indigo-300',
     bg: 'bg-indigo-500/10',
+  },
+  {
+    id: 'clickup',
+    name: 'ClickUp Tasks',
+    description: 'Crea task operativi dal workflow editoriale del team.',
+    icon: Cable,
+    color: 'text-sky-300',
+    bg: 'bg-sky-500/10',
   },
   {
     id: 'zapier',

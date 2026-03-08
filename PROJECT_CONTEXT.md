@@ -52,11 +52,14 @@ RepsBrief è una web app `Next.js + Supabase` per generare, organizzare e distri
   - [x] Hardening wave P0 (cron paid-plan filter + webhooks/logs runtime/RLS alignment)
   - [x] OAuth hardening wave Notion/Google (`/start` routes + nonce state + RBAC callback)
   - [x] `supabaseAdmin` fail-fast hardening su path admin/cron (production)
+  - [x] P2 baseline test/CI (`vitest` unit+smoke + scripts `typecheck/test/test:e2e` + GitHub Actions CI)
+  - [x] P2 maintainability refactor `IntegrationsSettings` (split componenti + hook team/webhooks)
+  - [x] P3 dependency/security maintenance wave (`npm audit fix` + regression checks full pipeline)
 
 ## 5) Task Status Tracking
 
-- [x] **Current Task (completed):** P1.2 `supabaseAdmin` fail-fast hardening su path admin/cron (2026-03-08)
-- [ ] **Next Task:** P2 baseline test/CI (`test` + workflow lint/typecheck/build)
+- [x] **Current Task (completed):** TECHNICAL_FIXES_PLAN closeout (`P0 -> P3` completati + regression checks full pipeline) (2026-03-08)
+- [ ] **Next Task:** Avvio integrazioni post-fix: Trello/ClickUp OAuth design + implementation spike
 
 ### Completed Milestones
 
@@ -104,12 +107,19 @@ RepsBrief è una web app `Next.js + Supabase` per generare, organizzare e distri
 - [x] P0.2 trigger webhooks allineato a path admin + policy SQL `INSERT` su `team_integration_logs`
 - [x] P1.1 hardening OAuth Notion/Google (start route server-side + nonce state cookie + RBAC callback)
 - [x] P1.2 fail-fast `SUPABASE_SERVICE_ROLE_KEY` nei path critici (cron/scraper/generator/webhooks/stripe webhook)
+- [x] P2 baseline quality gate (test suite + CI workflow)
+- [x] P2 refactor UI integrations settings (componentizzazione + custom hook)
+- [x] P3 security maintenance (`npm audit fix`) con regressioni assenti su lint/typecheck/test/build
+- [x] TECHNICAL_FIXES_PLAN closeout con validazione completa (`lint`, `typecheck`, `test`, `test:e2e`, `build`, `npm audit`)
 
 ## 6) Validation Snapshot (2026-03-08)
 
 - [x] `npx tsc --noEmit` passes.
 - [x] `npm run build` passes.
 - [x] `npm run lint` passes con `0 errors`, `0 warnings`.
+- [x] `npm run test` passes.
+- [x] `npm run test:e2e` passes.
+- [x] `npm audit --audit-level=moderate` reports `0 vulnerabilities`.
 
 ## 7) DB / Migrations Recenti
 
@@ -137,17 +147,17 @@ RepsBrief è una web app `Next.js + Supabase` per generare, organizzare e distri
 
 - Migration logs alignment applicata sull'ambiente corrente; se manca su altri ambienti (staging/prod), i log webhook possono fallire per vincolo `integration_id NOT NULL`.
 - Se la migration `add_channel_to_team_webhooks` non e' applicata in staging/prod, la creazione canali Slack fallisce (`column channel does not exist`).
-- Setup Slack via webhook funziona ma ha frizione per utenti non tecnici; prioritario introdurre OAuth Slack con UX guidata.
 - Slack OAuth richiede configurazione Redirect URL corretta in Slack App (`/api/auth/slack/callback`) su ogni ambiente.
 - Le chiavi Slack condivise durante setup vanno ruotate dopo il test (igiene segreti).
 - Discord OAuth richiede configurazione Redirect URL corretta in Discord App (`/api/auth/discord/callback`) su ogni ambiente.
 - Se la migration `20260308100000_add_discord_channel_to_team_webhooks` non è applicata in staging/prod, bootstrap Discord fallisce per constraint `team_webhooks_channel_check`.
 - `supabaseAdmin` mantiene fallback anon solo fuori production; in production i path critici ora vanno in fail-fast se `SUPABASE_SERVICE_ROLE_KEY` manca.
+- Trello/ClickUp OAuth non ancora implementati: resta gap sul task-management team-first post-hardening.
 
 ## 9) Immediate Execution Plan
 
 1. Applicare migration `20260308143000_add_insert_policy_team_integration_logs.sql` su staging/production.
-2. Eseguire smoke test end-to-end delivery (`brief.ready`, `idea.approved`, `content.scheduled`) verificando endpoint + Automation Logs.
-3. Eseguire smoke test OAuth Notion/Google post-hardening (`/start` + callback con `state` validato + RBAC owner/admin).
-4. Implementare baseline CI/test (`npm test`, workflow GitHub Actions con lint/typecheck/build).
-5. Avviare refactor maintainability su `IntegrationsSettings` (split componenti + hook dedicati).
+2. Eseguire smoke test manuale UI integrations (connect/manage/test/disconnect su generic/slack/discord) con verifica `Automation Logs`.
+3. Avviare spike Trello/ClickUp OAuth team-first (schema provider metadata, route `start/callback`, actions connect/disconnect, UX Settings).
+4. Definire spike Queue/Jobs layer (`Inngest` o alternativa) per retry/dead-letter delivery webhook e cron tasks.
+5. Agganciare observability stack (Sentry + alerting) sui path critici: OAuth callback, webhook delivery, cron weekly.

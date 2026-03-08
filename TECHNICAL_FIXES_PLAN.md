@@ -16,9 +16,9 @@ Stabilizzare runtime/sicurezza/operativita' prima di nuove integrazioni, riducen
 2. [x] `P0.2` Webhooks + integration logs RLS/runtime alignment.
 3. [x] `P1.1` OAuth hardening Notion/Google (state nonce + start routes server-side + RBAC callback).
 4. [x] `P1.2` `supabaseAdmin` fail-fast policy in ambienti non-local.
-5. [ ] `P2` Test/CI baseline.
-6. [ ] `P2` Refactor UI settings monolitica.
-7. [ ] `P3` Dependency/security maintenance wave.
+5. [x] `P2` Test/CI baseline.
+6. [x] `P2` Refactor UI settings monolitica.
+7. [x] `P3` Dependency/security maintenance wave.
 
 ## Fix Backlog
 
@@ -131,6 +131,21 @@ Actions:
 Acceptance:
 - Riduzione vulnerabilita' high senza breaking changes.
 
+## Execution Completion Snapshot (2026-03-08)
+
+- [x] Tutti i fix `P0.1 -> P3` implementati e validati.
+- [x] Quality gate locale completo:
+  - `npm run lint`
+  - `npm run typecheck`
+  - `npm run test`
+  - `npm run test:e2e`
+  - `npm run build`
+- [x] Security check:
+  - `npm audit --audit-level=moderate` -> `0 vulnerabilities`
+- [x] Checklist stato aggiornata in:
+  - `INIT_PROMPT.md`
+  - `PROJECT_CONTEXT.md`
+
 ## Integration Opportunities (After Fixes)
 
 Priorita' di integrazione da iniziare **dopo** completamento P0 + P1:
@@ -141,10 +156,14 @@ Priorita' di integrazione da iniziare **dopo** completamento P0 + P1:
 4. Publishing connectors (WordPress/Ghost) per trasformare brief -> draft operativo.
 5. Cloud asset sync (Drive/Dropbox) per pipeline creativa team.
 
+Piano operativo dettagliato post-fix:
+- `POST_FIX_INTEGRATION_PLAN.md`
+
 ## Rollout Policy
 
 - Ogni fix richiede:
   - patch codice + eventuale migration,
   - update stato in `PROJECT_CONTEXT.md` e `INIT_PROMPT.md`,
-  - validazione `npm run lint`, `npx tsc --noEmit`, `npm run build`,
+  - validazione `npm run lint`, `npx tsc --noEmit`, `npm run test`, `npm run test:e2e`, `npm run build`,
+  - verifica security baseline (`npm audit --audit-level=moderate`),
   - smoke test manuale focalizzato.

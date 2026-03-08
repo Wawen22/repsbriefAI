@@ -28,17 +28,23 @@ Last update: 2026-03-08
   - [x] Hardening wave P0 (cron paid-plan filter + webhooks/logs runtime/RLS alignment)
   - [x] OAuth hardening wave Notion/Google (`/start` routes + nonce state + RBAC callback)
   - [x] `supabaseAdmin` fail-fast hardening su path admin/cron (production)
+  - [x] P2 baseline test/CI (`vitest` + scripts + workflow GitHub Actions)
+  - [x] P2 maintainability refactor `IntegrationsSettings` (split componenti + hook)
+  - [x] P3 dependency/security maintenance wave (`npm audit fix` + full regression checks)
 
 ## Task Status Tracking
 
-- [x] **Current Task (completed):** P1.2 `supabaseAdmin` fail-fast hardening su path admin/cron (2026-03-08)
-- [ ] **Next Task:** P2 baseline test/CI (`test` script + workflow lint/typecheck/build)
+- [x] **Current Task (completed):** TECHNICAL_FIXES_PLAN closeout (`P0 -> P3` completati + regression checks full pipeline) (2026-03-08)
+- [ ] **Next Task:** Start post-fix integrations: Trello/ClickUp OAuth design + implementation spike
 
 ## Validation Snapshot
 
 - [x] `npx tsc --noEmit` passes.
 - [x] `npm run build` passes.
 - [x] `npm run lint` passes with `0 errors`, `0 warnings`.
+- [x] `npm run test` passes.
+- [x] `npm run test:e2e` passes.
+- [x] `npm audit --audit-level=moderate` reports `0 vulnerabilities`.
 
 ## Notes
 

@@ -7,6 +7,7 @@ Checklist operativa unica (dev/staging/prod):
 
 Priorita' integrazioni raccomandate post-hardening (dopo fix P0/P1):
 - [TECHNICAL_FIXES_PLAN.md](./TECHNICAL_FIXES_PLAN.md)
+- [POST_FIX_INTEGRATION_PLAN.md](./POST_FIX_INTEGRATION_PLAN.md)
 
 ## 🎯 Obiettivi Core
 - **Automazione:** Ridurre il "friction" tra la generazione della strategia e la sua esecuzione.
@@ -30,7 +31,7 @@ Priorita' integrazioni raccomandate post-hardening (dopo fix P0/P1):
 | :--- | :--- | :--- | :--- |
 | **Slack OAuth** | ✅ Completato | Connessione no-code + bootstrap webhook automatico + hardening state nonce. | 🔥 Alta |
 | **Discord OAuth** | ✅ Completato | OAuth one-click + webhook bootstrap + test send + disconnect/reconnect in Settings. | 🔥 Alta |
-| **Trello / ClickUp** | 📋 Backlog | Creazione automatica di card/task per il team. | 🟡 Media |
+| **Trello / ClickUp** | 🧪 Spike pianificato | Creazione automatica di card/task per il team. | 🟡 Media |
 
 ### Fase 3: Publishing & Content Hub (Brainstorming)
 | Integrazione | Stato | Funzionalità | Priorità |
@@ -103,6 +104,17 @@ Il sistema supporta l'invio asincrono di payload JSON con firma di sicurezza:
   - Callback con validazione `state` (nonce cookie HttpOnly + TTL) e RBAC owner/admin.
   - Redirect hardening basato su `NEXT_PUBLIC_APP_URL` (fallback `req.nextUrl.origin`).
 - Fail-fast production sui path critici che richiedono privilegi admin (`SUPABASE_SERVICE_ROLE_KEY`).
+- Aggiunta baseline quality gate:
+  - test unit (`vitest`) + smoke suite route import,
+  - script `typecheck/test/test:e2e`,
+  - workflow CI GitHub Actions (`lint`, `typecheck`, `test`, `build`, `test:e2e`).
+- Refactor maintainability UI:
+  - `IntegrationsSettings` separata in componenti riusabili (`ProvidersGrid`, `WebhookChannelSection`),
+  - hook dedicato `useIntegrationsData` per team context e fetch integrazioni/webhooks.
+- Security maintenance wave:
+  - eseguito `npm audit fix`,
+  - stato dipendenze: `0 vulnerabilities`,
+  - regression checks verdi (`lint`, `typecheck`, `test`, `test:e2e`, `build`).
 
 ### [2026-03-08] - Discord OAuth-first (MVP) Implementato
 - Aggiunte route OAuth:

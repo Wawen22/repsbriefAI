@@ -2,6 +2,9 @@
 
 Questo documento traccia lo stato delle integrazioni esterne (Plugins/Connections) di RepsBrief. L'obiettivo è trasformare RepsBrief in un hub operativo che si collega ai tool già usati dagli utenti.
 
+Checklist operativa unica (dev/staging/prod):
+- [INTEGRATIONS_CHECKLIST.md](./INTEGRATIONS_CHECKLIST.md)
+
 ## 🎯 Obiettivi Core
 - **Automazione:** Ridurre il "friction" tra la generazione della strategia e la sua esecuzione.
 - **Team-Centric:** Le integrazioni sono collegate al **Team Workspace**, non al singolo utente (dove possibile).

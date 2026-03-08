@@ -11,6 +11,11 @@ npm run dev
 
 App locale: `http://localhost:3000`
 
+## Setup integrazioni (checklist unica)
+
+Per configurazione ambienti, redirect OAuth, env e smoke test usa:
+- [INTEGRATIONS_CHECKLIST.md](./INTEGRATIONS_CHECKLIST.md)
+
 ## Switch AI Provider (solo via `.env`)
 
 Il progetto non richiede modifiche al codice per cambiare provider AI: basta modificare variabili env e riavviare il server.

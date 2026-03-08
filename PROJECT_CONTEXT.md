@@ -158,6 +158,7 @@ RepsBrief è una web app `Next.js + Supabase` per generare, organizzare e distri
 - `supabaseAdmin` mantiene fallback anon solo fuori production; in production i path critici ora vanno in fail-fast se `SUPABASE_SERVICE_ROLE_KEY` manca.
 - Trello OAuth non ancora implementato: resta gap parziale sul task-management team-first post-hardening.
 - ClickUp OAuth MVP implementato; resta rollout checklist su staging/prod (redirect URI + env vars + smoke test).
+- Correzione applicata su callback ClickUp per errore `Oauth token not found` (token normalization + authorization fallback).
 
 ## 9) Immediate Execution Plan
 

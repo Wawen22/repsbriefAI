@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
-import { exchangeCodeForClickUpToken, getClickUpWorkspaces } from "@/lib/integrations/clickup"
+import {
+  exchangeCodeForClickUpToken,
+  getClickUpWorkspaces,
+  readClickUpAccessToken,
+} from "@/lib/integrations/clickup"
 
 const CLICKUP_OAUTH_NONCE_COOKIE = "rb_clickup_oauth_nonce"
 const STATE_TTL_MS = 10 * 60 * 1000
@@ -94,7 +98,10 @@ export async function GET(req: NextRequest) {
     }
 
     const tokenData = await exchangeCodeForClickUpToken(code, redirectUri)
-    const accessToken = tokenData.access_token as string
+    const accessToken = readClickUpAccessToken(tokenData)
+    if (!accessToken) {
+      throw new Error("ClickUp OAuth token missing in exchange response")
+    }
     const workspaces = await getClickUpWorkspaces(accessToken)
     const firstWorkspace = workspaces[0]
 

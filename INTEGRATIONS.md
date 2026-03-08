@@ -149,6 +149,9 @@ Il sistema supporta l'invio asincrono di payload JSON con firma di sicurezza:
 - Server actions:
   - `testClickUpIntegrationAction` (verifica workspace API + log),
   - `disconnectClickUpIntegrationAction` (revoca locale + log).
+- Fix callback/runtime:
+  - normalizzazione token OAuth ClickUp (`access_token`/`token`/`oauth_token`),
+  - gestione header Authorization con fallback (`raw`/`Bearer`) per evitare errore `Oauth token not found`.
 - Checklist/env aggiornati:
   - `.env.example` (`CLICKUP_CLIENT_ID`, `CLICKUP_CLIENT_SECRET`),
   - `INTEGRATIONS_CHECKLIST.md` (redirect + env + smoke scope).

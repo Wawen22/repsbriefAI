@@ -33,6 +33,7 @@ Last update: 2026-03-08
   - [x] P3 dependency/security maintenance wave (`npm audit fix` + full regression checks)
   - [x] P4.1 Trello/ClickUp OAuth design spike (`TRELLO_CLICKUP_OAUTH_SPIKE.md`)
   - [x] P4.2 ClickUp OAuth MVP (`start/callback` + connect/disconnect/test + Settings UI)
+  - [x] P4.2 ClickUp callback reliability fix (`Oauth token not found` mitigation)
 
 ## Task Status Tracking
 

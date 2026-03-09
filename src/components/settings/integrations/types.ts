@@ -1,7 +1,7 @@
 'use client'
 
 import type { LucideIcon } from 'lucide-react'
-import { Calendar, Cable, Globe, Layout, MessageCircle, MessageSquare } from 'lucide-react'
+import { Calendar, Cable, Globe, Layout, LayoutPanelLeft, MessageCircle, MessageSquare } from 'lucide-react'
 
 export interface Integration {
   id: string
@@ -75,6 +75,14 @@ export const AVAILABLE_PROVIDERS: ProviderConfig[] = [
     icon: Cable,
     color: 'text-sky-300',
     bg: 'bg-sky-500/10',
+  },
+  {
+    id: 'trello',
+    name: 'Trello Tasks',
+    description: 'Crea card Trello da workflow editoriali e approvazioni.',
+    icon: LayoutPanelLeft,
+    color: 'text-blue-300',
+    bg: 'bg-blue-500/10',
   },
   {
     id: 'zapier',

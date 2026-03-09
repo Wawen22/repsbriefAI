@@ -11,11 +11,16 @@ import {
   connectGoogle,
   connectNotion,
   connectSlack,
+  connectTrello,
 } from '@/app/actions/integrations'
 import {
   disconnectClickUpIntegrationAction,
   testClickUpIntegrationAction,
 } from '@/app/actions/clickup'
+import {
+  disconnectTrelloIntegrationAction,
+  testTrelloIntegrationAction,
+} from '@/app/actions/trello'
 import {
   addWebhookAction,
   deleteWebhookAction,
@@ -24,6 +29,7 @@ import {
   toggleWebhookAction,
 } from '@/app/actions/webhooks'
 import { ClickUpIntegrationSection } from '@/components/settings/integrations/ClickUpIntegrationSection'
+import { TrelloIntegrationSection } from '@/components/settings/integrations/TrelloIntegrationSection'
 import { IntegrationsProvidersGrid } from '@/components/settings/integrations/IntegrationsProvidersGrid'
 import { WebhookChannelSection } from '@/components/settings/integrations/WebhookChannelSection'
 import {
@@ -48,10 +54,12 @@ export function IntegrationsSettings() {
   const [showSlack, setShowSlack] = useState(false)
   const [showDiscord, setShowDiscord] = useState(false)
   const [showClickUp, setShowClickUp] = useState(false)
+  const [showTrello, setShowTrello] = useState(false)
   const [hideGenericPanel, setHideGenericPanel] = useState(false)
   const [hideSlackPanel, setHideSlackPanel] = useState(false)
   const [hideDiscordPanel, setHideDiscordPanel] = useState(false)
   const [hideClickUpPanel, setHideClickUpPanel] = useState(false)
+  const [hideTrelloPanel, setHideTrelloPanel] = useState(false)
 
   const [newWebhookUrl, setNewWebhookUrl] = useState('')
   const [newWebhookName, setNewWebhookName] = useState('')
@@ -78,6 +86,8 @@ export function IntegrationsSettings() {
   const activeDiscordWebhooksCount = discordWebhooks.filter((webhook) => webhook.active).length
   const clickUpIntegration =
     (integrations.find((integration) => integration.provider === 'clickup') as Integration | undefined) || null
+  const trelloIntegration =
+    (integrations.find((integration) => integration.provider === 'trello') as Integration | undefined) || null
 
   const isGenericPanelVisible =
     genericWebhooks.length > 0 ? !hideGenericPanel : showWebhooks
@@ -86,6 +96,8 @@ export function IntegrationsSettings() {
     discordWebhooks.length > 0 ? !hideDiscordPanel : showDiscord
   const isClickUpPanelVisible =
     clickUpIntegration ? !hideClickUpPanel : showClickUp
+  const isTrelloPanelVisible =
+    trelloIntegration ? !hideTrelloPanel : showTrello
 
   const handleConnect = async (providerId: string) => {
     if (canManageIntegrations === false) {
@@ -112,6 +124,7 @@ export function IntegrationsSettings() {
       setShowSlack(false)
       setShowDiscord(false)
       setShowClickUp(false)
+      setShowTrello(false)
       return
     }
 
@@ -127,6 +140,7 @@ export function IntegrationsSettings() {
       setShowWebhooks(false)
       setShowDiscord(false)
       setShowClickUp(false)
+      setShowTrello(false)
       return
     }
 
@@ -142,6 +156,7 @@ export function IntegrationsSettings() {
       setShowWebhooks(false)
       setShowSlack(false)
       setShowClickUp(false)
+      setShowTrello(false)
       return
     }
 
@@ -150,6 +165,7 @@ export function IntegrationsSettings() {
         setShowWebhooks(false)
         setShowSlack(false)
         setShowDiscord(false)
+        setShowTrello(false)
         setHideClickUpPanel(false)
         return
       }
@@ -158,6 +174,25 @@ export function IntegrationsSettings() {
       setShowWebhooks(false)
       setShowSlack(false)
       setShowDiscord(false)
+      setShowTrello(false)
+      return
+    }
+
+    if (providerId === 'trello') {
+      if (trelloIntegration) {
+        setShowWebhooks(false)
+        setShowSlack(false)
+        setShowDiscord(false)
+        setShowClickUp(false)
+        setHideTrelloPanel(false)
+        return
+      }
+
+      await connectTrello()
+      setShowWebhooks(false)
+      setShowSlack(false)
+      setShowDiscord(false)
+      setShowClickUp(false)
       return
     }
 
@@ -330,6 +365,44 @@ export function IntegrationsSettings() {
     toast.error(res.error || 'Unable to disconnect ClickUp', { id: tid })
   }
 
+  const handleTestTrello = async () => {
+    if (canManageIntegrations === false) {
+      toast.error('Solo owner/admin possono gestire integrazioni.')
+      return
+    }
+    if (!teamId) return
+
+    const tid = toast.loading('Testing Trello connection...')
+    const res = await testTrelloIntegrationAction(teamId)
+    if (res.success) {
+      toast.success(`Trello OK (${res.workspaceCount || 0} workspace)`, { id: tid })
+      await fetchIntegrations()
+      return
+    }
+
+    toast.error(res.error || 'Trello test failed', { id: tid })
+  }
+
+  const handleDisconnectTrello = async () => {
+    if (canManageIntegrations === false) {
+      toast.error('Solo owner/admin possono gestire integrazioni.')
+      return
+    }
+    if (!teamId) return
+
+    const tid = toast.loading('Disconnecting Trello...')
+    const res = await disconnectTrelloIntegrationAction(teamId)
+    if (res.success) {
+      toast.success('Trello disconnected', { id: tid })
+      setShowTrello(false)
+      setHideTrelloPanel(false)
+      await fetchIntegrations()
+      return
+    }
+
+    toast.error(res.error || 'Unable to disconnect Trello', { id: tid })
+  }
+
   return (
     <div className="space-y-6">
       {canManageIntegrations === false && (
@@ -367,6 +440,22 @@ export function IntegrationsSettings() {
         onReconnect={connectClickUp}
         onTest={handleTestClickUp}
         onDisconnect={handleDisconnectClickUp}
+      />
+
+      <TrelloIntegrationSection
+        integration={trelloIntegration}
+        isVisible={isTrelloPanelVisible}
+        canManageIntegrations={canManageIntegrations}
+        onClose={() => {
+          if (trelloIntegration) {
+            setHideTrelloPanel(true)
+          } else {
+            setShowTrello(false)
+          }
+        }}
+        onReconnect={connectTrello}
+        onTest={handleTestTrello}
+        onDisconnect={handleDisconnectTrello}
       />
 
       <WebhookChannelSection

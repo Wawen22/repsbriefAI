@@ -138,3 +138,30 @@ export async function connectClickUp() {
   const startUrl = `/api/auth/clickup/start?team_id=${encodeURIComponent(profile.current_team_id)}`
   window.location.href = startUrl
 }
+
+/**
+ * Inizia il flusso di autenticazione Trello OAuth
+ */
+export async function connectTrello() {
+  const supabase = createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    toast.error("Devi essere loggato per connettere Trello.")
+    return
+  }
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('current_team_id')
+    .eq('id', user.id)
+    .single()
+
+  if (!profile?.current_team_id) {
+    toast.error("Nessun team attivo trovato.")
+    return
+  }
+
+  const startUrl = `/api/auth/trello/start?team_id=${encodeURIComponent(profile.current_team_id)}`
+  window.location.href = startUrl
+}

@@ -1,6 +1,6 @@
 # RepsBrief — Post-Fix Integration Plan
 
-Last update: 2026-03-08
+Last update: 2026-03-09
 Scope: roadmap esecutiva da avviare dopo completamento `TECHNICAL_FIXES_PLAN.md` (`P0 -> P3`).
 
 ## Goal
@@ -14,7 +14,7 @@ Sbloccare nuove integrazioni senza regressioni su sicurezza/runtime, mantenendo 
 ## Execution Order
 
 1. [x] `P4.1` Trello/ClickUp OAuth design spike.
-2. [ ] `P4.2` Trello/ClickUp MVP implementation (provider 1 alla volta).
+2. [x] `P4.2` Trello/ClickUp MVP implementation (ClickUp + Trello completati).
 3. [ ] `P4.3` Queue/Jobs spike (retry + dead-letter per delivery).
 4. [ ] `P4.4` Observability hardening (Sentry + alerting path critici).
 5. [ ] `P4.5` Publishing connectors spike (WordPress/Ghost).
@@ -25,7 +25,7 @@ Execution artifact:
 
 P4.2 progress snapshot:
 - [x] ClickUp OAuth MVP implemented.
-- [ ] Trello OAuth MVP pending.
+- [x] Trello OAuth MVP implemented.
 
 ## P4.1 — Trello/ClickUp OAuth Design Spike
 

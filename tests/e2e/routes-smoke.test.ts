@@ -11,6 +11,8 @@ describe('api auth routes smoke imports', () => {
       import('@/app/api/auth/discord/callback/route'),
       import('@/app/api/auth/clickup/start/route'),
       import('@/app/api/auth/clickup/callback/route'),
+      import('@/app/api/auth/trello/start/route'),
+      import('@/app/api/auth/trello/callback/route'),
     ])
 
     for (const route of routes) {

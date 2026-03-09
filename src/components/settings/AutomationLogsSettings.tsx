@@ -23,6 +23,7 @@ function providerLabel(provider: string | null): string {
   if (provider === 'slack') return 'Slack'
   if (provider === 'discord') return 'Discord'
   if (provider === 'clickup') return 'ClickUp'
+  if (provider === 'trello') return 'Trello'
   if (provider === 'webhook') return 'Webhook'
   return provider
 }

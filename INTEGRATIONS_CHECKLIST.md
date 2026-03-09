@@ -6,6 +6,7 @@ Checklist unica per tutte le integrazioni presenti in RepsBrief:
 - Slack OAuth Notifications
 - Discord OAuth Notifications
 - ClickUp OAuth Tasks
+- Trello OAuth Tasks
 - Generic Webhooks (Zapier/Make/custom endpoint)
 
 ---
@@ -38,6 +39,9 @@ Checklist unica per tutte le integrazioni presenti in RepsBrief:
 ### ClickUp
 - `<APP_URL>/api/auth/clickup/callback`
 
+### Trello
+- `<APP_URL>/api/auth/trello/callback`
+
 Note:
 - Se cambi ambiente (es. localhost -> staging), devi aggiungere i redirect corrispondenti nel provider.
 - In locale puoi usare HTTP o HTTPS in base a cosa il provider/tenant accetta e a come avvii l’app.
@@ -67,6 +71,11 @@ Note:
 ## ClickUp OAuth
 - `CLICKUP_CLIENT_ID`
 - `CLICKUP_CLIENT_SECRET`
+
+## Trello OAuth
+- `TRELLO_API_KEY`
+- `TRELLO_API_SECRET`
+- `TRELLO_APP_NAME` (opzionale, default `RepsBrief`)
 
 ## Globali utili al flusso
 - `NEXT_PUBLIC_APP_URL`
@@ -98,7 +107,7 @@ Connect/Disconnect/Test integrazioni:
 
 ## 6) Smoke test per ogni provider OAuth
 
-Per ciascuno tra Notion, Google, Slack, Discord, ClickUp:
+Per ciascuno tra Notion, Google, Slack, Discord, ClickUp, Trello:
 1. Connect
 2. Return callback senza errore
 3. Provider risulta connected in Settings

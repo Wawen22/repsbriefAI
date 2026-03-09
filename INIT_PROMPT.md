@@ -1,6 +1,6 @@
 # RepsBrief — INIT_PROMPT
 
-Last update: 2026-03-08
+Last update: 2026-03-09
 
 ## Development Progress
 
@@ -34,13 +34,14 @@ Last update: 2026-03-08
   - [x] P4.1 Trello/ClickUp OAuth design spike (`TRELLO_CLICKUP_OAUTH_SPIKE.md`)
   - [x] P4.2 ClickUp OAuth MVP (`start/callback` + connect/disconnect/test + Settings UI)
   - [x] P4.2 ClickUp callback reliability fix (`Oauth token not found` mitigation)
+  - [x] P4.2 Trello OAuth MVP (`start/callback` + connect/disconnect/test + Settings UI)
 
 ## Task Status Tracking
 
-- [x] **Current Task (completed):** P4.2 ClickUp OAuth MVP (2026-03-08)
-- [ ] **Next Task:** P4.2 Trello OAuth MVP (`start/callback` + connect/disconnect/test + Settings UI)
+- [x] **Current Task (completed):** P4.2 Trello OAuth MVP (2026-03-09)
+- [ ] **Next Task:** P4.3 Queue/Jobs spike (`retry` + dead-letter + scheduling reliability)
 
-## Validation Snapshot
+## Validation Snapshot (2026-03-09)
 
 - [x] `npx tsc --noEmit` passes.
 - [x] `npm run build` passes.

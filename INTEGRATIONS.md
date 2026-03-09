@@ -32,7 +32,7 @@ Priorita' integrazioni raccomandate post-hardening (dopo fix P0/P1):
 | **Slack OAuth** | ✅ Completato | Connessione no-code + bootstrap webhook automatico + hardening state nonce. | 🔥 Alta |
 | **Discord OAuth** | ✅ Completato | OAuth one-click + webhook bootstrap + test send + disconnect/reconnect in Settings. | 🔥 Alta |
 | **ClickUp OAuth** | ✅ MVP Completato | Connect/disconnect/test + persistenza team-level + pannello Settings dedicato. | 🟡 Media |
-| **Trello OAuth** | 🧪 Design spike completato | Creazione automatica di card/task per il team. | 🟡 Media |
+| **Trello OAuth** | ✅ MVP Completato | Connect/disconnect/test + persistenza team-level + pannello Settings dedicato. | 🟡 Media |
 
 ### Fase 3: Publishing & Content Hub (Brainstorming)
 | Integrazione | Stato | Funzionalità | Priorità |
@@ -46,7 +46,7 @@ Priorita' integrazioni raccomandate post-hardening (dopo fix P0/P1):
 ## 🛠️ Architettura Tecnica
 
 ### 1. Database Schema
-- `team_integrations`: Gestione token OAuth (Notion, Google).
+- `team_integrations`: Gestione token OAuth provider (Notion, Google, Slack, Discord, ClickUp, Trello).
 - `team_webhooks`: Configurazione URL, segreti HMAC e eventi.
 - `team_integration_logs`: Storico tentativi di invio e successi.
 
@@ -155,6 +155,27 @@ Il sistema supporta l'invio asincrono di payload JSON con firma di sicurezza:
 - Checklist/env aggiornati:
   - `.env.example` (`CLICKUP_CLIENT_ID`, `CLICKUP_CLIENT_SECRET`),
   - `INTEGRATIONS_CHECKLIST.md` (redirect + env + smoke scope).
+
+### [2026-03-09] - Trello OAuth MVP (P4.2 phase B) Implementato
+- Aggiunte route OAuth:
+  - `GET /api/auth/trello/start`
+  - `GET /api/auth/trello/callback`
+- Flow OAuth1 hardening:
+  - request token + token secret in cookie `HttpOnly` con TTL,
+  - validazione callback `oauth_token`/`oauth_verifier`,
+  - RBAC owner/admin prima del persist su team.
+- Persistenza integrazione:
+  - upsert `team_integrations` con `provider=trello`,
+  - salvataggio credenziali team-level (`access_token`, `token_secret`) e metadata account/workspace.
+- Settings UI:
+  - provider `Trello Tasks` nel grid integrazioni,
+  - pannello gestione con `Reconnect`, `Test Connection`, `Disconnect`.
+- Server actions:
+  - `testTrelloIntegrationAction` (verifica member/workspaces API + log),
+  - `disconnectTrelloIntegrationAction` (cleanup locale + log).
+- Copertura quality gate:
+  - esteso smoke import routes OAuth (`tests/e2e/routes-smoke.test.ts`),
+  - regression suite verde (`lint`, `typecheck`, `test`, `test:e2e`, `build`).
 
 ### [2026-03-08] - Discord OAuth-first (MVP) Implementato
 - Aggiunte route OAuth:

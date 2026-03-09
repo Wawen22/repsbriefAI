@@ -1,6 +1,6 @@
 # RepsBrief — Technical Fixes Plan (Execution Order)
 
-Last update: 2026-03-08
+Last update: 2026-03-09
 
 ## Goal
 
@@ -159,7 +159,7 @@ Priorita' di integrazione da iniziare **dopo** completamento P0 + P1:
 Piano operativo dettagliato post-fix:
 - `POST_FIX_INTEGRATION_PLAN.md`
 - `TRELLO_CLICKUP_OAUTH_SPIKE.md` (`P4.1` design spike completato)
-- ClickUp OAuth MVP implementato (`P4.2` phase A); Trello MVP pending.
+- ClickUp OAuth MVP implementato (`P4.2` phase A) + Trello OAuth MVP implementato (`P4.2` phase B).
 
 ## Rollout Policy
 

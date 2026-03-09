@@ -79,6 +79,8 @@ Note:
 
 ## Globali utili al flusso
 - `NEXT_PUBLIC_APP_URL`
+- `WEBHOOK_DELIVERY_MODE` (`inline` | `queue`)
+- `QUEUE_WORKER_BATCH_SIZE` (opzionale, default `20`)
 
 ---
 
@@ -92,6 +94,7 @@ Applicare tutte le migration integrazioni in ogni ambiente:
 - `20260307183000_harden_integrations_webhooks_rls.sql`
 - `20260308100000_add_discord_channel_to_team_webhooks.sql`
 - `20260308143000_add_insert_policy_team_integration_logs.sql`
+- `20260309123000_add_job_queue_spike.sql`
 
 Se mancano migration `channel`, Slack/Discord possono fallire su `team_webhooks`.
 
@@ -141,7 +144,22 @@ Verificare delivery:
 
 ---
 
-## 9) Errori comuni e fix rapidi
+## 9) Queue worker (solo se `WEBHOOK_DELIVERY_MODE=queue`)
+
+1. Configura env:
+   - `WEBHOOK_DELIVERY_MODE=queue`
+   - `CRON_SECRET` valorizzato
+2. Esegui worker manuale:
+   - `POST /api/cron/webhook-queue?limit=20` con header `Authorization: Bearer <CRON_SECRET>`
+3. Verifica che i job passino:
+   - `job_queue.status` da `pending` -> `completed` (o `dead` dopo max retry)
+4. Verifica dead-letter:
+   - record presenti in `job_dead_letters` su failure non recuperabili
+5. Se usi Vercel Cron, pianifica endpoint worker almeno ogni 1 minuto.
+
+---
+
+## 10) Errori comuni e fix rapidi
 
 - `*_state_invalid` / `*_state_mismatch`:
   - schema/host/porta non allineati tra browser, `NEXT_PUBLIC_APP_URL`, redirect provider
@@ -157,9 +175,13 @@ Verificare delivery:
   - policy del workspace/provider
   - migration DB mancanti
 
+- Coda accumulata (`job_queue.pending` cresce):
+  - worker cron non schedulato o `CRON_SECRET` mismatch
+  - `WEBHOOK_DELIVERY_MODE=queue` senza worker attivo
+
 ---
 
-## 10) Security hygiene
+## 11) Security hygiene
 
 - Non committare `.env`
 - Ruotare subito secret condivisi in chat

@@ -2,7 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
-import { triggerWebhooks } from '@/lib/integrations/webhooks'
+import { dispatchWebhookEvent } from '@/lib/jobs/webhookQueue'
 
 type ServerSupabaseClient = Awaited<ReturnType<typeof createClient>>
 
@@ -59,12 +59,17 @@ export async function approveIdeaAction(ideaId: string, teamId: string) {
   if (error) return { error: 'Failed to approve idea' }
 
   // TRIGGER WEBHOOK
-  await triggerWebhooks(teamId, 'idea.approved', {
+  await dispatchWebhookEvent({
+    teamId,
+    event: 'idea.approved',
+    dedupeKey: `idea-approved:${idea.id}:${idea.updated_at}`,
+    payload: {
     idea_id: idea.id,
     title: idea.idea_title,
     data: idea.idea_data,
     approved_by: user.id,
     approved_at: idea.updated_at
+    },
   })
 
   revalidatePath(`/dashboard/strategy/${ideaId}`)

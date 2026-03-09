@@ -2,7 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
-import { triggerWebhooks } from '@/lib/integrations/webhooks'
+import { dispatchWebhookEvent } from '@/lib/jobs/webhookQueue'
 
 type ServerSupabaseClient = Awaited<ReturnType<typeof createClient>>
 
@@ -68,12 +68,17 @@ export async function scheduleIdeaAction({
   }
 
   // TRIGGER WEBHOOK
-  await triggerWebhooks(teamId, 'content.scheduled', {
-    calendar_id: data.id,
-    title,
-    platform,
-    scheduled_date: scheduledDate,
-    idea_id: ideaId || null
+  await dispatchWebhookEvent({
+    teamId,
+    event: 'content.scheduled',
+    dedupeKey: `content-scheduled:${data.id}`,
+    payload: {
+      calendar_id: data.id,
+      title,
+      platform,
+      scheduled_date: scheduledDate,
+      idea_id: ideaId || null,
+    },
   })
 
   revalidatePath('/dashboard/calendar')

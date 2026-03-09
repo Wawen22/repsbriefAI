@@ -191,6 +191,26 @@ Il sistema supporta l'invio asincrono di payload JSON con firma di sicurezza:
 - Comportamento coerente su close/disconnect/delete:
   - il pannello attivo si richiude quando la connessione viene rimossa o il canale viene scollegato.
 
+### [2026-03-09] - P4.3 Queue/Jobs Spike (Webhook Delivery) Completato
+- Decision record e piano spike documentati in `QUEUE_JOBS_SPIKE.md`.
+- Aggiunta infrastruttura queue DB:
+  - migration `20260309123000_add_job_queue_spike.sql`,
+  - tabelle `job_queue` + `job_dead_letters`,
+  - funzione SQL `claim_queue_jobs(...)` con lock `SKIP LOCKED`.
+- Implementata libreria runtime `src/lib/jobs/webhookQueue.ts`:
+  - dispatch policy `inline|queue` via env `WEBHOOK_DELIVERY_MODE`,
+  - enqueue con dedupe key opzionale,
+  - worker processor con retry exponential backoff + dead-letter.
+- Aggiunta route worker:
+  - `POST /api/cron/webhook-queue` (protetta da `CRON_SECRET`).
+- Integrati i path evento principali con dispatch queue-aware:
+  - approval flow (`idea.approved`),
+  - calendar scheduling (`content.scheduled`),
+  - generate-now e cron weekly (`brief.ready`).
+- Backward compatibility:
+  - modalità default `inline`,
+  - fallback automatico a inline se enqueue fallisce.
+
 ### [2026-03-08] - Discord OAuth-first (MVP) Implementato
 - Aggiunte route OAuth:
   - `GET /api/auth/discord/start`

@@ -59,11 +59,12 @@ RepsBrief è una web app `Next.js + Supabase` per generare, organizzare e distri
   - [x] P4.2 ClickUp OAuth MVP (`start/callback` + connect/disconnect/test + Settings UI)
   - [x] P4.2 Trello OAuth MVP (`start/callback` + connect/disconnect/test + Settings UI)
   - [x] Integrations Settings UX refinement (single-open panel + micro-animations + copy unificato in italiano)
+  - [x] P4.3 Queue/Jobs spike (DB queue PoC + retry/backoff + dead-letter + worker route)
 
 ## 5) Task Status Tracking
 
-- [x] **Current Task (completed):** Integrations Settings UX refinement (single-open + motion + copy i18n IT) (2026-03-09)
-- [ ] **Next Task:** P4.3 Queue/Jobs spike (`retry` + dead-letter per webhook/cron delivery)
+- [x] **Current Task (completed):** P4.3 Queue/Jobs spike (2026-03-09)
+- [ ] **Next Task:** P4.4 Observability hardening (`error tracking` + alerting su OAuth/webhook/cron)
 
 ### Completed Milestones
 
@@ -119,6 +120,7 @@ RepsBrief è una web app `Next.js + Supabase` per generare, organizzare e distri
 - [x] P4.2 ClickUp OAuth MVP (OAuth routes + actions + Settings panel + env/checklist updates)
 - [x] P4.2 Trello OAuth MVP (OAuth1 routes + actions + Settings panel + smoke route coverage)
 - [x] Integrations Settings UX refinement (single-open disclosure + active provider highlight + micro-animations + copy uniforme IT)
+- [x] P4.3 Queue/Jobs spike (decision record + DB queue PoC + worker route + webhook dispatch integration)
 
 ## 6) Validation Snapshot (2026-03-09)
 
@@ -150,6 +152,10 @@ RepsBrief è una web app `Next.js + Supabase` per generare, organizzare e distri
 - Added: `supabase/migrations/20260308143000_add_insert_policy_team_integration_logs.sql`
   - aggiunge policy `INSERT` su `team_integration_logs` per owner/admin
   - riallinea observability logs con hardening RLS integrazioni
+- Added: `supabase/migrations/20260309123000_add_job_queue_spike.sql`
+  - introduce `job_queue` e `job_dead_letters` con RLS owner/admin
+  - aggiunge funzione `claim_queue_jobs(...)` (`FOR UPDATE SKIP LOCKED`) per worker concorrenti
+  - abilita dedupe key su job attivi e stato retry/dead-letter
 
 ## 8) Open Risks & Notes
 
@@ -162,6 +168,7 @@ RepsBrief è una web app `Next.js + Supabase` per generare, organizzare e distri
 - `supabaseAdmin` mantiene fallback anon solo fuori production; in production i path critici ora vanno in fail-fast se `SUPABASE_SERVICE_ROLE_KEY` manca.
 - ClickUp OAuth MVP implementato; resta rollout checklist su staging/prod (redirect URI + env vars + smoke test).
 - Trello OAuth MVP implementato; resta rollout checklist su staging/prod (callback URL + env vars + smoke test).
+- P4.3 queue mode e' feature-flagged (`WEBHOOK_DELIVERY_MODE=queue`): se worker cron non gira, i job restano `pending`.
 - Correzione applicata su callback ClickUp per errore `Oauth token not found` (token normalization + authorization fallback).
 
 ## 9) Immediate Execution Plan
@@ -169,5 +176,5 @@ RepsBrief è una web app `Next.js + Supabase` per generare, organizzare e distri
 1. Applicare migration `20260308143000_add_insert_policy_team_integration_logs.sql` su staging/production.
 2. Eseguire smoke test manuale UI integrations (connect/manage/test/disconnect su generic/slack/discord) con verifica `Automation Logs`.
 3. Eseguire smoke test ClickUp/Trello OAuth su staging/prod (connect/test/disconnect + Automation Logs).
-4. Definire spike Queue/Jobs layer (`Inngest` o alternativa) per retry/dead-letter delivery webhook e cron tasks.
+4. Abilitare queue mode su staging (`WEBHOOK_DELIVERY_MODE=queue`) + cron worker `/api/cron/webhook-queue`.
 5. Agganciare observability stack (Sentry + alerting) sui path critici: OAuth callback, webhook delivery, cron weekly.

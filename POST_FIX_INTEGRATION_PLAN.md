@@ -15,13 +15,14 @@ Sbloccare nuove integrazioni senza regressioni su sicurezza/runtime, mantenendo 
 
 1. [x] `P4.1` Trello/ClickUp OAuth design spike.
 2. [x] `P4.2` Trello/ClickUp MVP implementation (ClickUp + Trello completati).
-3. [ ] `P4.3` Queue/Jobs spike (retry + dead-letter per delivery).
+3. [x] `P4.3` Queue/Jobs spike (retry + dead-letter per delivery) con PoC DB queue.
 4. [ ] `P4.4` Observability hardening (Sentry + alerting path critici).
 5. [ ] `P4.5` Publishing connectors spike (WordPress/Ghost).
 6. [ ] `P4.6` Cloud asset sync spike (Drive/Dropbox).
 
 Execution artifact:
 - `TRELLO_CLICKUP_OAUTH_SPIKE.md`
+- `QUEUE_JOBS_SPIKE.md`
 
 P4.2 progress snapshot:
 - [x] ClickUp OAuth MVP implemented.

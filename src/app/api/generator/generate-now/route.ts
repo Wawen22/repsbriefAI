@@ -4,6 +4,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { getSupabaseAdmin } from '@/lib/supabase'
+import { dispatchWebhookEvent } from '@/lib/jobs/webhookQueue'
 import { NICHES } from '@/config/niches'
 import { scrapeNiche } from '../../scraper'
 import { generateBrief } from '../briefGenerator'
@@ -153,13 +154,16 @@ export async function POST() {
       return NextResponse.json({ error: 'Failed to save brief' }, { status: 500 })
     }
 
-    // TRIGGER WEBHOOK
-    const { triggerWebhooks } = await import('@/lib/integrations/webhooks')
     if (profile.current_team_id) {
-      await triggerWebhooks(profile.current_team_id, 'brief.ready', {
-        week_date: weekDate,
-        niche: nicheId,
-        ideas_count: ideas.length
+      await dispatchWebhookEvent({
+        teamId: profile.current_team_id,
+        event: 'brief.ready',
+        dedupeKey: `brief-ready:${profile.current_team_id}:${user.id}:${weekDate}:${nicheId}`,
+        payload: {
+          week_date: weekDate,
+          niche: nicheId,
+          ideas_count: ideas.length,
+        },
       })
     }
 

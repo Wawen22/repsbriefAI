@@ -5,7 +5,7 @@ import { NICHES } from '@/config/niches'
 import { scrapeNiche } from '../../scraper'
 import { generateBrief } from '../../generator/briefGenerator'
 import { getSupabaseAdmin } from '@/lib/supabase'
-import { triggerWebhooks } from '@/lib/integrations/webhooks'
+import { dispatchWebhookEvent } from '@/lib/jobs/webhookQueue'
 import { sendBrief } from '../../email/sendBrief'
 import { ACTIVE_PAID_PLANS } from '@/lib/billing'
 import type { NicheConfig, TrendItem } from '@/types/niche'
@@ -100,10 +100,15 @@ export async function POST(req: Request) {
 
         // TRIGGER WEBHOOK
         if (user.current_team_id) {
-          await triggerWebhooks(user.current_team_id, 'brief.ready', {
-            week_date: weekDate,
-            niche: nicheId,
-            ideas_count: ideas.length
+          await dispatchWebhookEvent({
+            teamId: user.current_team_id,
+            event: 'brief.ready',
+            dedupeKey: `brief-ready:${user.current_team_id}:${user.id}:${weekDate}:${nicheId}`,
+            payload: {
+              week_date: weekDate,
+              niche: nicheId,
+              ideas_count: ideas.length,
+            },
           })
         }
 

@@ -35,6 +35,7 @@ import { WebhookChannelSection } from '@/components/settings/integrations/Webhoo
 import {
   DEFAULT_EVENTS,
   type Integration,
+  type IntegrationPanelId,
   normalizeWebhookChannel,
   type WebhookChannel,
 } from '@/components/settings/integrations/types'
@@ -50,16 +51,7 @@ export function IntegrationsSettings() {
     fetchWebhooks,
   } = useIntegrationsData()
 
-  const [showWebhooks, setShowWebhooks] = useState(false)
-  const [showSlack, setShowSlack] = useState(false)
-  const [showDiscord, setShowDiscord] = useState(false)
-  const [showClickUp, setShowClickUp] = useState(false)
-  const [showTrello, setShowTrello] = useState(false)
-  const [hideGenericPanel, setHideGenericPanel] = useState(false)
-  const [hideSlackPanel, setHideSlackPanel] = useState(false)
-  const [hideDiscordPanel, setHideDiscordPanel] = useState(false)
-  const [hideClickUpPanel, setHideClickUpPanel] = useState(false)
-  const [hideTrelloPanel, setHideTrelloPanel] = useState(false)
+  const [activePanel, setActivePanel] = useState<IntegrationPanelId | null>(null)
 
   const [newWebhookUrl, setNewWebhookUrl] = useState('')
   const [newWebhookName, setNewWebhookName] = useState('')
@@ -89,15 +81,15 @@ export function IntegrationsSettings() {
   const trelloIntegration =
     (integrations.find((integration) => integration.provider === 'trello') as Integration | undefined) || null
 
-  const isGenericPanelVisible =
-    genericWebhooks.length > 0 ? !hideGenericPanel : showWebhooks
-  const isSlackPanelVisible = slackWebhooks.length > 0 ? !hideSlackPanel : showSlack
-  const isDiscordPanelVisible =
-    discordWebhooks.length > 0 ? !hideDiscordPanel : showDiscord
-  const isClickUpPanelVisible =
-    clickUpIntegration ? !hideClickUpPanel : showClickUp
-  const isTrelloPanelVisible =
-    trelloIntegration ? !hideTrelloPanel : showTrello
+  const isGenericPanelVisible = activePanel === 'zapier'
+  const isSlackPanelVisible = activePanel === 'slack'
+  const isDiscordPanelVisible = activePanel === 'discord'
+  const isClickUpPanelVisible = activePanel === 'clickup'
+  const isTrelloPanelVisible = activePanel === 'trello'
+
+  const togglePanel = (panelId: IntegrationPanelId) => {
+    setActivePanel((prev) => (prev === panelId ? null : panelId))
+  }
 
   const handleConnect = async (providerId: string) => {
     if (canManageIntegrations === false) {
@@ -106,93 +98,63 @@ export function IntegrationsSettings() {
     }
 
     if (providerId === 'notion') {
+      setActivePanel(null)
       await connectNotion()
       return
     }
 
     if (providerId === 'google_calendar') {
+      setActivePanel(null)
       await connectGoogle()
       return
     }
 
     if (providerId === 'zapier') {
-      if (genericWebhooks.length > 0) {
-        setHideGenericPanel(false)
-      } else {
-        setShowWebhooks((prev) => !prev)
-      }
-      setShowSlack(false)
-      setShowDiscord(false)
-      setShowClickUp(false)
-      setShowTrello(false)
+      togglePanel('zapier')
       return
     }
 
     if (providerId === 'slack') {
       if (slackWebhooks.length > 0) {
-        setShowWebhooks(false)
-        setShowDiscord(false)
-        setHideSlackPanel(false)
+        togglePanel('slack')
         return
       }
 
+      setActivePanel(null)
       await connectSlack()
-      setShowWebhooks(false)
-      setShowDiscord(false)
-      setShowClickUp(false)
-      setShowTrello(false)
       return
     }
 
     if (providerId === 'discord') {
       if (discordWebhooks.length > 0) {
-        setShowWebhooks(false)
-        setShowSlack(false)
-        setHideDiscordPanel(false)
+        togglePanel('discord')
         return
       }
 
+      setActivePanel(null)
       await connectDiscord()
-      setShowWebhooks(false)
-      setShowSlack(false)
-      setShowClickUp(false)
-      setShowTrello(false)
       return
     }
 
     if (providerId === 'clickup') {
       if (clickUpIntegration) {
-        setShowWebhooks(false)
-        setShowSlack(false)
-        setShowDiscord(false)
-        setShowTrello(false)
-        setHideClickUpPanel(false)
+        togglePanel('clickup')
         return
       }
 
+      setActivePanel(null)
       await connectClickUp()
-      setShowWebhooks(false)
-      setShowSlack(false)
-      setShowDiscord(false)
-      setShowTrello(false)
       return
     }
 
     if (providerId === 'trello') {
       if (trelloIntegration) {
-        setShowWebhooks(false)
-        setShowSlack(false)
-        setShowDiscord(false)
-        setShowClickUp(false)
-        setHideTrelloPanel(false)
+        togglePanel('trello')
         return
       }
 
+      setActivePanel(null)
       await connectTrello()
-      setShowWebhooks(false)
-      setShowSlack(false)
-      setShowDiscord(false)
-      setShowClickUp(false)
       return
     }
 
@@ -243,9 +205,7 @@ export function IntegrationsSettings() {
     if (res.success) {
       toast.success(mapping.ok)
       mapping.reset()
-      if (channel === 'generic') setHideGenericPanel(false)
-      if (channel === 'slack') setHideSlackPanel(false)
-      if (channel === 'discord') setHideDiscordPanel(false)
+      setActivePanel(channel === 'generic' ? 'zapier' : channel)
       await fetchWebhooks()
       return
     }
@@ -263,6 +223,15 @@ export function IntegrationsSettings() {
       const label =
         channel === 'slack' ? 'Slack channel' : channel === 'discord' ? 'Discord channel' : 'Webhook'
       toast.success(`${label} deleted`)
+      if (activePanel === 'zapier' && channel === 'generic' && genericWebhooks.length <= 1) {
+        setActivePanel(null)
+      }
+      if (activePanel === 'slack' && channel === 'slack' && slackWebhooks.length <= 1) {
+        setActivePanel(null)
+      }
+      if (activePanel === 'discord' && channel === 'discord' && discordWebhooks.length <= 1) {
+        setActivePanel(null)
+      }
       await fetchWebhooks()
     }
   }
@@ -315,10 +284,9 @@ export function IntegrationsSettings() {
 
     if (res.success) {
       toast.success(`${label} disconnected`, { id: tid })
-      if (channel === 'slack') setShowSlack(false)
-      if (channel === 'discord') setShowDiscord(false)
-      if (channel === 'slack') setHideSlackPanel(false)
-      if (channel === 'discord') setHideDiscordPanel(false)
+      if (activePanel === channel) {
+        setActivePanel(null)
+      }
       await fetchIntegrations()
       await fetchWebhooks()
       return
@@ -356,8 +324,9 @@ export function IntegrationsSettings() {
     const res = await disconnectClickUpIntegrationAction(teamId)
     if (res.success) {
       toast.success('ClickUp disconnected', { id: tid })
-      setShowClickUp(false)
-      setHideClickUpPanel(false)
+      if (activePanel === 'clickup') {
+        setActivePanel(null)
+      }
       await fetchIntegrations()
       return
     }
@@ -394,8 +363,9 @@ export function IntegrationsSettings() {
     const res = await disconnectTrelloIntegrationAction(teamId)
     if (res.success) {
       toast.success('Trello disconnected', { id: tid })
-      setShowTrello(false)
-      setHideTrelloPanel(false)
+      if (activePanel === 'trello') {
+        setActivePanel(null)
+      }
       await fetchIntegrations()
       return
     }
@@ -419,9 +389,7 @@ export function IntegrationsSettings() {
         activeGenericWebhooksCount={activeGenericWebhooksCount}
         activeSlackWebhooksCount={activeSlackWebhooksCount}
         activeDiscordWebhooksCount={activeDiscordWebhooksCount}
-        showWebhooks={isGenericPanelVisible}
-        showSlack={isSlackPanelVisible}
-        showDiscord={isDiscordPanelVisible}
+        activePanel={activePanel}
         canManageIntegrations={canManageIntegrations}
         onConnect={handleConnect}
       />
@@ -430,13 +398,7 @@ export function IntegrationsSettings() {
         integration={clickUpIntegration}
         isVisible={isClickUpPanelVisible}
         canManageIntegrations={canManageIntegrations}
-        onClose={() => {
-          if (clickUpIntegration) {
-            setHideClickUpPanel(true)
-          } else {
-            setShowClickUp(false)
-          }
-        }}
+        onClose={() => setActivePanel(null)}
         onReconnect={connectClickUp}
         onTest={handleTestClickUp}
         onDisconnect={handleDisconnectClickUp}
@@ -446,13 +408,7 @@ export function IntegrationsSettings() {
         integration={trelloIntegration}
         isVisible={isTrelloPanelVisible}
         canManageIntegrations={canManageIntegrations}
-        onClose={() => {
-          if (trelloIntegration) {
-            setHideTrelloPanel(true)
-          } else {
-            setShowTrello(false)
-          }
-        }}
+        onClose={() => setActivePanel(null)}
         onReconnect={connectTrello}
         onTest={handleTestTrello}
         onDisconnect={handleDisconnectTrello}
@@ -466,13 +422,7 @@ export function IntegrationsSettings() {
         webhooks={slackWebhooks}
         isVisible={isSlackPanelVisible}
         canManageIntegrations={canManageIntegrations}
-        onClose={() => {
-          if (slackWebhooks.length > 0) {
-            setHideSlackPanel(true)
-          } else {
-            setShowSlack(false)
-          }
-        }}
+        onClose={() => setActivePanel(null)}
         onDisconnect={() => handleDisconnectChannel('slack')}
         onTest={handleTestWebhook}
         onToggle={handleToggleWebhook}
@@ -492,13 +442,7 @@ export function IntegrationsSettings() {
         webhooks={discordWebhooks}
         isVisible={isDiscordPanelVisible}
         canManageIntegrations={canManageIntegrations}
-        onClose={() => {
-          if (discordWebhooks.length > 0) {
-            setHideDiscordPanel(true)
-          } else {
-            setShowDiscord(false)
-          }
-        }}
+        onClose={() => setActivePanel(null)}
         onDisconnect={() => handleDisconnectChannel('discord')}
         onTest={handleTestWebhook}
         onToggle={handleToggleWebhook}
@@ -518,13 +462,7 @@ export function IntegrationsSettings() {
         webhooks={genericWebhooks}
         isVisible={isGenericPanelVisible}
         canManageIntegrations={canManageIntegrations}
-        onClose={() => {
-          if (genericWebhooks.length > 0) {
-            setHideGenericPanel(true)
-          } else {
-            setShowWebhooks(false)
-          }
-        }}
+        onClose={() => setActivePanel(null)}
         onTest={handleTestWebhook}
         onToggle={handleToggleWebhook}
         onDelete={handleDeleteWebhook}

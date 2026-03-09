@@ -177,6 +177,16 @@ Il sistema supporta l'invio asincrono di payload JSON con firma di sicurezza:
   - esteso smoke import routes OAuth (`tests/e2e/routes-smoke.test.ts`),
   - regression suite verde (`lint`, `typecheck`, `test`, `test:e2e`, `build`).
 
+### [2026-03-09] - Integrations Settings UX Refinement
+- Sostituito il comportamento multi-pannello con disclosure `single-open` (una sola integrazione aperta alla volta).
+- Introdotto stato condiviso `activePanel` in `IntegrationsSettings` per eliminare apertura simultanea e ambiguità visuale.
+- Migliorata la leggibilità CTA provider:
+  - pulsante ad alto contrasto (`Apri pannello` / `Aperta`),
+  - stato `Open` badge su card attiva,
+  - evidenziazione card aperta (border/ring/background dedicati).
+- Comportamento coerente su close/disconnect/delete:
+  - il pannello attivo si richiude quando la connessione viene rimossa o il canale viene scollegato.
+
 ### [2026-03-08] - Discord OAuth-first (MVP) Implementato
 - Aggiunte route OAuth:
   - `GET /api/auth/discord/start`

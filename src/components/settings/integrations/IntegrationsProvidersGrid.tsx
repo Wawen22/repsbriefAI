@@ -4,7 +4,13 @@ import { AlertCircle, Plus, Settings } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { AVAILABLE_PROVIDERS, Integration, TeamWebhook } from './types'
+import {
+  AVAILABLE_PROVIDERS,
+  getIntegrationPanelId,
+  Integration,
+  IntegrationPanelId,
+  TeamWebhook,
+} from './types'
 
 type IntegrationsProvidersGridProps = {
   integrations: Integration[]
@@ -14,9 +20,7 @@ type IntegrationsProvidersGridProps = {
   activeGenericWebhooksCount: number
   activeSlackWebhooksCount: number
   activeDiscordWebhooksCount: number
-  showWebhooks: boolean
-  showSlack: boolean
-  showDiscord: boolean
+  activePanel: IntegrationPanelId | null
   canManageIntegrations: boolean | null
   onConnect: (providerId: string) => void
 }
@@ -29,9 +33,7 @@ export function IntegrationsProvidersGrid({
   activeGenericWebhooksCount,
   activeSlackWebhooksCount,
   activeDiscordWebhooksCount,
-  showWebhooks,
-  showSlack,
-  showDiscord,
+  activePanel,
   canManageIntegrations,
   onConnect,
 }: IntegrationsProvidersGridProps) {
@@ -66,11 +68,17 @@ export function IntegrationsProvidersGrid({
                 ? `Ultimo sync: ${new Date(integration.updated_at).toLocaleDateString()}`
                 : 'Not connected'
         const Icon = provider.icon
+        const panelId = getIntegrationPanelId(provider.id)
+        const isPanelProvider = panelId !== null
+        const isPanelOpen = panelId !== null && activePanel === panelId
+        const manageLabel = isPanelOpen ? 'Aperta' : 'Apri pannello'
 
         return (
           <Card
             key={provider.id}
-            className="relative overflow-hidden border-white/10 bg-white/[0.03] p-6 transition-all hover:border-white/20"
+            className={`relative overflow-hidden border-white/10 bg-white/[0.03] p-6 transition-all hover:border-white/20 ${
+              isPanelOpen ? 'border-emerald-400/40 bg-emerald-500/[0.08] ring-1 ring-emerald-400/30' : ''
+            }`}
           >
             <div className="flex items-start justify-between gap-4">
               <div className="flex items-start gap-4">
@@ -100,6 +108,11 @@ export function IntegrationsProvidersGrid({
                         {discordWebhooks.length} canale{discordWebhooks.length > 1 ? 'i' : ''}
                       </Badge>
                     )}
+                    {isPanelOpen && (
+                      <Badge className="bg-emerald-500/20 text-emerald-200 hover:bg-emerald-500/30">
+                        Open
+                      </Badge>
+                    )}
                   </div>
                   <p className="text-sm text-slate-400 leading-relaxed">{provider.description}</p>
                 </div>
@@ -120,20 +133,16 @@ export function IntegrationsProvidersGrid({
                 disabled={canManageIntegrations === false}
                 className={
                   connected
-                    ? 'border-white/10 bg-white/5 hover:bg-white/10'
+                    ? isPanelOpen
+                      ? 'border-emerald-400/30 bg-emerald-500/20 text-emerald-100 hover:bg-emerald-500/30'
+                      : 'border-sky-400/30 bg-sky-500/15 text-sky-100 hover:bg-sky-500/25'
                     : 'bg-white text-black hover:bg-slate-200'
                 }
               >
                 {connected ? (
                   <>
                     <Settings className="mr-2 h-4 w-4" />
-                    {isWebhookProvider && !showWebhooks
-                      ? 'View'
-                      : isSlackProvider && !showSlack
-                        ? 'View'
-                        : isDiscordProvider && !showDiscord
-                          ? 'View'
-                          : 'Manage'}
+                    {isPanelProvider ? manageLabel : 'Reconnect'}
                   </>
                 ) : (
                   <>

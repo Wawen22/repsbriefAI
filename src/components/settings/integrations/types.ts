@@ -23,6 +23,7 @@ export interface TeamWebhook {
 
 export type WebhookChannel = 'generic' | 'slack' | 'discord'
 export type TeamRole = 'owner' | 'admin' | 'member'
+export type IntegrationPanelId = 'zapier' | 'slack' | 'discord' | 'clickup' | 'trello'
 
 export type ProviderConfig = {
   id: string
@@ -98,4 +99,18 @@ export function normalizeWebhookChannel(channel: string | null | undefined): Web
   if (channel === 'slack') return 'slack'
   if (channel === 'discord') return 'discord'
   return 'generic'
+}
+
+export function getIntegrationPanelId(providerId: string): IntegrationPanelId | null {
+  if (
+    providerId === 'zapier' ||
+    providerId === 'slack' ||
+    providerId === 'discord' ||
+    providerId === 'clickup' ||
+    providerId === 'trello'
+  ) {
+    return providerId
+  }
+
+  return null
 }

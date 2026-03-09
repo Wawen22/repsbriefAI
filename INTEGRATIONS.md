@@ -168,8 +168,8 @@ Il sistema supporta l'invio asincrono di payload JSON con firma di sicurezza:
   - upsert `team_integrations` con `provider=trello`,
   - salvataggio credenziali team-level (`access_token`, `token_secret`) e metadata account/workspace.
 - Settings UI:
-  - provider `Trello Tasks` nel grid integrazioni,
-  - pannello gestione con `Reconnect`, `Test Connection`, `Disconnect`.
+  - provider `Task Trello` nel grid integrazioni,
+  - pannello gestione con `Riconnetti`, `Testa connessione`, `Disconnetti`.
 - Server actions:
   - `testTrelloIntegrationAction` (verifica member/workspaces API + log),
   - `disconnectTrelloIntegrationAction` (cleanup locale + log).
@@ -182,8 +182,12 @@ Il sistema supporta l'invio asincrono di payload JSON con firma di sicurezza:
 - Introdotto stato condiviso `activePanel` in `IntegrationsSettings` per eliminare apertura simultanea e ambiguità visuale.
 - Migliorata la leggibilità CTA provider:
   - pulsante ad alto contrasto (`Apri pannello` / `Aperta`),
-  - stato `Open` badge su card attiva,
+  - badge `Aperta` su card attiva,
   - evidenziazione card aperta (border/ring/background dedicati).
+- Rifinite micro-animazioni pannelli:
+  - transizione fluida open/close (`opacity`, `translate`, `grid-rows`) senza salti di layout.
+- Uniformato copy UI integrazioni in italiano:
+  - CTA, toasts, etichette pannelli e sezioni webhook.
 - Comportamento coerente su close/disconnect/delete:
   - il pannello attivo si richiude quando la connessione viene rimossa o il canale viene scollegato.
 

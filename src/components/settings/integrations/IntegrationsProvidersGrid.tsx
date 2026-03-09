@@ -55,18 +55,18 @@ export function IntegrationsProvidersGrid({
         const lastSyncLabel = isWebhookProvider
           ? connected
             ? `${activeGenericWebhooksCount}/${genericWebhooks.length} webhook attivi`
-            : 'Not connected'
+            : 'Non connessa'
           : isSlackProvider
             ? connected
               ? `${activeSlackWebhooksCount}/${slackWebhooks.length} canali Slack attivi`
-              : 'Not connected'
+              : 'Non connessa'
             : isDiscordProvider
               ? connected
                 ? `${activeDiscordWebhooksCount}/${discordWebhooks.length} canali Discord attivi`
-                : 'Not connected'
+                : 'Non connessa'
               : integration
                 ? `Ultimo sync: ${new Date(integration.updated_at).toLocaleDateString()}`
-                : 'Not connected'
+                : 'Non connessa'
         const Icon = provider.icon
         const panelId = getIntegrationPanelId(provider.id)
         const isPanelProvider = panelId !== null
@@ -90,12 +90,12 @@ export function IntegrationsProvidersGrid({
                     <h3 className="font-bold text-white">{provider.name}</h3>
                     {connected && !isWebhookProvider && !isSlackProvider && !isDiscordProvider && (
                       <Badge className="bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30">
-                        Connected
+                        Connessa
                       </Badge>
                     )}
                     {connected && isWebhookProvider && (
                       <Badge className="bg-orange-500/20 text-orange-300 hover:bg-orange-500/30">
-                        {genericWebhooks.length} webhook{genericWebhooks.length > 1 ? 's' : ''}
+                        {genericWebhooks.length} webhook
                       </Badge>
                     )}
                     {connected && isSlackProvider && (
@@ -110,7 +110,7 @@ export function IntegrationsProvidersGrid({
                     )}
                     {isPanelOpen && (
                       <Badge className="bg-emerald-500/20 text-emerald-200 hover:bg-emerald-500/30">
-                        Open
+                        Aperta
                       </Badge>
                     )}
                   </div>
@@ -142,12 +142,12 @@ export function IntegrationsProvidersGrid({
                 {connected ? (
                   <>
                     <Settings className="mr-2 h-4 w-4" />
-                    {isPanelProvider ? manageLabel : 'Reconnect'}
+                    {isPanelProvider ? manageLabel : 'Riconnetti'}
                   </>
                 ) : (
                   <>
                     <Plus className="mr-2 h-4 w-4" />
-                    Connect
+                    Connetti
                   </>
                 )}
               </Button>

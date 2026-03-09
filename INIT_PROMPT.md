@@ -35,11 +35,11 @@ Last update: 2026-03-09
   - [x] P4.2 ClickUp OAuth MVP (`start/callback` + connect/disconnect/test + Settings UI)
   - [x] P4.2 ClickUp callback reliability fix (`Oauth token not found` mitigation)
   - [x] P4.2 Trello OAuth MVP (`start/callback` + connect/disconnect/test + Settings UI)
-  - [x] Integrations Settings UX refinement (single-open panel + active card state + CTA readability)
+  - [x] Integrations Settings UX refinement (single-open panel + micro-animations + copy unificato in italiano)
 
 ## Task Status Tracking
 
-- [x] **Current Task (completed):** Integrations Settings UX refinement (2026-03-09)
+- [x] **Current Task (completed):** Integrations Settings UX refinement (single-open + motion + copy i18n IT) (2026-03-09)
 - [ ] **Next Task:** P4.3 Queue/Jobs spike (`retry` + dead-letter + scheduling reliability)
 
 ## Validation Snapshot (2026-03-09)

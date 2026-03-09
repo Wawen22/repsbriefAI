@@ -48,14 +48,14 @@ export const AVAILABLE_PROVIDERS: ProviderConfig[] = [
   {
     id: 'google_calendar',
     name: 'Google Calendar',
-    description: 'Sincronizza il tuo calendario editoriale con GCal.',
+    description: 'Sincronizza il calendario editoriale con Google Calendar.',
     icon: Calendar,
     color: 'text-blue-400',
     bg: 'bg-blue-500/10',
   },
   {
     id: 'slack',
-    name: 'Slack Notifications',
+    name: 'Notifiche Slack',
     description: 'Invia notifiche Slack preformattate per brief, approvazioni e contenuti schedulati.',
     icon: MessageSquare,
     color: 'text-cyan-300',
@@ -63,7 +63,7 @@ export const AVAILABLE_PROVIDERS: ProviderConfig[] = [
   },
   {
     id: 'discord',
-    name: 'Discord Notifications',
+    name: 'Notifiche Discord',
     description: 'Invia notifiche Discord preformattate per brief, approvazioni e contenuti schedulati.',
     icon: MessageCircle,
     color: 'text-indigo-300',
@@ -71,7 +71,7 @@ export const AVAILABLE_PROVIDERS: ProviderConfig[] = [
   },
   {
     id: 'clickup',
-    name: 'ClickUp Tasks',
+    name: 'Task ClickUp',
     description: 'Crea task operativi dal workflow editoriale del team.',
     icon: Cable,
     color: 'text-sky-300',
@@ -79,7 +79,7 @@ export const AVAILABLE_PROVIDERS: ProviderConfig[] = [
   },
   {
     id: 'trello',
-    name: 'Trello Tasks',
+    name: 'Task Trello',
     description: 'Crea card Trello da workflow editoriali e approvazioni.',
     icon: LayoutPanelLeft,
     color: 'text-blue-300',
@@ -88,7 +88,7 @@ export const AVAILABLE_PROVIDERS: ProviderConfig[] = [
   {
     id: 'zapier',
     name: 'Zapier / Webhooks',
-    description: 'Collega RepsBrief a oltre 5000+ app tramite Webhooks.',
+    description: 'Collega RepsBrief a oltre 5000+ app tramite webhook.',
     icon: Globe,
     color: 'text-orange-400',
     bg: 'bg-orange-500/10',

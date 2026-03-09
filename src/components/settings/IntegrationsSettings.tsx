@@ -172,22 +172,22 @@ export function IntegrationsSettings() {
       channel === 'slack'
         ? {
             url: newSlackWebhookUrl,
-            name: newSlackWebhookName || 'Slack Notifications',
+            name: newSlackWebhookName || 'Notifiche Slack',
             reset: () => {
               setNewSlackWebhookUrl('')
               setNewSlackWebhookName('')
             },
-            ok: 'Slack channel connected!',
+            ok: 'Canale Slack collegato.',
           }
         : channel === 'discord'
           ? {
               url: newDiscordWebhookUrl,
-              name: newDiscordWebhookName || 'Discord Notifications',
+              name: newDiscordWebhookName || 'Notifiche Discord',
               reset: () => {
                 setNewDiscordWebhookUrl('')
                 setNewDiscordWebhookName('')
               },
-              ok: 'Discord channel connected!',
+              ok: 'Canale Discord collegato.',
             }
           : {
               url: newWebhookUrl,
@@ -196,7 +196,7 @@ export function IntegrationsSettings() {
                 setNewWebhookUrl('')
                 setNewWebhookName('')
               },
-              ok: 'Webhook added!',
+              ok: 'Webhook aggiunto.',
             }
 
     if (!mapping.url) return
@@ -221,8 +221,8 @@ export function IntegrationsSettings() {
     const res = await deleteWebhookAction(id)
     if (res.success) {
       const label =
-        channel === 'slack' ? 'Slack channel' : channel === 'discord' ? 'Discord channel' : 'Webhook'
-      toast.success(`${label} deleted`)
+        channel === 'slack' ? 'Canale Slack' : channel === 'discord' ? 'Canale Discord' : 'Webhook'
+      toast.success(`${label} eliminato`)
       if (activePanel === 'zapier' && channel === 'generic' && genericWebhooks.length <= 1) {
         setActivePanel(null)
       }
@@ -253,22 +253,26 @@ export function IntegrationsSettings() {
     if (!teamId) return
     const tid = toast.loading(
       channel === 'slack'
-        ? 'Sending Slack test...'
+        ? 'Invio test Slack...'
         : channel === 'discord'
-          ? 'Sending Discord test...'
-          : 'Sending test payload...'
+          ? 'Invio test Discord...'
+          : 'Invio payload di test...'
     )
     const res = await testWebhookAction(teamId, id)
 
     if (res?.success) {
       toast.success(
-        channel === 'slack' ? 'Slack test sent!' : channel === 'discord' ? 'Discord test sent!' : 'Test sent!',
+        channel === 'slack'
+          ? 'Test Slack inviato.'
+          : channel === 'discord'
+            ? 'Test Discord inviato.'
+            : 'Test inviato.',
         { id: tid }
       )
       return
     }
 
-    toast.error(res?.error || 'Unable to send test payload', { id: tid })
+    toast.error(res?.error || 'Impossibile inviare il payload di test', { id: tid })
   }
 
   const handleDisconnectChannel = async (channel: Exclude<WebhookChannel, 'generic'>) => {
@@ -279,11 +283,11 @@ export function IntegrationsSettings() {
     if (!teamId) return
 
     const label = channel === 'slack' ? 'Slack' : 'Discord'
-    const tid = toast.loading(`Disconnecting ${label}...`)
+    const tid = toast.loading(`Disconnessione ${label}...`)
     const res = await disconnectChannelAction(teamId, channel)
 
     if (res.success) {
-      toast.success(`${label} disconnected`, { id: tid })
+      toast.success(`${label} disconnesso`, { id: tid })
       if (activePanel === channel) {
         setActivePanel(null)
       }
@@ -292,7 +296,7 @@ export function IntegrationsSettings() {
       return
     }
 
-    toast.error(res.error || `Unable to disconnect ${label}`, { id: tid })
+    toast.error(res.error || `Impossibile disconnettere ${label}`, { id: tid })
   }
 
   const handleTestClickUp = async () => {
@@ -302,15 +306,15 @@ export function IntegrationsSettings() {
     }
     if (!teamId) return
 
-    const tid = toast.loading('Testing ClickUp connection...')
+    const tid = toast.loading('Test connessione ClickUp...')
     const res = await testClickUpIntegrationAction(teamId)
     if (res.success) {
-      toast.success(`ClickUp OK (${res.workspaceCount || 0} workspace)`, { id: tid })
+      toast.success(`ClickUp OK (${res.workspaceCount || 0} spazi di lavoro)`, { id: tid })
       await fetchIntegrations()
       return
     }
 
-    toast.error(res.error || 'ClickUp test failed', { id: tid })
+    toast.error(res.error || 'Test ClickUp fallito', { id: tid })
   }
 
   const handleDisconnectClickUp = async () => {
@@ -320,10 +324,10 @@ export function IntegrationsSettings() {
     }
     if (!teamId) return
 
-    const tid = toast.loading('Disconnecting ClickUp...')
+    const tid = toast.loading('Disconnessione ClickUp...')
     const res = await disconnectClickUpIntegrationAction(teamId)
     if (res.success) {
-      toast.success('ClickUp disconnected', { id: tid })
+      toast.success('ClickUp disconnesso', { id: tid })
       if (activePanel === 'clickup') {
         setActivePanel(null)
       }
@@ -331,7 +335,7 @@ export function IntegrationsSettings() {
       return
     }
 
-    toast.error(res.error || 'Unable to disconnect ClickUp', { id: tid })
+    toast.error(res.error || 'Impossibile disconnettere ClickUp', { id: tid })
   }
 
   const handleTestTrello = async () => {
@@ -341,15 +345,15 @@ export function IntegrationsSettings() {
     }
     if (!teamId) return
 
-    const tid = toast.loading('Testing Trello connection...')
+    const tid = toast.loading('Test connessione Trello...')
     const res = await testTrelloIntegrationAction(teamId)
     if (res.success) {
-      toast.success(`Trello OK (${res.workspaceCount || 0} workspace)`, { id: tid })
+      toast.success(`Trello OK (${res.workspaceCount || 0} spazi di lavoro)`, { id: tid })
       await fetchIntegrations()
       return
     }
 
-    toast.error(res.error || 'Trello test failed', { id: tid })
+    toast.error(res.error || 'Test Trello fallito', { id: tid })
   }
 
   const handleDisconnectTrello = async () => {
@@ -359,10 +363,10 @@ export function IntegrationsSettings() {
     }
     if (!teamId) return
 
-    const tid = toast.loading('Disconnecting Trello...')
+    const tid = toast.loading('Disconnessione Trello...')
     const res = await disconnectTrelloIntegrationAction(teamId)
     if (res.success) {
-      toast.success('Trello disconnected', { id: tid })
+      toast.success('Trello disconnesso', { id: tid })
       if (activePanel === 'trello') {
         setActivePanel(null)
       }
@@ -370,7 +374,7 @@ export function IntegrationsSettings() {
       return
     }
 
-    toast.error(res.error || 'Unable to disconnect Trello', { id: tid })
+    toast.error(res.error || 'Impossibile disconnettere Trello', { id: tid })
   }
 
   return (
@@ -416,8 +420,8 @@ export function IntegrationsSettings() {
 
       <WebhookChannelSection
         channel="slack"
-        title="Slack Notifications"
-        description="Messaggi preformattati per brief pronti, approvazioni e scheduling."
+        title="Notifiche Slack"
+        description="Messaggi preformattati per brief pronti, approvazioni e pianificazione."
         icon={MessageSquare}
         webhooks={slackWebhooks}
         isVisible={isSlackPanelVisible}
@@ -436,8 +440,8 @@ export function IntegrationsSettings() {
 
       <WebhookChannelSection
         channel="discord"
-        title="Discord Notifications"
-        description="Messaggi Discord preformattati per brief pronti, approvazioni e scheduling."
+        title="Notifiche Discord"
+        description="Messaggi Discord preformattati per brief pronti, approvazioni e pianificazione."
         icon={MessageCircle}
         webhooks={discordWebhooks}
         isVisible={isDiscordPanelVisible}
@@ -456,7 +460,7 @@ export function IntegrationsSettings() {
 
       <WebhookChannelSection
         channel="generic"
-        title="Gestione Webhooks"
+        title="Gestione webhook"
         description="Invia eventi a Zapier, Make o ai tuoi server custom."
         icon={Link2}
         webhooks={genericWebhooks}

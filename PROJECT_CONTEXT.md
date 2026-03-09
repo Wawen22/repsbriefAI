@@ -58,11 +58,11 @@ RepsBrief è una web app `Next.js + Supabase` per generare, organizzare e distri
   - [x] P4.1 Trello/ClickUp OAuth design spike (`TRELLO_CLICKUP_OAUTH_SPIKE.md`)
   - [x] P4.2 ClickUp OAuth MVP (`start/callback` + connect/disconnect/test + Settings UI)
   - [x] P4.2 Trello OAuth MVP (`start/callback` + connect/disconnect/test + Settings UI)
-  - [x] Integrations Settings UX refinement (single-open panel + active card state + CTA readability)
+  - [x] Integrations Settings UX refinement (single-open panel + micro-animations + copy unificato in italiano)
 
 ## 5) Task Status Tracking
 
-- [x] **Current Task (completed):** Integrations Settings UX refinement (2026-03-09)
+- [x] **Current Task (completed):** Integrations Settings UX refinement (single-open + motion + copy i18n IT) (2026-03-09)
 - [ ] **Next Task:** P4.3 Queue/Jobs spike (`retry` + dead-letter per webhook/cron delivery)
 
 ### Completed Milestones
@@ -118,7 +118,7 @@ RepsBrief è una web app `Next.js + Supabase` per generare, organizzare e distri
 - [x] P4.1 Trello/ClickUp OAuth design spike (contract, mapping schema, security checks, implementation plan)
 - [x] P4.2 ClickUp OAuth MVP (OAuth routes + actions + Settings panel + env/checklist updates)
 - [x] P4.2 Trello OAuth MVP (OAuth1 routes + actions + Settings panel + smoke route coverage)
-- [x] Integrations Settings UX refinement (single-open disclosure + active provider highlight + improved action labels)
+- [x] Integrations Settings UX refinement (single-open disclosure + active provider highlight + micro-animations + copy uniforme IT)
 
 ## 6) Validation Snapshot (2026-03-09)
 

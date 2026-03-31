@@ -46,13 +46,17 @@ Dominio: **repsbrief.com** (Hostinger DNS → Vercel)
   - [ ] P4.4 Observability hardening (Sentry + alerting) — backlog
   - [ ] P4.5 Publishing connectors (WordPress/Ghost) — backlog bassa priorità
   - [ ] P4.6 Cloud asset sync (Drive/Dropbox) — backlog bassa priorità
-- [ ] **Phase 6: Launch** (In corso)
-  - [ ] Vercel deploy + dominio repsbrief.com
-  - [ ] Stripe live mode configurato (price IDs pro/team)
-  - [ ] Supabase production migrations applicate
-  - [ ] Guided Onboarding Tour (critico per conversioni)
+- [ ] **Phase 6: Launch** (In corso — 2026-03-31)
+  - [x] Vercel deploy → https://repsbrief.com (GitHub CI/CD attivo)
+  - [x] Stripe live mode: Pro $19/mo, Team $39/mo; Starter = Free
+  - [x] Supabase prod migrations applicate (tutte, inclusa job_queue)
+  - [x] YouTube API key configurata
+  - [x] DNS repsbrief.com → 76.76.21.21 (Hostinger A record, propagazione in corso)
+  - [ ] OAuth redirect URLs aggiornate a repsbrief.com per tutti i provider (bloccante per integrazioni)
+  - [ ] Guided Onboarding Tour — CRITICO per conversioni
   - [ ] Trends Visualizer
   - [ ] Shareable Strategy Links
+  - [ ] Reddit API (in attesa approvazione)
 
 ## 5) UI/UX Roadmap — Pending
 
@@ -65,17 +69,17 @@ Dominio: **repsbrief.com** (Hostinger DNS → Vercel)
 
 UI/UX completate: 1-12 (Generazione Immersiva, Kanban, AI Remix, Brand Voice, Timeline, Teleprompter, ecc.)
 
-## 6) Billing Config
+## 6) Billing Config (Live — 2026-03-31)
 
-Piani: `starter` (free) | `pro` (monthly) | `team` (monthly)
+Piani: `starter` (free) | `pro` ($19/mo) | `team` ($39/mo)
 
-```ts
-// src/lib/billing.ts
-LEGACY_PRO_PRICE_ID = 'price_1T3kiQQ8w32NjQAk6830MCV3'
-// env vars richieste in prod:
-STRIPE_PRICE_PRO_MONTHLY=<live price ID>
-STRIPE_PRICE_TEAM_MONTHLY=<live price ID>
 ```
+STRIPE_PRICE_PRO_MONTHLY=price_1TH3ecQ8w32NjQAk0KMEetVv
+STRIPE_PRICE_TEAM_MONTHLY=price_1TH3ecQ8w32NjQAkpJYZtYq9
+STRIPE_WEBHOOK_SECRET=whsec_A3tNpDermwvOkV2FT8N4vouOxns8OrHI
+Webhook endpoint: https://repsbrief.com/api/stripe/webhook
+```
+Tutte le chiavi Stripe sono in **live mode**. Il prodotto Starter $9 è stato archiviato (inactive).
 
 ## 7) Validation Snapshot (2026-03-09)
 
@@ -93,9 +97,10 @@ Migration più recente: `20260309123000_add_job_queue_spike.sql`
 
 Variabili env richieste per prod: vedere `INTEGRATIONS_CHECKLIST.md`.
 
-## 9) Open Risks
+## 9) Open Risks (aggiornato 2026-03-31)
 
-- `STRIPE_PRICE_PRO_MONTHLY` e `STRIPE_PRICE_TEAM_MONTHLY` non configurati in `.env` — da creare in Stripe live mode.
-- Tutte le OAuth redirect URL vanno aggiornate ai domini prod (vedi `INTEGRATIONS_CHECKLIST.md`).
-- Queue mode feature-flagged (`WEBHOOK_DELIVERY_MODE=queue`): attivare il cron worker `/api/cron/webhook-queue` su Vercel.
-- `supabaseAdmin` fail-fast su production se `SUPABASE_SERVICE_ROLE_KEY` manca.
+- **OAuth redirect URLs**: tutti i provider (Notion, Google, Slack, Discord, ClickUp, Trello) hanno ancora redirect URL localhost/staging. Vanno aggiornate a `https://repsbrief.com/api/auth/<provider>/callback` nelle rispettive app console. Senza questo le integrazioni OAuth non funzionano per gli utenti prod.
+- **Reddit API**: in attesa approvazione. Lo scraper Reddit è disabilitato finché non arriva.
+- **DNS propagazione**: A record `76.76.21.21` aggiunto su Hostinger — può richiedere fino a 24h.
+- Queue mode feature-flagged (`WEBHOOK_DELIVERY_MODE=inline` in prod): ok per lancio, da valutare switch a `queue` con traffico crescente.
+- `supabaseAdmin` fail-fast su production se `SUPABASE_SERVICE_ROLE_KEY` manca — chiave configurata su Vercel.

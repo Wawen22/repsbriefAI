@@ -26,8 +26,7 @@ export function PricingNexus() {
             <div className="mb-10">
               <span className="text-[10px] font-black text-slate-600 uppercase tracking-[0.3em]">Starter</span>
               <div className="mt-6 flex items-baseline gap-1">
-                <span className="text-6xl font-black text-white">$9</span>
-                <span className="text-slate-600 font-bold uppercase text-xs tracking-widest">/mo</span>
+                <span className="text-6xl font-black text-white">Free</span>
               </div>
               <p className="text-xs text-slate-500 mt-3 font-bold uppercase tracking-widest">For Solo Creators.</p>
             </div>

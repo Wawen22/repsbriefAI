@@ -45,11 +45,14 @@ export function OnboardingChecklist({ voiceConfigured, briefGenerated, ideaSaved
   return (
     <div className="fixed bottom-6 right-6 z-50 w-72 rounded-[1.5rem] bg-[#0a0a0a] border border-white/10 shadow-[0_20px_60px_-10px_rgba(0,0,0,0.8)] overflow-hidden">
       {/* Header */}
-      <button
-        onClick={() => setCollapsed(c => !c)}
-        className="w-full flex items-center justify-between px-5 py-4 hover:bg-white/[0.02] transition-colors"
-      >
-        <div className="flex items-center gap-2.5">
+      <div className="flex items-center justify-between px-5 py-4">
+        <div
+          role="button"
+          tabIndex={0}
+          onClick={() => setCollapsed(c => !c)}
+          onKeyDown={(e) => e.key === 'Enter' && setCollapsed(c => !c)}
+          className="flex items-center gap-2.5 flex-1 cursor-pointer hover:opacity-80 transition-opacity"
+        >
           <div className="w-7 h-7 rounded-full bg-blue-500/20 flex items-center justify-center">
             <Rocket className="w-3.5 h-3.5 text-blue-400" />
           </div>
@@ -60,18 +63,18 @@ export function OnboardingChecklist({ voiceConfigured, briefGenerated, ideaSaved
         </div>
         <div className="flex items-center gap-1">
           {collapsed
-            ? <ChevronUp className="w-4 h-4 text-slate-600" />
-            : <ChevronDown className="w-4 h-4 text-slate-600" />
+            ? <ChevronUp className="w-4 h-4 text-slate-600 pointer-events-none" />
+            : <ChevronDown className="w-4 h-4 text-slate-600 pointer-events-none" />
           }
           <button
-            onClick={(e) => { e.stopPropagation(); setDismissed(true) }}
+            onClick={() => setDismissed(true)}
             className="ml-1 p-1 rounded-full hover:bg-white/10 text-slate-600 hover:text-white transition-colors"
             aria-label="Dismiss"
           >
             <X className="w-3.5 h-3.5" />
           </button>
         </div>
-      </button>
+      </div>
 
       {/* Progress bar */}
       <div className="h-px bg-white/5 mx-5">

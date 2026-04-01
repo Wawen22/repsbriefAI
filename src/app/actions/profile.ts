@@ -1,7 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, revalidateTag } from 'next/cache'
 import { getAIProvider } from '@/lib/ai'
 
 type ServerSupabaseClient = Awaited<ReturnType<typeof createClient>>
@@ -91,6 +91,7 @@ export async function updateActiveNicheAction(nicheId: string) {
     return { error: 'Failed to update niche' }
   }
 
+  revalidateTag(`profile-${user.id}`, { expire: 0 })
   revalidatePath('/dashboard')
   revalidatePath('/dashboard/settings')
   return { success: true }
@@ -161,6 +162,7 @@ Return ONLY the plain text analysis.
       return { error: 'Unable to save Brand Voice. Check workspace permissions and try again.' }
     }
 
+    revalidateTag(`profile-${user.id}`, { expire: 0 })
     revalidatePath('/dashboard/settings')
     return { success: true, analysis }
   } catch (err: unknown) {
@@ -197,6 +199,7 @@ export async function resetBrandPersonaAction() {
     return { error: 'Failed to reset persona' }
   }
 
+  revalidateTag(`profile-${user.id}`, { expire: 0 })
   revalidatePath('/dashboard/settings')
   return { success: true }
 }
@@ -216,6 +219,7 @@ export async function completeOnboardingAction() {
     return { error: 'Failed to update onboarding status' }
   }
 
+  revalidateTag(`profile-${user.id}`, { expire: 0 })
   revalidatePath('/dashboard')
   return { success: true }
 }

@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
+import { getCurrentUser, getCachedProfile } from "@/lib/supabase/cached-queries"
 import { redirect } from "next/navigation"
 import { AddIdeaModal } from "@/components/ui/AddIdeaModal"
 import { KanbanBoard } from "@/components/dashboard/KanbanBoard"
@@ -22,17 +23,13 @@ type KanbanIdeaRecord = {
 }
 
 export default async function MyIdeasPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const user = await getCurrentUser()
   if (!user) {
     redirect('/login')
   }
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('plan, current_team_id')
-    .eq('id', user.id)
-    .single()
+  const supabase = await createClient()
+  const profile = await getCachedProfile(user.id)
 
   const { data: allIdeas } = await supabase
     .from('idea_history')

@@ -1,6 +1,7 @@
 // src/app/(dashboard)/dashboard/page.tsx
 
 import { createClient } from "@/lib/supabase/server"
+import { getCurrentUser, getCachedProfile } from "@/lib/supabase/cached-queries"
 import { redirect } from "next/navigation"
 import { IdeaObject } from "@/types/niche"
 import { BriefList } from "@/components/brief/BriefList"
@@ -69,12 +70,12 @@ export default async function DashboardPage({
 }: {
   searchParams?: Promise<{ upgrade?: string; session_id?: string }>
 }) {
-  const supabase = await createClient()
-
-  const { data: { user } } = await supabase.auth.getUser()
+  const user = await getCurrentUser()
   if (!user) {
     redirect('/login')
   }
+
+  const supabase = await createClient()
 
   const params = searchParams ? await searchParams : undefined
   if (params?.upgrade === 'success' && params.session_id) {
@@ -88,7 +89,8 @@ export default async function DashboardPage({
   const todayStart = new Date()
   todayStart.setHours(0, 0, 0, 0)
 
-  const [{ data: brief }, { data: generatedToday }, { data: profile }] = await Promise.all([
+  const [profile, { data: brief }, { data: generatedToday }] = await Promise.all([
+    getCachedProfile(user.id),
     supabase
       .from('briefs')
       .select('*')
@@ -103,11 +105,6 @@ export default async function DashboardPage({
       .gte('created_at', todayStart.toISOString())
       .limit(1)
       .maybeSingle(),
-    supabase
-      .from('profiles')
-      .select('active_niche, plan, current_team_id, has_onboarded')
-      .eq('id', user.id)
-      .single(),
   ])
 
   const { data: savedHistory } = await supabase

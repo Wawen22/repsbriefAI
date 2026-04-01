@@ -1,6 +1,7 @@
 // src/app/(dashboard)/dashboard/analytics/page.tsx
 
 import { createClient } from "@/lib/supabase/server"
+import { getCurrentUser, getCachedProfile } from "@/lib/supabase/cached-queries"
 import { redirect } from "next/navigation"
 import { IdeaObject } from "@/types/niche"
 import type { ComponentType, SVGProps } from "react"
@@ -57,16 +58,11 @@ function LightbulbIcon(props: SVGProps<SVGSVGElement>) {
 }
 
 export default async function AnalyticsPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const user = await getCurrentUser()
   if (!user) redirect('/login')
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('current_team_id')
-    .eq('id', user.id)
-    .single()
-
+  const supabase = await createClient()
+  const profile = await getCachedProfile(user.id)
   const teamId = profile?.current_team_id
 
   // Fetch published ideas with performance data

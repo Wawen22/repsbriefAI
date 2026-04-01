@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
+import { getCurrentUser, getCachedProfile } from "@/lib/supabase/cached-queries"
 import { redirect } from "next/navigation"
 import { BriefList } from "@/components/brief/BriefList"
 import type { ComponentType, SVGProps } from "react"
@@ -43,23 +44,19 @@ const formatIcons: Record<string, ComponentType<SVGProps<SVGSVGElement>>> = {
 }
 
 export default async function HistoryPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const user = await getCurrentUser()
   if (!user) {
     redirect('/login')
   }
 
-  const [{ data: briefs }, { data: profile }] = await Promise.all([
+  const supabase = await createClient()
+  const [profile, { data: briefs }] = await Promise.all([
+    getCachedProfile(user.id),
     supabase
       .from('briefs')
       .select('*')
       .eq('user_id', user.id)
       .order('week_date', { ascending: false }),
-    supabase
-      .from('profiles')
-      .select('plan, current_team_id')
-      .eq('id', user.id)
-      .single()
   ])
 
   // Fetch saved ideas with their IDs to enable Studio access from history

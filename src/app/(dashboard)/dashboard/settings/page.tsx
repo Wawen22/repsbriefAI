@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { NICHES } from "@/config/niches"
 import { createClient } from "@/lib/supabase/server"
+import { getCurrentUser, getCachedFullProfile } from "@/lib/supabase/cached-queries"
 
 export const dynamic = 'force-dynamic'
 
@@ -21,8 +22,7 @@ export default async function SettingsPage({
 }: {
   searchParams?: Promise<{ tab?: string }>
 }) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const user = await getCurrentUser()
   if (!user) {
     redirect('/login')
   }
@@ -30,11 +30,10 @@ export default async function SettingsPage({
   const params = searchParams ? await searchParams : undefined
   const defaultTab = params?.tab || "account"
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .single()
+  const [profile, supabase] = await Promise.all([
+    getCachedFullProfile(user.id),
+    createClient(),
+  ])
 
   if (!profile) return null
 

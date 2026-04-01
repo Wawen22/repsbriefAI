@@ -3,14 +3,14 @@ import { MobileNav } from "@/components/layout/MobileNav"
 import { CommandPalette } from "@/components/layout/CommandPalette"
 import { OnboardingChecklist } from "@/components/dashboard/OnboardingChecklist"
 import { createClient } from "@/lib/supabase/server"
+import { getCurrentUser, getCachedProfile } from "@/lib/supabase/cached-queries"
 
 export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const user = await getCurrentUser()
 
   let plan = 'starter'
   let userEmail = user?.email || ''
@@ -21,11 +21,7 @@ export default async function DashboardLayout({
   let ideaSaved = false
 
   if (user) {
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('plan, full_name, email, has_onboarded, brand_voice, current_team_id')
-      .eq('id', user.id)
-      .single()
+    const profile = await getCachedProfile(user.id)
 
     if (profile?.plan) plan = profile.plan
     if (profile?.full_name) userFullName = profile.full_name
@@ -34,6 +30,7 @@ export default async function DashboardLayout({
     if (profile?.has_onboarded) {
       voiceConfigured = !!(profile.brand_voice)
 
+      const supabase = await createClient()
       const [{ data: anyBrief }, { data: anySavedIdea }] = await Promise.all([
         supabase.from('briefs').select('id').eq('user_id', user.id).limit(1).maybeSingle(),
         supabase.from('idea_history').select('id')

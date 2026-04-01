@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { CheckCircle2, Circle, ChevronDown, ChevronUp, Rocket } from 'lucide-react'
+import { CheckCircle2, Circle, ChevronDown, ChevronUp, Rocket, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
 
@@ -34,12 +34,13 @@ const ITEMS = [
 
 export function OnboardingChecklist({ voiceConfigured, briefGenerated, ideaSaved }: OnboardingChecklistProps) {
   const [collapsed, setCollapsed] = useState(false)
+  const [dismissed, setDismissed] = useState(false)
 
   const completionMap = { voiceConfigured, briefGenerated, ideaSaved }
   const completedCount = Object.values(completionMap).filter(Boolean).length
   const allDone = completedCount === 3
 
-  if (allDone) return null
+  if (allDone || dismissed) return null
 
   return (
     <div className="fixed bottom-6 right-6 z-50 w-72 rounded-[1.5rem] bg-[#0a0a0a] border border-white/10 shadow-[0_20px_60px_-10px_rgba(0,0,0,0.8)] overflow-hidden">
@@ -57,10 +58,19 @@ export function OnboardingChecklist({ voiceConfigured, briefGenerated, ideaSaved
             <p className="text-[10px] text-slate-500 font-medium">{completedCount}/3 steps complete</p>
           </div>
         </div>
-        {collapsed
-          ? <ChevronUp className="w-4 h-4 text-slate-600" />
-          : <ChevronDown className="w-4 h-4 text-slate-600" />
-        }
+        <div className="flex items-center gap-1">
+          {collapsed
+            ? <ChevronUp className="w-4 h-4 text-slate-600" />
+            : <ChevronDown className="w-4 h-4 text-slate-600" />
+          }
+          <button
+            onClick={(e) => { e.stopPropagation(); setDismissed(true) }}
+            className="ml-1 p-1 rounded-full hover:bg-white/10 text-slate-600 hover:text-white transition-colors"
+            aria-label="Dismiss"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
       </button>
 
       {/* Progress bar */}

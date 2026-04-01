@@ -123,7 +123,7 @@ export function OnboardingModal({ userName }: OnboardingModalProps) {
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest text-slate-400">
                 <Sparkles className="w-3 h-3" /> Studio Setup
               </div>
-              <Button variant="ghost" size="sm" onClick={handleSkip} className="text-slate-600 hover:text-white text-xs font-bold uppercase tracking-widest h-8">
+              <Button variant="ghost" size="sm" onClick={handleSkip} className="text-slate-400 hover:text-white text-xs font-bold uppercase tracking-widest h-8 border border-white/10 hover:border-white/20">
                 Skip all
               </Button>
             </div>

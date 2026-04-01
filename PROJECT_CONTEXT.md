@@ -52,7 +52,7 @@ Dominio: **repsbrief.com** (Hostinger DNS → Vercel)
   - [x] Supabase prod migrations applicate (tutte, inclusa job_queue)
   - [x] YouTube API key configurata
   - [x] DNS repsbrief.com → 76.76.21.21 (Hostinger A record, propagazione in corso)
-  - [ ] OAuth redirect URLs aggiornate a repsbrief.com per tutti i provider (bloccante per integrazioni)
+  - [x] OAuth redirect URLs aggiornate a repsbrief.com per tutti i provider (Slack, Discord, Notion, Google, ClickUp, Trello)
   - [ ] Guided Onboarding Tour — CRITICO per conversioni
   - [ ] Trends Visualizer
   - [ ] Shareable Strategy Links

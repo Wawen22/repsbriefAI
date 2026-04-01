@@ -58,16 +58,24 @@ Dominio: **repsbrief.com** (Hostinger DNS → Vercel)
   - [ ] Shareable Strategy Links
   - [ ] Reddit API (in attesa approvazione)
 
-## 5) UI/UX Roadmap — Pending
+## 5) UI/UX Roadmap
 
 | ID | Feature | Priorità | Stato |
 |:---|:---|:---:|:---:|
-| 13 | Guided Onboarding Tour | 🔴 High | ⬜ Todo |
+| 13 | Guided Onboarding Tour | 🔴 High | ✅ Done |
 | 14 | Trends Visualizer | 🟡 Medium | ⬜ Todo |
-| 15 | Shareable Strategy Links | 🟡 Medium | ⬜ Todo |
+| 15 | Shareable Strategy Links (/s/[id]) | 🟡 Medium | 🔵 Planned |
 | 16 | Custom Theme Accents | 🟢 Low | ⬜ Todo |
+| 17 | Email Capture (Landing Hero) + Welcome Email | 🔴 High | 🔵 Planned |
+| 18 | Idea Gate — Starter sees 5/20 ideas | 🔴 High | 🔵 Planned |
+| 19 | Social Proof bar on Landing | 🔴 High | 🔵 Planned |
+| 20 | Rate Limit: Starter 1/week, Pro 1/day | 🔴 High | 🔵 Planned |
+| 21 | Analytics Day-1 Insights (brief stats) | 🟡 Medium | 🔵 Planned |
+| 22 | Day 3 + Day 7 Re-engagement Emails | 🟡 Medium | 🔵 Planned |
 
 UI/UX completate: 1-12 (Generazione Immersiva, Kanban, AI Remix, Brand Voice, Timeline, Teleprompter, ecc.)
+
+**Plan:** `docs/superpowers/plans/2026-04-01-revenue-growth.md`
 
 ## 6) Billing Config (Live — 2026-03-31)
 

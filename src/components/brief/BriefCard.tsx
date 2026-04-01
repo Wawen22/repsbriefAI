@@ -5,9 +5,9 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { 
-  Zap, 
-  Sparkles, 
-  Trash2, 
+  Zap,
+  Sparkles,
+  Trash2,
   CalendarDays,
   Star,
   ChevronRight,
@@ -17,7 +17,8 @@ import {
   AlertCircle,
   Youtube,
   TrendingUp,
-  Rss
+  Rss,
+  Share2
 } from "lucide-react"
 
 // ... (existing imports)
@@ -46,6 +47,7 @@ const SourceBadge = ({ source }: { source: string }) => {
 import { IdeaObject } from '@/types/niche'
 import { toast } from 'sonner'
 import { deleteIdeaAction } from '@/app/actions/ideas'
+import { createShareAction } from '@/app/actions/share'
 import { SaveIdeaButton } from '@/components/ui/SaveIdeaButton'
 import { PerformanceModal } from '@/components/dashboard/PerformanceModal'
 import { ScheduleDialog } from '@/components/calendar/ScheduleDialog'
@@ -94,6 +96,26 @@ export function BriefCard({
   const format = idea.format || 'Idea'
   const colors = FORMAT_COLORS[format] || FORMAT_COLORS['Strategy']
   const approvalStatus = ideaWithMeta.approval_status || 'draft'
+  const [sharing, setSharing] = useState(false)
+
+  const handleShare = async (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setSharing(true)
+    try {
+      const result = await createShareAction(idea, idea.niche || 'general')
+      if ('error' in result) {
+        toast.error(result.error)
+        return
+      }
+      const url = `${window.location.origin}/s/${result.id}`
+      await navigator.clipboard.writeText(url)
+      toast.success('Link copied to clipboard!')
+    } catch {
+      toast.error('Failed to create share link')
+    } finally {
+      setSharing(false)
+    }
+  }
 
   const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -330,21 +352,30 @@ export function BriefCard({
 
           <div className="p-4 bg-white/[0.02] border-t border-white/5 flex items-center justify-between gap-2 mt-auto">
             <div className="flex items-center gap-1.5 text-left">
-              <Button 
-                variant="ghost" 
+              <Button
+                variant="ghost"
                 className="h-10 px-4 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 text-[11px] font-black uppercase tracking-widest gap-2"
                 onClick={(e) => { e.stopPropagation(); handleNavigateToStrategy(e); }}
               >
                 <Maximize2 className="w-4 h-4" />
                 Open Studio
               </Button>
-              <Button 
-                variant="ghost" 
+              <Button
+                variant="ghost"
                 className="h-10 px-4 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 text-[11px] font-black uppercase tracking-widest gap-2"
                 onClick={(e) => { e.stopPropagation(); setIsScheduleOpen(true); }}
               >
                 <CalendarDays className="w-4 h-4 text-blue-400" />
                 Schedule
+              </Button>
+              <Button
+                variant="ghost"
+                className="h-10 px-4 rounded-xl text-slate-400 hover:text-emerald-400 hover:bg-emerald-500/10 text-[11px] font-black uppercase tracking-widest gap-2"
+                onClick={handleShare}
+                disabled={sharing}
+              >
+                <Share2 className="w-4 h-4" />
+                {sharing ? 'Copying...' : 'Share'}
               </Button>
             </div>
 

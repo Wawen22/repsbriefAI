@@ -204,7 +204,7 @@ export default async function DashboardPage({
             </div>
 
             <div className="pt-4 flex flex-col items-center gap-4 text-center">
-              <GenerateNowButton alreadyGeneratedToday={alreadyGeneratedToday} />
+              <GenerateNowButton alreadyGeneratedToday={alreadyGeneratedToday} plan={userPlan} />
               <p className="text-[10px] text-slate-600 font-bold uppercase tracking-[0.2em]">Takes ~30 seconds to analyze</p>
             </div>
           </div>

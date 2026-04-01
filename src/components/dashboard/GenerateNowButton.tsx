@@ -19,11 +19,13 @@ type State = 'idle' | 'loading' | 'success' | 'error' | 'rate_limited'
 
 interface GenerateNowButtonProps {
   alreadyGeneratedToday?: boolean
+  plan?: string
 }
 
-export function GenerateNowButton({ alreadyGeneratedToday = false }: GenerateNowButtonProps) {
+export function GenerateNowButton({ alreadyGeneratedToday = false, plan }: GenerateNowButtonProps) {
   const router = useRouter()
   const [state, setState] = useState<State>(alreadyGeneratedToday ? 'rate_limited' : 'idle')
+  const isStarter = !plan || plan === 'starter'
   const [currentStep, setCurrentStep] = useState(0)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [logs, setLogs] = useState<string[]>([])
@@ -88,9 +90,23 @@ export function GenerateNowButton({ alreadyGeneratedToday = false }: GenerateNow
 
   if (state === 'rate_limited') {
     return (
-      <div className="flex items-center gap-3 px-6 py-3 rounded-2xl bg-white/5 border border-white/10 text-slate-400 text-sm font-medium">
-        <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
-        <span>Daily brief already generated. New ideas available tomorrow.</span>
+      <div className="flex flex-col items-center gap-3">
+        <div className="flex items-center gap-3 px-6 py-3 rounded-2xl bg-white/5 border border-white/10 text-slate-400 text-sm font-medium">
+          <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
+          <span>
+            {isStarter
+              ? 'Weekly brief generated. Next one available Monday.'
+              : 'Daily brief already generated. New ideas available tomorrow.'}
+          </span>
+        </div>
+        {isStarter && (
+          <a
+            href="/dashboard/settings?tab=billing"
+            className="text-xs text-blue-400 hover:text-blue-300 font-bold uppercase tracking-widest transition-colors"
+          >
+            Upgrade to Pro for daily briefs →
+          </a>
+        )}
       </div>
     )
   }

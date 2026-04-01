@@ -52,21 +52,38 @@ export async function POST() {
       return NextResponse.json({ error: `Unknown niche: ${nicheId}` }, { status: 400 })
     }
 
-    // 3. Rate limit — 1 generation per calendar day
-    const todayStart = new Date()
-    todayStart.setHours(0, 0, 0, 0)
+    // 3. Rate limit — Pro/Team: 1/day | Starter: 1/week (Monday reset)
+    const isPaidPlan = profile.plan === 'pro' || profile.plan === 'team'
 
-    const { data: existingToday } = await supabaseAdmin
+    let rateLimitSince: Date
+    let rateLimitMessage: string
+
+    if (isPaidPlan) {
+      rateLimitSince = new Date()
+      rateLimitSince.setHours(0, 0, 0, 0)
+      rateLimitMessage = 'You already generated a brief today. Your next generation is available tomorrow.'
+    } else {
+      // Starter: 1 per week, resets on Monday 00:00
+      const now = new Date()
+      const dayOfWeek = now.getDay() // 0=Sun, 1=Mon
+      const daysSinceMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1
+      rateLimitSince = new Date(now)
+      rateLimitSince.setDate(now.getDate() - daysSinceMonday)
+      rateLimitSince.setHours(0, 0, 0, 0)
+      rateLimitMessage = 'Starter plan includes 1 brief per week. Upgrade to Pro for daily briefs.'
+    }
+
+    const { data: existingInWindow } = await supabaseAdmin
       .from('briefs')
       .select('id, created_at')
       .eq('user_id', user.id)
-      .gte('created_at', todayStart.toISOString())
+      .gte('created_at', rateLimitSince.toISOString())
       .limit(1)
       .maybeSingle()
 
-    if (existingToday) {
+    if (existingInWindow) {
       return NextResponse.json(
-        { error: 'rate_limited', message: 'You already generated a brief today. Your next generation is available tomorrow.' },
+        { error: 'rate_limited', message: rateLimitMessage },
         { status: 429 }
       )
     }

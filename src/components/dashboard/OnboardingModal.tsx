@@ -67,6 +67,7 @@ export function OnboardingModal({ userName }: OnboardingModalProps) {
   const handleSkip = async () => {
     setIsOpen(false)
     await completeOnboardingAction()
+    router.refresh()
   }
 
   const handleNext = () => {
@@ -79,6 +80,7 @@ export function OnboardingModal({ userName }: OnboardingModalProps) {
     if (current.id === 'voice') {
       setIsOpen(false)
       await completeOnboardingAction()
+      router.refresh()
       router.push('/dashboard/settings?tab=voice')
     } else if (current.id === 'generate') {
       setGenerating(true)
@@ -100,6 +102,7 @@ export function OnboardingModal({ userName }: OnboardingModalProps) {
     } else if (current.id === 'kanban') {
       setIsOpen(false)
       await completeOnboardingAction()
+      router.refresh()
       router.push('/dashboard/ideas')
     }
   }

@@ -6,6 +6,7 @@ import { AnthropicProvider } from './providers/anthropic'
 import { GeminiProvider } from './providers/gemini'
 import { AzureProvider } from './providers/azure'
 import { GroqProvider } from './providers/groq'
+import { OpenRouterProvider } from './providers/openrouter'
 
 export function getAIProvider(): AIProvider {
   const provider = process.env.AI_PROVIDER ?? 'openai'
@@ -38,6 +39,9 @@ export function getAIProvider(): AIProvider {
     }
     case 'groq': {
       return new GroqProvider(process.env.GROQ_API_KEY!, model)
+    }
+    case 'openrouter': {
+      return new OpenRouterProvider(process.env.OPENROUTER_API_KEY!, model)
     }
     default:
       throw new Error(`Unknown AI provider: ${provider}`)

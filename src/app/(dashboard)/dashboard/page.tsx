@@ -13,7 +13,6 @@ import { CalendarDays, Zap, Sparkles, Orbit } from "lucide-react"
 import { stripe } from "@/lib/stripe"
 import { resolvePlanFromPriceId } from "@/lib/billing"
 import { OnboardingModal } from "@/components/dashboard/OnboardingModal"
-import { OnboardingChecklist } from "@/components/dashboard/OnboardingChecklist"
 
 export const dynamic = 'force-dynamic'
 
@@ -89,7 +88,7 @@ export default async function DashboardPage({
   const todayStart = new Date()
   todayStart.setHours(0, 0, 0, 0)
 
-  const [{ data: brief }, { data: generatedToday }, { data: profile }, { data: profileVoice }, { data: anyBrief }] = await Promise.all([
+  const [{ data: brief }, { data: generatedToday }, { data: profile }] = await Promise.all([
     supabase
       .from('briefs')
       .select('*')
@@ -109,27 +108,7 @@ export default async function DashboardPage({
       .select('active_niche, plan, current_team_id, has_onboarded')
       .eq('id', user.id)
       .single(),
-    supabase
-      .from('profiles')
-      .select('brand_voice')
-      .eq('id', user.id)
-      .single(),
-    supabase
-      .from('briefs')
-      .select('id')
-      .eq('user_id', user.id)
-      .limit(1)
-      .maybeSingle(),
   ])
-
-  // Sequential: needs profile.current_team_id resolved first
-  const { data: anySavedIdea } = await supabase
-    .from('idea_history')
-    .select('id')
-    .eq('team_id', profile?.current_team_id ?? '')
-    .eq('saved', true)
-    .limit(1)
-    .maybeSingle()
 
   const { data: savedHistory } = await supabase
     .from('idea_history')
@@ -172,21 +151,10 @@ export default async function DashboardPage({
     : null
 
   const showOnboarding = !profile?.has_onboarded
-  const voiceConfigured = !!(profileVoice?.brand_voice)
-  const briefGenerated = !!anyBrief
-  const ideaSaved = !!anySavedIdea
-  const showChecklist = !!profile?.has_onboarded && !(voiceConfigured && briefGenerated && ideaSaved)
 
   return (
     <div className="space-y-10">
       {showOnboarding && <OnboardingModal userName={user.user_metadata?.full_name || user.email?.split('@')[0]} />}
-      {showChecklist && (
-        <OnboardingChecklist
-          voiceConfigured={voiceConfigured}
-          briefGenerated={briefGenerated}
-          ideaSaved={ideaSaved}
-        />
-      )}
       {/* Upper Utility Bar */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 py-2 border-b border-white/5">
         <div className="flex items-center gap-4">

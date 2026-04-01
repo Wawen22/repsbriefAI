@@ -1,6 +1,7 @@
 import { DashboardSidebar } from "@/components/layout/DashboardSidebar"
 import { MobileNav } from "@/components/layout/MobileNav"
 import { CommandPalette } from "@/components/layout/CommandPalette"
+import { OnboardingChecklist } from "@/components/dashboard/OnboardingChecklist"
 import { createClient } from "@/lib/supabase/server"
 
 export default async function DashboardLayout({
@@ -10,26 +11,39 @@ export default async function DashboardLayout({
 }) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  
+
   let plan = 'starter'
   let userEmail = user?.email || ''
   let userFullName: string | null = null
+  let showChecklist = false
+  let voiceConfigured = false
+  let briefGenerated = false
+  let ideaSaved = false
 
   if (user) {
     const { data: profile } = await supabase
       .from('profiles')
-      .select('plan, full_name, email')
+      .select('plan, full_name, email, has_onboarded, brand_voice, current_team_id')
       .eq('id', user.id)
       .single()
-      
-    if (profile?.plan) {
-      plan = profile.plan
-    }
-    if (profile?.full_name) {
-      userFullName = profile.full_name
-    }
-    if (profile?.email) {
-      userEmail = profile.email
+
+    if (profile?.plan) plan = profile.plan
+    if (profile?.full_name) userFullName = profile.full_name
+    if (profile?.email) userEmail = profile.email
+
+    if (profile?.has_onboarded) {
+      voiceConfigured = !!(profile.brand_voice)
+
+      const [{ data: anyBrief }, { data: anySavedIdea }] = await Promise.all([
+        supabase.from('briefs').select('id').eq('user_id', user.id).limit(1).maybeSingle(),
+        supabase.from('idea_history').select('id')
+          .eq('team_id', profile.current_team_id ?? '')
+          .eq('saved', true).limit(1).maybeSingle(),
+      ])
+
+      briefGenerated = !!anyBrief
+      ideaSaved = !!anySavedIdea
+      showChecklist = !(voiceConfigured && briefGenerated && ideaSaved)
     }
   }
 
@@ -50,13 +64,21 @@ export default async function DashboardLayout({
       <div className="flex-1 flex overflow-hidden relative z-10">
         {/* Desktop Sidebar */}
         <DashboardSidebar plan={plan} userEmail={userEmail} userFullName={userFullName} />
-        
+
         <main className="flex-1 overflow-y-auto p-6 md:p-10 lg:p-12 scroll-smooth custom-scrollbar">
           <div className="max-w-7xl mx-auto">
             {children}
           </div>
         </main>
       </div>
+
+      {showChecklist && (
+        <OnboardingChecklist
+          voiceConfigured={voiceConfigured}
+          briefGenerated={briefGenerated}
+          ideaSaved={ideaSaved}
+        />
+      )}
     </div>
   )
 }

@@ -9,6 +9,7 @@ import { IntegrationsSettings } from "@/components/settings/IntegrationsSettings
 import { AutomationLogsSettings } from "@/components/settings/AutomationLogsSettings"
 import { LogoutButton } from "@/components/ui/LogoutButton"
 import { UpgradeToProButton } from "@/components/settings/UpgradeToProButton"
+import { ManageBillingButton } from "@/components/settings/ManageBillingButton"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { NICHES } from "@/config/niches"
@@ -167,7 +168,7 @@ export default async function SettingsPage({
 
             {profile.plan === 'starter' && (
               <div className="space-y-2 rounded-2xl border border-blue-500/20 bg-blue-500/5 p-4">
-                <p className="text-xs font-semibold text-white">Passa a Pro per sbloccare storico e controlli avanzati.</p>
+                <p className="text-xs font-semibold text-white">Upgrade to Pro to unlock full history and advanced controls.</p>
                 <UpgradeToProButton />
               </div>
             )}
@@ -186,7 +187,7 @@ export default async function SettingsPage({
               <h2 className="text-lg font-semibold text-white">Content Niche</h2>
             </div>
             <p className="text-sm text-slate-500">
-              Seleziona la nicchia usata per trend scouting e generazione dei tuoi brief.
+              Select the niche used for trend scouting and brief generation.
             </p>
           </div>
           <div className="space-y-5">
@@ -202,7 +203,7 @@ export default async function SettingsPage({
               <h2 className="text-lg font-semibold text-white">AI Brand Voice</h2>
             </div>
             <p className="text-sm text-slate-500">
-              Definisci lo stile editoriale condiviso dal team per script, caption e remix.
+              Define the editorial style shared across your team for scripts, captions and remixes.
             </p>
           </div>
           <BrandVoiceSettings
@@ -219,7 +220,7 @@ export default async function SettingsPage({
               <h2 className="text-lg font-semibold text-white">Workspace Management</h2>
             </div>
             <p className="text-sm text-slate-500">
-              Cambia workspace, gestisci branding e controlla i permessi del team.
+              Switch workspace, manage branding and control team permissions.
             </p>
           </div>
           <TeamWorkspaceSettings />
@@ -233,7 +234,7 @@ export default async function SettingsPage({
               <h2 className="text-lg font-semibold text-white">Connections & Plugins</h2>
             </div>
             <p className="text-sm text-slate-500">
-              Collega RepsBrief ai tuoi strumenti di lavoro preferiti.
+              Connect RepsBrief to your favourite tools.
             </p>
           </div>
           <IntegrationsSettings />
@@ -247,7 +248,7 @@ export default async function SettingsPage({
               <h2 className="text-lg font-semibold text-white">Automation Logs</h2>
             </div>
             <p className="text-sm text-slate-500">
-              Monitora tutte le esportazioni e notifiche inviate dal tuo workspace.
+              Monitor all exports and notifications sent from your workspace.
             </p>
           </div>
           <AutomationLogsSettings />
@@ -328,8 +329,11 @@ export default async function SettingsPage({
               {profile.plan === 'starter' ? (
                 <UpgradeToProButton />
               ) : profile.plan === 'pro' ? (
-                <div className="h-10 flex items-center justify-center rounded-2xl border border-blue-500/30 text-xs font-bold text-blue-400 uppercase tracking-widest">
-                  Active plan
+                <div className="space-y-2">
+                  <div className="h-10 flex items-center justify-center rounded-2xl border border-blue-500/30 text-xs font-bold text-blue-400 uppercase tracking-widest">
+                    Active plan
+                  </div>
+                  <ManageBillingButton />
                 </div>
               ) : null}
             </div>
@@ -361,8 +365,11 @@ export default async function SettingsPage({
                 ))}
               </ul>
               {profile.plan === 'team' ? (
-                <div className="h-10 flex items-center justify-center rounded-2xl border border-purple-500/30 text-xs font-bold text-purple-400 uppercase tracking-widest">
-                  Active plan
+                <div className="space-y-2">
+                  <div className="h-10 flex items-center justify-center rounded-2xl border border-purple-500/30 text-xs font-bold text-purple-400 uppercase tracking-widest">
+                    Active plan
+                  </div>
+                  <ManageBillingButton />
                 </div>
               ) : (
                 <a

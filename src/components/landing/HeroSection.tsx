@@ -93,6 +93,9 @@ export function HeroSection() {
               Explore features
             </Link>
           </div>
+          <p className="text-[11px] text-slate-600 font-medium">
+            Free forever · <span className="text-emerald-500 font-bold">Pro includes 7-day free trial</span> · No credit card required
+          </p>
         </div>
 
         {/* Social proof */}

@@ -63,11 +63,14 @@ export function PricingNexus() {
               </div>
               <div className="mb-10">
                 <span className="text-[10px] font-black text-blue-400 uppercase tracking-[0.3em]">Pro Creator</span>
-                <div className="mt-6 flex items-baseline gap-1">
-                  <span className="text-7xl font-black text-white">$19</span>
-                  <span className="text-blue-400/50 font-bold uppercase text-xs tracking-widest">/mo</span>
+                <div className="mt-4 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+                  <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest">7-day free trial</span>
                 </div>
-                <p className="text-xs text-blue-300/40 mt-3 font-bold uppercase tracking-widest">Scale Your Personal Brand.</p>
+                <div className="mt-3 flex items-baseline gap-1">
+                  <span className="text-7xl font-black text-white">$19</span>
+                  <span className="text-blue-400/50 font-bold uppercase text-xs tracking-widest">/mo after trial</span>
+                </div>
+                <p className="text-xs text-slate-500 mt-2 font-medium">No credit card required to start.</p>
               </div>
               <div className="space-y-5 mb-12 flex-1">
                 {[
@@ -87,8 +90,9 @@ export function PricingNexus() {
                 ))}
               </div>
               <Button className="w-full rounded-2xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-black uppercase tracking-widest h-16 shadow-2xl shadow-blue-500/30 transition-all hover:scale-105 active:scale-95" asChild>
-                <Link href="/signup">Unleash Pro</Link>
+                <Link href="/signup">Start Free Trial →</Link>
               </Button>
+              <p className="text-center text-[10px] text-slate-600 font-medium mt-3">Then $19/mo · Cancel anytime</p>
             </div>
           </div>
 

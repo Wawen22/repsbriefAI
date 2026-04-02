@@ -11,9 +11,29 @@ type IdeaHistoryUpdate = {
   published_at?: string
 }
 
-async function getCurrentTeamId(supabase: ServerSupabaseClient, userId: string) {
-  const { data } = await supabase.from('profiles').select('current_team_id').eq('id', userId).single()
-  return data?.current_team_id
+async function getCurrentTeamId(supabase: ServerSupabaseClient, userId: string): Promise<string | null> {
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('current_team_id, full_name, email')
+    .eq('id', userId)
+    .single()
+
+  if (profile?.current_team_id) return profile.current_team_id
+
+  // Auto-create personal workspace for users who signed up before the workspace migration
+  const displayName = profile?.full_name || profile?.email?.split('@')[0] || 'My'
+  const { data: team } = await supabase
+    .from('teams')
+    .insert({ name: `${displayName}'s Workspace`, owner_id: userId })
+    .select('id')
+    .single()
+
+  if (!team) return null
+
+  await supabase.from('team_members').insert({ team_id: team.id, user_id: userId, role: 'owner' })
+  await supabase.from('profiles').update({ current_team_id: team.id }).eq('id', userId)
+
+  return team.id
 }
 
 export async function saveIdeaAction(

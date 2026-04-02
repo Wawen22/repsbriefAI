@@ -85,11 +85,16 @@ export function UpgradeModal() {
             <h2 className="text-2xl font-black text-white tracking-tight">
               Unlock the full Studio
             </h2>
+            <div className="flex items-baseline gap-2">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/25">
+                <span className="text-[11px] font-black text-emerald-400 uppercase tracking-widest">7-day free trial</span>
+              </div>
+            </div>
             <div className="flex items-baseline gap-1">
               <span className="text-4xl font-black text-white">$19</span>
-              <span className="text-slate-400 text-sm">/month</span>
+              <span className="text-slate-400 text-sm">/month after trial</span>
             </div>
-            <p className="text-slate-400 text-sm">Cancel anytime. No contracts.</p>
+            <p className="text-slate-400 text-sm">No charge today. Cancel anytime.</p>
           </div>
         </div>
 
@@ -117,10 +122,13 @@ export function UpgradeModal() {
             ) : (
               <>
                 <Sparkles className="w-4 h-4" />
-                Upgrade to Pro — $19/mo
+                Start Free Trial — 7 Days
               </>
             )}
           </Button>
+          <p className="text-center text-[10px] text-slate-600 font-medium">
+            Then $19/mo · No charge today · Cancel anytime
+          </p>
           <button
             onClick={close}
             className="w-full text-center text-[11px] text-slate-600 hover:text-slate-400 transition-colors font-medium py-1"

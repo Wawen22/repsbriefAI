@@ -54,6 +54,7 @@ export async function POST(req: Request) {
         plan,
       },
       subscription_data: {
+        trial_period_days: plan === 'pro' ? 7 : undefined,
         metadata: {
           userId: user.id,
           plan,

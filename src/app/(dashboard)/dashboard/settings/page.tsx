@@ -302,8 +302,11 @@ export default async function SettingsPage({
               </div>
               <div className="space-y-1">
                 <span className="text-xs font-black uppercase tracking-widest text-blue-400">Pro</span>
+                <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+                  <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest">7-day free trial</span>
+                </div>
                 <p className="text-3xl font-black text-white">$19<span className="text-sm font-normal text-slate-400">/mo</span></p>
-                <p className="text-xs text-slate-500">Billed monthly</p>
+                <p className="text-xs text-slate-500">No charge today · Cancel anytime</p>
               </div>
               <ul className="space-y-2 flex-1">
                 {[

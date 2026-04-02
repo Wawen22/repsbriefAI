@@ -1,11 +1,13 @@
+'use client'
+
 // src/components/brief/BriefList.tsx
 
 import { IdeaObject } from "@/types/niche"
 import { BriefCard } from "./BriefCard"
 import { LockedIdeasOverlay } from "./LockedIdeasGate"
-import Link from "next/link"
 import { Lock, Zap } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { useUpgradeModal } from "@/components/ui/UpgradeModal"
 
 interface BriefListProps {
   ideas: IdeaObject[]
@@ -48,6 +50,7 @@ const FAKE_CARDS = [
 
 export function BriefList({ ideas, savedHashes, savedIdsMap, plan }: BriefListProps) {
   const isStarter = !plan || plan === 'starter'
+  const openUpgrade = useUpgradeModal((s) => s.open)
   const visibleIdeas = isStarter ? ideas.slice(0, FREE_IDEAS_LIMIT) : ideas
   const lockedCount = isStarter ? Math.max(0, ideas.length - FREE_IDEAS_LIMIT) : 0
   const fakeCardsToShow = Math.min(lockedCount, FAKE_CARDS.length)
@@ -130,13 +133,11 @@ export function BriefList({ ideas, savedHashes, savedIdsMap, plan }: BriefListPr
               </p>
             </div>
             <Button
+              onClick={() => openUpgrade('20 Ideas Unlocked')}
               className="rounded-full px-8 h-12 bg-blue-600 hover:bg-blue-500 text-white text-xs font-black uppercase tracking-widest shadow-2xl shadow-blue-500/30 hover:scale-105 transition-all"
-              asChild
             >
-              <Link href="/dashboard/settings?tab=billing">
-                <Zap className="w-4 h-4 mr-2" />
-                Unlock All 20 — $19/mo
-              </Link>
+              <Zap className="w-4 h-4 mr-2" />
+              Unlock All 20 — $19/mo
             </Button>
             <p className="text-[10px] text-slate-600 font-bold uppercase tracking-widest">No commitment · Cancel anytime</p>
           </div>

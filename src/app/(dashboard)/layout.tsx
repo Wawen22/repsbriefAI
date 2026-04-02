@@ -2,6 +2,7 @@ import { DashboardSidebar } from "@/components/layout/DashboardSidebar"
 import { MobileNav } from "@/components/layout/MobileNav"
 import { CommandPalette } from "@/components/layout/CommandPalette"
 import { OnboardingChecklist } from "@/components/dashboard/OnboardingChecklist"
+import { UpgradeModal } from "@/components/ui/UpgradeModal"
 import { createClient } from "@/lib/supabase/server"
 import { getCurrentUser, getCachedProfile } from "@/lib/supabase/cached-queries"
 
@@ -76,6 +77,7 @@ export default async function DashboardLayout({
           ideaSaved={ideaSaved}
         />
       )}
+      <UpgradeModal />
     </div>
   )
 }

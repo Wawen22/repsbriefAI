@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { CheckCircle2, AlertCircle, Sparkles, Orbit, Search, BarChart3, Brain, Database, Check } from 'lucide-react'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
+import { useUpgradeModal } from '@/components/ui/UpgradeModal'
 
 const STEPS = [
   { id: 'scrape', label: 'Signal Extraction', icon: Search, sub: 'Scraping Reddit & YouTube view velocity...' },
@@ -26,6 +27,7 @@ export function GenerateNowButton({ alreadyGeneratedToday = false, plan }: Gener
   const router = useRouter()
   const [state, setState] = useState<State>(alreadyGeneratedToday ? 'rate_limited' : 'idle')
   const isStarter = !plan || plan === 'starter'
+  const openUpgrade = useUpgradeModal((s) => s.open)
   const [currentStep, setCurrentStep] = useState(0)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [logs, setLogs] = useState<string[]>([])
@@ -100,12 +102,12 @@ export function GenerateNowButton({ alreadyGeneratedToday = false, plan }: Gener
           </span>
         </div>
         {isStarter && (
-          <a
-            href="/dashboard/settings?tab=billing"
+          <button
+            onClick={() => openUpgrade('Daily Briefs')}
             className="text-xs text-blue-400 hover:text-blue-300 font-bold uppercase tracking-widest transition-colors"
           >
             Upgrade to Pro for daily briefs →
-          </a>
+          </button>
         )}
       </div>
     )

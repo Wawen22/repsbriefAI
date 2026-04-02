@@ -52,6 +52,7 @@ type IdeaWorkflowMeta = IdeaObject & {
 }
 
 import { exportStrategyToNotionAction } from "@/app/actions/notion-export"
+import { useUpgradeModal } from "@/components/ui/UpgradeModal"
 
 // Small inline badge shown on locked buttons
 function ProBadge() {
@@ -62,22 +63,8 @@ function ProBadge() {
   )
 }
 
-// Toast triggered when a locked feature is clicked
-function showUpgradeToast(featureName: string) {
-  toast(
-    <div className="flex flex-col gap-1">
-      <span className="font-black text-sm text-white">{featureName} is a Pro feature</span>
-      <span className="text-xs text-slate-400">Upgrade to unlock this and all Pro features.</span>
-    </div>,
-    {
-      action: {
-        label: 'Upgrade →',
-        onClick: () => window.location.href = '/dashboard/settings?tab=billing',
-      },
-      duration: 5000,
-    }
-  )
-}
+// No-op placeholder — replaced by useUpgradeModal below
+function showUpgradeToast(_featureName: string) { /* see handleLockedClick */ }
 
 export function StrategicBriefView({
   idea,
@@ -142,6 +129,8 @@ export function StrategicBriefView({
 
   // Plan helpers
   const isStarter = !userPlan || userPlan === 'starter'
+  const openUpgrade = useUpgradeModal((s) => s.open)
+  const handleLockedClick = (featureName: string) => openUpgrade(featureName)
 
   const copyToClipboard = (text: string, msg = "Copied to clipboard!") => {
     navigator.clipboard.writeText(text)
@@ -149,7 +138,7 @@ export function StrategicBriefView({
   }
 
   const handleNotionAction = async () => {
-    if (isStarter) { showUpgradeToast('Notion Export'); return }
+    if (isStarter) { handleLockedClick('Notion Export'); return }
     const content = `Title: ${currentIdea.title}\n\nHook: ${currentIdea.hook}\n\nStrategy:\n${currentIdea.description}\n\nScript:\n${currentIdea.scriptDraft || 'N/A'}`
 
     if (isNotionConnected) {
@@ -182,7 +171,7 @@ export function StrategicBriefView({
   }
 
   const exportToPDF = async () => {
-    if (isStarter) { showUpgradeToast('PDF Export'); return }
+    if (isStarter) { handleLockedClick('PDF Export'); return }
     const tid = toast.loading("Generating professional PDF...")
     try {
       const doc = new jsPDF('p', 'mm', 'a4')
@@ -251,7 +240,7 @@ export function StrategicBriefView({
   }
 
   const exportAsMarkdown = () => {
-    if (isStarter) { showUpgradeToast('Markdown Export'); return }
+    if (isStarter) { handleLockedClick('Markdown Export'); return }
     try {
       const markdown = [
         `# ${currentIdea.title}`,
@@ -527,7 +516,7 @@ export function StrategicBriefView({
                 {(currentIdea.scriptDraft || currentIdea.description) && (
                   isStarter ? (
                     <Button
-                      onClick={() => showUpgradeToast('Live Recording Mode')}
+                      onClick={() => handleLockedClick('Live Recording Mode')}
                       className="h-9 px-5 rounded-full bg-white/5 border border-white/10 text-slate-500 font-black text-[10px] uppercase tracking-widest gap-2 transition-all"
                     >
                       <Lock className="w-3.5 h-3.5" />
@@ -577,12 +566,13 @@ export function StrategicBriefView({
                         <Lock className="w-4 h-4 text-purple-400" />
                       </div>
                       <p className="text-white font-black text-sm">Full script locked</p>
-                      <Link href="/dashboard/settings?tab=billing">
-                        <Button className="h-9 px-6 rounded-full bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-black uppercase tracking-widest gap-2 shadow-lg shadow-blue-500/20 hover:scale-105 transition-all">
-                          <Zap className="w-3.5 h-3.5" />
-                          Upgrade to Pro — $19/mo
-                        </Button>
-                      </Link>
+                      <Button
+                        onClick={() => handleLockedClick('Full Script')}
+                        className="h-9 px-6 rounded-full bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-black uppercase tracking-widest gap-2 shadow-lg shadow-blue-500/20 hover:scale-105 transition-all"
+                      >
+                        <Zap className="w-3.5 h-3.5" />
+                        Upgrade to Pro — $19/mo
+                      </Button>
                     </div>
                   </div>
                 )}
@@ -624,12 +614,13 @@ export function StrategicBriefView({
                   ))}
                 </div>
 
-                <Link href="/dashboard/settings?tab=billing">
-                  <Button className="w-full h-11 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-black text-[10px] uppercase tracking-widest gap-2 shadow-lg shadow-blue-500/20 hover:scale-[1.02] transition-all">
-                    <Zap className="w-3.5 h-3.5" />
-                    Unlock AI Remix — Pro
-                  </Button>
-                </Link>
+                <Button
+                  onClick={() => handleLockedClick('AI Strategy Remix')}
+                  className="w-full h-11 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-black text-[10px] uppercase tracking-widest gap-2 shadow-lg shadow-blue-500/20 hover:scale-[1.02] transition-all"
+                >
+                  <Zap className="w-3.5 h-3.5" />
+                  Unlock AI Remix — Pro
+                </Button>
               </section>
             ) : (
               /* Full remix panel for pro */

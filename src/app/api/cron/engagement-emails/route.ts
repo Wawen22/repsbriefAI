@@ -1,9 +1,11 @@
 // src/app/api/cron/engagement-emails/route.ts
-// Runs daily at 10:00 UTC. Sends Day 1, Day 3, and Day 7 emails based on signup date.
+// Runs daily at 10:00 UTC.
+// Sends: Day 1/3/7 onboarding + Monday "brief ready" notification.
 
 import { NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase'
-import { sendWelcomeSequenceEmail } from '@/lib/mail'
+import { sendWelcomeSequenceEmail, sendBriefReadyEmail } from '@/lib/mail'
+import { NICHES } from '@/config/niches'
 
 export const dynamic = 'force-dynamic'
 
@@ -28,7 +30,7 @@ export async function POST(req: Request) {
   }
 
   const supabase = getSupabaseAdmin('api/cron/engagement-emails')
-  const results = { day1: 0, day3: 0, day7: 0, errors: 0 }
+  const results = { day1: 0, day3: 0, day7: 0, briefReady: 0, errors: 0 }
 
   // DAY 1 — users who signed up today
   const { data: day1Users } = await supabase
@@ -75,6 +77,50 @@ export async function POST(req: Request) {
     if (!user.email) continue
     const r = await sendWelcomeSequenceEmail(user.email, user.full_name || '', 7)
     r.success ? results.day7++ : results.errors++
+  }
+
+  // BRIEF READY — Monday: notify all users who have a brief generated this week
+  // Pro users get it every day; starter only on Mondays.
+  const isMonday = new Date().getDay() === 1
+
+  if (isMonday) {
+    // Starter users: brief generated today (weekly brief runs Monday cron)
+    const { data: starterUsers } = await supabase
+      .from('profiles')
+      .select('id, email, full_name, active_niche')
+      .eq('plan', 'starter')
+      .not('email', 'is', null)
+
+    for (const user of starterUsers || []) {
+      if (!user.email) continue
+      // Check they have at least one brief
+      const { data: brief } = await supabase
+        .from('briefs')
+        .select('id')
+        .eq('user_id', user.id)
+        .limit(1)
+        .maybeSingle()
+      if (!brief) continue
+      const nicheLabel = NICHES[user.active_niche as string]?.label || 'content'
+      const r = await sendBriefReadyEmail(user.email, user.full_name || '', nicheLabel, false)
+      r.success ? results.briefReady++ : results.errors++
+    }
+  }
+
+  // Pro/Team users: notify every day their brief was generated today
+  const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0)
+  const { data: proUsersWithBriefToday } = await supabase
+    .from('briefs')
+    .select('user_id, profiles!inner(email, full_name, plan, active_niche)')
+    .gte('created_at', todayStart.toISOString())
+    .in('profiles.plan', ['pro', 'team'])
+
+  for (const row of proUsersWithBriefToday || []) {
+    const profile = row.profiles as { email?: string; full_name?: string; plan?: string; active_niche?: string } | null
+    if (!profile?.email) continue
+    const nicheLabel = NICHES[profile.active_niche as string]?.label || 'content'
+    const r = await sendBriefReadyEmail(profile.email, profile.full_name || '', nicheLabel, true)
+    r.success ? results.briefReady++ : results.errors++
   }
 
   console.log('[EngagementEmails] Results:', results)

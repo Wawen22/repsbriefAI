@@ -27,7 +27,13 @@ import {
   FileDown,
   FileText,
   FileCode,
-  Lock
+  Lock,
+  Youtube,
+  Rss,
+  BarChart2,
+  Music,
+  Image,
+  ChevronDown
 } from "lucide-react"
 import { useState, useEffect } from "react"
 import { toast } from "sonner"
@@ -65,6 +71,100 @@ function ProBadge() {
 
 // No-op placeholder — replaced by useUpgradeModal below
 function showUpgradeToast(_featureName: string) { /* see handleLockedClick */ }
+
+// ─── Trend Intelligence Panel ──────────────────────────────────────────────
+
+const SOURCE_CONFIG: Record<string, { icon: React.ComponentType<{ className?: string }>; label: string; color: string; bg: string }> = {
+  reddit:          { icon: Zap,      label: 'Reddit',        color: 'text-orange-400', bg: 'bg-orange-500/10 border-orange-500/20' },
+  youtube:         { icon: Youtube,  label: 'YouTube',       color: 'text-red-400',    bg: 'bg-red-500/10 border-red-500/20' },
+  'google-trends': { icon: BarChart2,label: 'Google Trends', color: 'text-blue-400',   bg: 'bg-blue-500/10 border-blue-500/20' },
+  rss:             { icon: Rss,      label: 'RSS Feed',      color: 'text-amber-400',  bg: 'bg-amber-500/10 border-amber-500/20' },
+}
+
+function TrendIntelligencePanel({ idea }: { idea: IdeaObject }) {
+  const [expanded, setExpanded] = useState(false)
+
+  const hasSources     = !!idea.sources?.length
+  const hasAudio       = !!idea.trendingAudioSuggestion
+  const hasVisuals     = !!idea.keyVisuals
+  const hasAltHooks    = !!idea.alternativeHooks?.length
+
+  return (
+    <section className="rounded-[2rem] border border-white/5 bg-white/[0.02] overflow-hidden">
+      {/* Header — always visible, clickable */}
+      <button
+        onClick={() => setExpanded(v => !v)}
+        className="w-full flex items-center justify-between px-5 py-4 hover:bg-white/[0.02] transition-colors"
+      >
+        <div className="flex items-center gap-3">
+          <div className="p-1.5 rounded-lg bg-blue-500/10 border border-blue-500/20">
+            <TrendingUp className="w-3.5 h-3.5 text-blue-400" />
+          </div>
+          <span className="text-[10px] font-black text-white uppercase tracking-widest">Trend Intelligence</span>
+          {hasSources && (
+            <div className="flex items-center gap-1">
+              {idea.sources!.map(s => {
+                const cfg = SOURCE_CONFIG[s]
+                if (!cfg) return null
+                const Icon = cfg.icon
+                return (
+                  <span key={s} className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full border text-[8px] font-black uppercase tracking-widest ${cfg.bg} ${cfg.color}`}>
+                    <Icon className="w-2.5 h-2.5" />{cfg.label}
+                  </span>
+                )
+              })}
+            </div>
+          )}
+        </div>
+        <ChevronDown className={cn("w-4 h-4 text-slate-600 transition-transform duration-300", expanded && "rotate-180")} />
+      </button>
+
+      {/* Expandable body */}
+      {expanded && (
+        <div className="px-5 pb-5 space-y-4 border-t border-white/5 pt-4">
+
+          {/* Alternative Hooks */}
+          {hasAltHooks && (
+            <div className="space-y-2">
+              <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Alternative Hooks</span>
+              {idea.alternativeHooks!.map((h, i) => (
+                <div key={i} className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-white/[0.02] border border-white/5">
+                  <span className="text-[9px] font-black text-blue-500/60 mt-0.5 shrink-0">0{i + 1}</span>
+                  <p className="text-[11px] text-slate-300 italic leading-relaxed">&ldquo;{h}&rdquo;</p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Audio Suggestion */}
+          {hasAudio && (
+            <div className="space-y-1.5">
+              <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
+                <Music className="w-3 h-3 text-purple-400" /> Trending Audio
+              </span>
+              <p className="text-[11px] text-slate-300 px-3 py-2 rounded-xl bg-white/[0.02] border border-white/5">
+                {idea.trendingAudioSuggestion}
+              </p>
+            </div>
+          )}
+
+          {/* Key Visuals */}
+          {hasVisuals && (
+            <div className="space-y-1.5">
+              <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
+                <Image className="w-3 h-3 text-emerald-400" /> Key Visuals
+              </span>
+              <p className="text-[11px] text-slate-300 px-3 py-2 rounded-xl bg-white/[0.02] border border-white/5">
+                {idea.keyVisuals}
+              </p>
+            </div>
+          )}
+
+        </div>
+      )}
+    </section>
+  )
+}
 
 export function StrategicBriefView({
   idea,
@@ -672,6 +772,11 @@ export function StrategicBriefView({
                 {currentIdea.whyItWorks}
               </p>
             </section>
+
+            {/* Trend Intelligence — always visible */}
+            {(currentIdea.sources?.length || currentIdea.trendingAudioSuggestion || currentIdea.keyVisuals || currentIdea.alternativeHooks?.length) && (
+              <TrendIntelligencePanel idea={currentIdea} />
+            )}
 
             {/* Production Data */}
             <section className="space-y-6">

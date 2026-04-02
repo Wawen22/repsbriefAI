@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 import { Button } from '@/components/ui/button'
 import { Check, Zap, Loader2, X, Sparkles } from 'lucide-react'
 import { create } from 'zustand'
@@ -59,6 +60,9 @@ export function UpgradeModal() {
   return (
     <Dialog open={isOpen} onOpenChange={(v) => !v && close()}>
       <DialogContent className="bg-[#0a0a0a] border border-white/10 rounded-[2.5rem] p-0 max-w-md w-full shadow-2xl overflow-hidden gap-0">
+        <VisuallyHidden>
+          <DialogTitle>Upgrade to Pro</DialogTitle>
+        </VisuallyHidden>
 
         {/* Close */}
         <button

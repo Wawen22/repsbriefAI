@@ -23,7 +23,7 @@ function windowEnd(daysAgo: number): string {
   return d.toISOString()
 }
 
-export async function POST(req: Request) {
+export async function GET(req: Request) {
   const authHeader = req.headers.get('Authorization')
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return new Response('Unauthorized', { status: 401 })

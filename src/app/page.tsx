@@ -240,7 +240,7 @@ export default function LandingPage() {
                      <li className="hover:text-blue-400 cursor-pointer transition-colors uppercase tracking-widest text-[10px] font-black">About Studio</li>
                      <li className="hover:text-blue-400 cursor-pointer transition-colors uppercase tracking-widest text-[10px] font-black">Ecosystem</li>
                      <li className="hover:text-blue-400 cursor-pointer transition-colors uppercase tracking-widest text-[10px] font-black">Agency Partners</li>
-                     <li className="hover:text-blue-400 cursor-pointer transition-colors uppercase tracking-widest text-[10px] font-black">Privacy Nexus</li>
+                     <li><Link href="/privacy" className="hover:text-blue-400 transition-colors uppercase tracking-widest text-[10px] font-black">Privacy Policy</Link></li>
                   </ul>
                </div>
                <div className="space-y-6">
@@ -262,7 +262,8 @@ export default function LandingPage() {
                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Global Engine Active</span>
                 </div>
-                <Link href="#" className="text-[10px] font-black text-slate-500 uppercase tracking-widest hover:text-white transition-colors">Terms of Service</Link>
+                <Link href="/privacy" className="text-[10px] font-black text-slate-500 uppercase tracking-widest hover:text-white transition-colors">Privacy Policy</Link>
+                <Link href="/terms" className="text-[10px] font-black text-slate-500 uppercase tracking-widest hover:text-white transition-colors">Terms of Service</Link>
              </div>
           </div>
         </div>

@@ -12,7 +12,7 @@ import type { NicheConfig, TrendItem } from '@/types/niche'
 
 export const dynamic = 'force-dynamic'
 
-export async function POST(req: Request) {
+export async function GET(req: Request) {
   // 1. Verify CRON_SECRET
   const authHeader = req.headers.get('Authorization')
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {

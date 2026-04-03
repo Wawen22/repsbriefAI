@@ -5,9 +5,8 @@ import { createClient as createServiceClient } from '@supabase/supabase-js'
 import { notFound } from 'next/navigation'
 import { IdeaObject } from '@/types/niche'
 import { Badge } from '@/components/ui/badge'
-import { Sparkles, ArrowRight } from 'lucide-react'
+import { Sparkles, ArrowRight, Zap, TrendingUp } from 'lucide-react'
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
 
 export const dynamic = 'force-dynamic'
 
@@ -46,59 +45,99 @@ export default async function SharedStrategyPage({
   const formatColor = FORMAT_COLORS[idea.format] || FORMAT_COLORS.Idea
 
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center px-4 py-20">
-      <div className="w-full max-w-2xl space-y-10">
-        {/* Header */}
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center">
-            <Sparkles className="w-4 h-4 text-blue-400" />
-          </div>
-          <div>
-            <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Shared via RepsBrief</p>
-            <p className="text-xs text-slate-400 font-medium">by {share.creator_name}</p>
-          </div>
-        </div>
+    <div className="min-h-screen bg-black text-white">
+      {/* Ambient background */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-blue-600/6 rounded-full blur-[150px]" />
+      </div>
 
-        {/* Strategy card */}
-        <div className="bg-white/[0.03] border border-white/10 rounded-3xl p-8 space-y-6">
-          <div className="flex items-start justify-between gap-4">
-            <h1 className="text-2xl font-black tracking-tight leading-tight text-white">
-              {idea.title}
-            </h1>
-            <Badge className={`shrink-0 text-[9px] font-black uppercase tracking-widest border px-3 py-1 rounded-full ${formatColor}`}>
-              {idea.format}
-            </Badge>
-          </div>
+      <div className="relative z-10 flex flex-col items-center min-h-screen px-4 py-16">
+        <div className="w-full max-w-xl space-y-8">
 
-          <div className="space-y-1">
-            <p className="text-[10px] font-black uppercase tracking-widest text-slate-600">Hook</p>
-            <p className="text-slate-300 text-sm leading-relaxed font-medium italic">"{idea.hook}"</p>
-          </div>
-
-          <div className="space-y-1">
-            <p className="text-[10px] font-black uppercase tracking-widest text-slate-600">Strategy</p>
-            <p className="text-slate-400 text-sm leading-relaxed">{idea.description}</p>
-          </div>
-
-          <div className="space-y-1">
-            <p className="text-[10px] font-black uppercase tracking-widest text-slate-600">Why It Works</p>
-            <p className="text-slate-400 text-sm leading-relaxed">{idea.whyItWorks}</p>
-          </div>
-        </div>
-
-        {/* Viral CTA */}
-        <div className="text-center space-y-4">
-          <p className="text-slate-500 text-sm">Want 20 strategies like this, every week?</p>
-          <Button
-            className="rounded-full px-10 h-14 bg-blue-600 hover:bg-blue-500 text-white text-xs font-black uppercase tracking-widest shadow-2xl shadow-blue-500/30 hover:scale-105 transition-all group"
-            asChild
-          >
-            <Link href="/signup">
-              Generate My Free Brief
-              <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          {/* Top nav */}
+          <div className="flex items-center justify-between">
+            <Link href="/" className="flex items-center gap-2">
+              <Zap className="w-5 h-5 text-blue-400 fill-blue-400/20" />
+              <span className="text-sm font-black text-white tracking-tight">RepsBrief</span>
             </Link>
-          </Button>
-          <p className="text-[10px] text-slate-600 font-bold uppercase tracking-widest">Free · No credit card</p>
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.08]">
+              <TrendingUp className="w-3 h-3 text-emerald-400" />
+              <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Trend-backed</span>
+            </div>
+          </div>
+
+          {/* Attribution */}
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-full bg-blue-500/20 border border-blue-500/20 flex items-center justify-center shrink-0">
+              <Sparkles className="w-3.5 h-3.5 text-blue-400" />
+            </div>
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Strategy shared by</p>
+              <p className="text-sm text-white font-bold">{share.creator_name}</p>
+            </div>
+          </div>
+
+          {/* Strategy card */}
+          <div className="bg-white/[0.02] border border-white/[0.08] rounded-3xl p-7 space-y-6">
+            <div className="flex items-start justify-between gap-4">
+              <h1 className="text-2xl font-black tracking-tight leading-tight text-white">
+                {idea.title}
+              </h1>
+              <Badge className={`shrink-0 text-[9px] font-black uppercase tracking-widest border px-3 py-1 rounded-full ${formatColor}`}>
+                {idea.format}
+              </Badge>
+            </div>
+
+            <div className="space-y-1">
+              <p className="text-[10px] font-black uppercase tracking-widest text-slate-600">Hook</p>
+              <p className="text-slate-300 text-sm leading-relaxed font-medium italic">&ldquo;{idea.hook}&rdquo;</p>
+            </div>
+
+            <div className="space-y-1">
+              <p className="text-[10px] font-black uppercase tracking-widest text-slate-600">Strategy</p>
+              <p className="text-slate-400 text-sm leading-relaxed">{idea.description}</p>
+            </div>
+
+            {idea.whyItWorks && (
+              <div className="space-y-1">
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-600">Why It Works</p>
+                <p className="text-slate-400 text-sm leading-relaxed">{idea.whyItWorks}</p>
+              </div>
+            )}
+          </div>
+
+          {/* Viral CTA block */}
+          <div className="rounded-3xl border border-blue-500/20 bg-gradient-to-b from-blue-500/[0.08] to-transparent p-7 space-y-5 text-center">
+            <div className="space-y-1.5">
+              <p className="text-white font-black text-lg tracking-tight">
+                Get 20 strategies like this — every week
+              </p>
+              <p className="text-slate-400 text-sm font-light">
+                AI-curated from Reddit, YouTube &amp; Google Trends. Free forever.
+              </p>
+            </div>
+
+            <Link
+              href="/signup"
+              className="flex items-center justify-center gap-2 w-full h-13 py-4 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-black uppercase tracking-widest shadow-2xl shadow-blue-500/25 transition-all hover:scale-[1.02] group"
+            >
+              Start Free — Get My Brief
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+            </Link>
+
+            <div className="flex items-center justify-center gap-4 text-[10px] font-bold text-slate-600 uppercase tracking-widest">
+              <span className="text-emerald-500/80">✓ Free forever</span>
+              <span>·</span>
+              <span className="text-emerald-500/80">✓ Pro: 7-day trial</span>
+              <span>·</span>
+              <span className="text-emerald-500/80">✓ No credit card</span>
+            </div>
+          </div>
+
+          {/* Powered by */}
+          <p className="text-center text-[10px] text-slate-700 font-bold uppercase tracking-widest">
+            Powered by RepsBrief — AI Content Intelligence
+          </p>
         </div>
       </div>
     </div>

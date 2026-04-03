@@ -1,24 +1,35 @@
-// src/app/(auth)/signup/page.tsx
+'use client'
 
-"use client"
+import { useState, useEffect, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Zap, Loader2, CheckCircle2, ArrowRight, Sparkles } from 'lucide-react'
+import Link from 'next/link'
 
-import { useState } from "react"
-import { createClient } from "@/lib/supabase/client"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Zap, Loader2, CheckCircle2 } from "lucide-react"
-import Link from "next/link"
+function getCookie(name: string): string | null {
+  if (typeof document === 'undefined') return null
+  const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'))
+  return match ? match[2] : null
+}
 
-export default function SignupPage() {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
+function SignupForm() {
+  const searchParams = useSearchParams()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
-  
+  const [refCode, setRefCode] = useState<string | null>(null)
+
   const supabase = createClient()
+
+  useEffect(() => {
+    const fromUrl = searchParams.get('ref')
+    const fromCookie = getCookie('repsbrief_ref')
+    setRefCode(fromUrl || fromCookie || null)
+  }, [searchParams])
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -31,18 +42,14 @@ export default function SignupPage() {
         password,
         options: {
           emailRedirectTo: `${window.location.origin}/auth/callback`,
+          data: refCode ? { referred_by: refCode } : undefined,
         },
       })
 
       if (error) throw error
-      
-      // Update profile or send initial logic if needed
-      if (data?.user) {
-        setSuccess(true)
-      }
+      if (data?.user) setSuccess(true)
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Signup failed"
-      setError(message)
+      setError(err instanceof Error ? err.message : 'Signup failed')
     } finally {
       setLoading(false)
     }
@@ -50,75 +57,119 @@ export default function SignupPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md bg-slate-900 border-slate-800 text-slate-50 text-center">
-          <CardHeader>
-             <CheckCircle2 className="w-16 h-16 text-emerald-500 mx-auto mb-4" />
-             <CardTitle className="text-2xl font-bold italic">Check your inbox!</CardTitle>
-             <CardDescription className="text-slate-400">We&apos;ve sent a verification link to your email.</CardDescription>
-          </CardHeader>
-          <CardFooter className="flex justify-center">
-             <Button variant="ghost" asChild>
-                <Link href="/login" className="text-blue-500 hover:text-blue-400">Back to Login</Link>
-             </Button>
-          </CardFooter>
-        </Card>
+      <div className="text-center space-y-6">
+        <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mx-auto">
+          <CheckCircle2 className="w-8 h-8 text-emerald-400" />
+        </div>
+        <div className="space-y-2">
+          <h2 className="text-2xl font-black text-white tracking-tight">Check your inbox</h2>
+          <p className="text-slate-400 text-sm">We sent a verification link to <span className="text-white font-semibold">{email}</span></p>
+        </div>
+        <Link href="/login" className="text-blue-400 hover:text-blue-300 text-sm font-bold transition-colors">
+          Back to login →
+        </Link>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md bg-slate-900 border-slate-800 text-slate-50">
-        <CardHeader className="text-center">
-          <div className="flex justify-center mb-4">
-            <Zap className="w-10 h-10 text-blue-500 fill-blue-500" />
+    <form onSubmit={handleSignup} className="space-y-5">
+      {refCode && (
+        <div className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20">
+          <Sparkles className="w-4 h-4 text-emerald-400 shrink-0" />
+          <p className="text-xs font-bold text-emerald-400">You were invited — Pro trial included</p>
+        </div>
+      )}
+
+      {error && (
+        <div className="px-4 py-3 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-sm font-medium text-center">
+          {error}
+        </div>
+      )}
+
+      <div className="space-y-3">
+        <Input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="your@email.com"
+          required
+          className="h-12 px-5 rounded-2xl bg-white/5 border border-white/10 text-white placeholder-slate-500 text-sm focus:border-blue-500/50 focus:ring-0"
+        />
+        <Input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Password (8+ chars)"
+          required
+          className="h-12 px-5 rounded-2xl bg-white/5 border border-white/10 text-white placeholder-slate-500 text-sm focus:border-blue-500/50 focus:ring-0"
+        />
+      </div>
+
+      <Button
+        type="submit"
+        disabled={loading}
+        className="w-full h-12 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-black uppercase tracking-widest shadow-2xl shadow-blue-500/20 transition-all hover:scale-[1.02] group"
+      >
+        {loading ? (
+          <Loader2 className="w-4 h-4 animate-spin" />
+        ) : (
+          <>Create Account <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-0.5 transition-transform" /></>
+        )}
+      </Button>
+
+      <p className="text-center text-xs text-slate-600">
+        Already a member?{' '}
+        <Link href="/login" className="text-blue-400 hover:text-blue-300 font-bold transition-colors">
+          Sign in
+        </Link>
+      </p>
+
+      <p className="text-center text-[10px] text-slate-700 leading-relaxed">
+        By creating an account you agree to our{' '}
+        <Link href="/terms" className="text-slate-500 hover:text-white transition-colors underline">Terms</Link>
+        {' '}and{' '}
+        <Link href="/privacy" className="text-slate-500 hover:text-white transition-colors underline">Privacy Policy</Link>
+      </p>
+    </form>
+  )
+}
+
+export default function SignupPage() {
+  return (
+    <div className="min-h-screen bg-black text-white flex items-center justify-center p-4">
+      {/* Background */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-600/8 rounded-full blur-[120px]" />
+      </div>
+
+      <div className="relative z-10 w-full max-w-sm space-y-8">
+        {/* Logo */}
+        <div className="text-center space-y-3">
+          <div className="inline-flex items-center gap-2 mb-2">
+            <Zap className="w-7 h-7 text-blue-400 fill-blue-400/20" />
+            <span className="text-xl font-black tracking-tight text-white">RepsBrief</span>
           </div>
-          <CardTitle className="text-2xl font-bold">Join the 1%</CardTitle>
-          <CardDescription className="text-slate-400">Start getting high-impact content ideas every week</CardDescription>
-        </CardHeader>
-        <form onSubmit={handleSignup}>
-          <CardContent className="space-y-4">
-            {error && (
-              <div className="p-3 bg-rose-500/10 border border-rose-500/20 text-rose-500 text-sm rounded-lg text-center font-medium">
-                {error}
-              </div>
-            )}
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input 
-                id="email" 
-                type="email" 
-                placeholder="m@example.com" 
-                className="bg-slate-950 border-slate-800"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input 
-                id="password" 
-                type="password" 
-                className="bg-slate-950 border-slate-800"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-              <p className="text-[12px] text-slate-500 pt-1">At least 8 characters, 1 number, and 1 symbol.</p>
-            </div>
-          </CardContent>
-          <CardFooter className="flex flex-col gap-4">
-            <Button className="w-full bg-blue-600 hover:bg-blue-700 h-11" type="submit" disabled={loading}>
-              {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : "Create Account"}
-            </Button>
-            <p className="text-sm text-slate-500 text-center">
-              Already a member? <Link href="/login" className="text-blue-500 hover:text-blue-400 font-semibold tracking-wide">Sign In</Link>
-            </p>
-          </CardFooter>
-        </form>
-      </Card>
+          <div className="space-y-1">
+            <h1 className="text-3xl font-black tracking-tighter text-white">Join the 1%</h1>
+            <p className="text-slate-400 text-sm font-light">20 trend-backed ideas, every week. Free.</p>
+          </div>
+          <div className="flex items-center justify-center gap-4 text-[10px] font-bold text-slate-600 uppercase tracking-widest">
+            <span className="text-emerald-500">✓ Free forever</span>
+            <span>·</span>
+            <span className="text-emerald-500">✓ Pro: 7-day trial</span>
+            <span>·</span>
+            <span className="text-emerald-500">✓ No card</span>
+          </div>
+        </div>
+
+        {/* Form */}
+        <div className="bg-white/[0.03] border border-white/[0.08] rounded-3xl p-7">
+          <Suspense>
+            <SignupForm />
+          </Suspense>
+        </div>
+      </div>
     </div>
   )
 }

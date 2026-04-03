@@ -60,6 +60,59 @@ async function updateProfileFromSubscription(
   if (error) throw error
 }
 
+async function rewardReferrer(subscription: Stripe.Subscription) {
+  try {
+    const supabaseAdmin = getSupabaseAdmin('api/stripe/webhook/referral')
+    const customerId =
+      typeof subscription.customer === 'string' ? subscription.customer : subscription.customer?.id
+    const userId = subscription.metadata?.userId
+
+    // Find the converting user's profile
+    let profile: { referred_by_code?: string | null } | null = null
+    if (userId) {
+      const { data } = await supabaseAdmin
+        .from('profiles')
+        .select('referred_by_code')
+        .eq('id', userId)
+        .maybeSingle()
+      profile = data
+    } else if (customerId) {
+      const { data } = await supabaseAdmin
+        .from('profiles')
+        .select('referred_by_code')
+        .eq('stripe_customer_id', customerId)
+        .maybeSingle()
+      profile = data
+    }
+
+    if (!profile?.referred_by_code) return
+
+    // Find referrer
+    const { data: referrer } = await supabaseAdmin
+      .from('profiles')
+      .select('id, stripe_customer_id, plan')
+      .eq('referral_code', profile.referred_by_code)
+      .maybeSingle()
+
+    if (!referrer?.stripe_customer_id) {
+      console.log(`[Referral] Referrer has no stripe_customer_id — skipping credit for code ${profile.referred_by_code}`)
+      return
+    }
+
+    // Apply $19 credit (1 month Pro free) to referrer's Stripe account
+    await stripe.customers.createBalanceTransaction(referrer.stripe_customer_id, {
+      amount: -1900, // -$19.00 in cents
+      currency: 'usd',
+      description: `Referral reward — your invite converted to Pro`,
+    })
+
+    console.log(`[Referral] Applied $19 credit to referrer ${referrer.id} (stripe: ${referrer.stripe_customer_id})`)
+  } catch (err) {
+    // Non-fatal — don't fail the webhook
+    console.error('[Referral] Error applying referrer reward:', err)
+  }
+}
+
 export async function POST(req: Request) {
   const body = await req.text()
   const headerList = await headers()
@@ -96,6 +149,18 @@ export async function POST(req: Request) {
       case 'customer.subscription.deleted': {
         const subscription = event.data.object as Stripe.Subscription
         await updateProfileFromSubscription(subscription)
+
+        // Referral reward: when a trial converts to active, reward the referrer
+        if (
+          event.type === 'customer.subscription.updated' &&
+          subscription.status === 'active'
+        ) {
+          const prevAttrs = (event.data as Stripe.Event.Data).previous_attributes as Record<string, unknown> | undefined
+          const wasTrialing = prevAttrs?.status === 'trialing'
+          if (wasTrialing) {
+            await rewardReferrer(subscription)
+          }
+        }
         break
       }
 

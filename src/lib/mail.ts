@@ -21,7 +21,7 @@ export async function sendWeeklyBriefEmail({
     // In Sandbox mode (senza dominio verificato), Resend accetta solo 'onboarding@resend.dev' come mittente
     // e l'email del proprietario dell'account come destinatario.
     const { data, error } = await resend.emails.send({
-      from: 'RepsBrief <onboarding@resend.dev>',
+      from: process.env.RESEND_FROM_EMAIL || 'RepsBrief <onboarding@resend.dev>',
       to: [email],
       subject: `Your Weekly Brief: ${ideas.length} strategies for ${nicheLabel}`,
       react: WeeklyBriefEmail({ nicheLabel, ideas, userName }),
@@ -81,7 +81,7 @@ export async function sendWelcomeSequenceEmail(
 
   try {
     const { error } = await resend.emails.send({
-      from: 'RepsBrief <onboarding@resend.dev>',
+      from: process.env.RESEND_FROM_EMAIL || 'RepsBrief <onboarding@resend.dev>',
       to: [email],
       subject: subjects[day],
       html: `
@@ -148,7 +148,7 @@ export async function sendBriefReadyEmail(
 
   try {
     const { error } = await resend.emails.send({
-      from: 'RepsBrief <onboarding@resend.dev>',
+      from: process.env.RESEND_FROM_EMAIL || 'RepsBrief <onboarding@resend.dev>',
       to: [email],
       subject,
       html,

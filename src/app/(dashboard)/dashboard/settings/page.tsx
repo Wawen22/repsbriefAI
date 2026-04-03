@@ -10,6 +10,7 @@ import { AutomationLogsSettings } from "@/components/settings/AutomationLogsSett
 import { LogoutButton } from "@/components/ui/LogoutButton"
 import { UpgradeToProButton } from "@/components/settings/UpgradeToProButton"
 import { ManageBillingButton } from "@/components/settings/ManageBillingButton"
+import { ReferralCard } from "@/components/dashboard/ReferralCard"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { NICHES } from "@/config/niches"
@@ -171,6 +172,14 @@ export default async function SettingsPage({
                 <p className="text-xs font-semibold text-white">Upgrade to Pro to unlock full history and advanced controls.</p>
                 <UpgradeToProButton />
               </div>
+            )}
+
+            {profile.referral_code && (
+              <ReferralCard
+                referralCode={profile.referral_code as string}
+                referralCount={(profile.referral_count as number) || 0}
+                plan={profile.plan || 'starter'}
+              />
             )}
 
             <div className="border-t border-white/[0.06] pt-4">

@@ -75,8 +75,8 @@ export function GenerateNowButton({ alreadyGeneratedToday = false, plan }: Gener
       if (!res.ok) throw new Error(data.error || 'Generation failed')
 
       setState('success')
-      setLogs(prev => [...prev, '> Brief validated.', '> 20 ideas ready for deployment.'])
-      toast.success(`Success! 20 ideas generated.`, {
+      setLogs(prev => [...prev, '> Brief validated.', `> ${isStarter ? '5' : '20'} ideas ready for deployment.`])
+      toast.success(`Success! ${isStarter ? '5 ideas unlocked' : '20 ideas generated'}.`, {
         icon: <Sparkles className="w-4 h-4 text-blue-400" />
       })
 

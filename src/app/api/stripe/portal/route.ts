@@ -31,8 +31,28 @@ export async function POST(req: Request) {
     }
 
     const appBaseUrl = getAppBaseUrl(req)
+
+    let customerId = profile.stripe_customer_id
+
+    // Verify the customer exists in live mode before creating a portal session
+    try {
+      await stripe.customers.retrieve(customerId)
+    } catch (stripeErr: unknown) {
+      const msg = stripeErr instanceof Error ? stripeErr.message : ''
+      if (msg.includes('No such customer') || msg.includes('test mode')) {
+        // Stale test-mode customer — clear it and tell the client to re-subscribe
+        const supabaseAdmin = (await import('@/lib/supabase')).getSupabaseAdmin('api/stripe/portal')
+        await supabaseAdmin
+          .from('profiles')
+          .update({ stripe_customer_id: null, stripe_subscription_id: null, plan: 'starter' })
+          .eq('id', user.id)
+        return NextResponse.json({ error: 'Your billing profile was reset (test data). Please subscribe again.' }, { status: 400 })
+      }
+      throw stripeErr
+    }
+
     const session = await stripe.billingPortal.sessions.create({
-      customer: profile.stripe_customer_id,
+      customer: customerId,
       return_url: `${appBaseUrl}/dashboard/settings?tab=account`,
     })
 

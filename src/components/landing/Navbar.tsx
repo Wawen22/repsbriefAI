@@ -55,9 +55,9 @@ export function LandingNavbar() {
           <Image
             src="/logo.png"
             alt="RepsBrief"
-            width={32}
-            height={32}
-            className="rounded-lg group-hover:scale-110 transition-all"
+            width={44}
+            height={44}
+            className="rounded-xl group-hover:scale-110 transition-all"
           />
           <span className="text-lg font-black tracking-tighter text-white uppercase hidden sm:block">RepsBrief</span>
         </Link>

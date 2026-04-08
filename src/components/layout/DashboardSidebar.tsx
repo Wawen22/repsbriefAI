@@ -114,9 +114,9 @@ export function DashboardSidebar({
         <Image
           src="/logo.png"
           alt="RepsBrief"
-          width={32}
-          height={32}
-          className="rounded-lg"
+          width={40}
+          height={40}
+          className="rounded-xl"
         />
         <span className="text-lg font-bold tracking-tight text-white">RepsBrief</span>
       </div>

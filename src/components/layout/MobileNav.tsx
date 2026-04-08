@@ -8,7 +8,8 @@ import {
   SheetDescription,
   SheetHeader
 } from "@/components/ui/sheet"
-import { Menu, Zap } from "lucide-react"
+import { Menu } from "lucide-react"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { DashboardSidebar } from "./DashboardSidebar"
 import { useState } from "react"
@@ -19,9 +20,13 @@ export function MobileNav({ plan, userEmail, userFullName }: { plan: string; use
   return (
     <div className="lg:hidden flex items-center justify-between px-6 h-16 border-b border-white/5 bg-black/40 backdrop-blur-xl sticky top-0 z-40">
       <div className="flex items-center gap-2">
-        <div className="relative flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-700 shadow-lg shadow-blue-500/20">
-          <Zap className="w-4 h-4 text-white fill-white" />
-        </div>
+        <Image
+          src="/logo.png"
+          alt="RepsBrief"
+          width={32}
+          height={32}
+          className="rounded-lg"
+        />
         <span className="text-lg font-bold tracking-tight text-white">RepsBrief</span>
       </div>
 

@@ -5,7 +5,8 @@ import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Zap, Loader2, CheckCircle2, ArrowRight, Sparkles } from 'lucide-react'
+import { Loader2, CheckCircle2, ArrowRight, Sparkles } from 'lucide-react'
+import Image from 'next/image'
 import Link from 'next/link'
 
 function getCookie(name: string): string | null {
@@ -147,7 +148,7 @@ export default function SignupPage() {
         {/* Logo */}
         <div className="text-center space-y-3">
           <div className="inline-flex items-center gap-2 mb-2">
-            <Zap className="w-7 h-7 text-blue-400 fill-blue-400/20" />
+            <Image src="/logo.png" alt="RepsBrief" width={32} height={32} className="rounded-lg" />
             <span className="text-xl font-black tracking-tight text-white">RepsBrief</span>
           </div>
           <div className="space-y-1">

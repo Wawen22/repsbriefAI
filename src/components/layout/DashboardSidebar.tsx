@@ -1,12 +1,12 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
-import { 
-  LayoutGrid, 
-  History as HistoryIcon, 
-  Zap, 
-  Star, 
+import {
+  LayoutGrid,
+  History as HistoryIcon,
+  Star,
   BarChart3,
   CalendarDays,
   Settings,
@@ -111,9 +111,13 @@ export function DashboardSidebar({
     >
       {/* Brand */}
       <div className="flex items-center gap-3 px-5 h-16 shrink-0">
-        <div className="relative flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg shadow-blue-500/20">
-          <Zap className="w-4 h-4 text-white fill-white" />
-        </div>
+        <Image
+          src="/logo.png"
+          alt="RepsBrief"
+          width={32}
+          height={32}
+          className="rounded-lg"
+        />
         <span className="text-lg font-bold tracking-tight text-white">RepsBrief</span>
       </div>
 

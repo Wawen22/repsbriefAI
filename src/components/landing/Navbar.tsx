@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useEffect } from "react"
-import { Zap } from "lucide-react"
 import Link from "next/link"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
@@ -52,9 +52,13 @@ export function LandingNavbar() {
       )}>
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 group">
-          <div className="relative flex items-center justify-center w-8 h-8 rounded-lg bg-blue-600 shadow-lg shadow-blue-500/20 group-hover:scale-110 transition-all">
-            <Zap className="w-4 h-4 text-white fill-white" />
-          </div>
+          <Image
+            src="/logo.png"
+            alt="RepsBrief"
+            width={32}
+            height={32}
+            className="rounded-lg group-hover:scale-110 transition-all"
+          />
           <span className="text-lg font-black tracking-tighter text-white uppercase hidden sm:block">RepsBrief</span>
         </Link>
         

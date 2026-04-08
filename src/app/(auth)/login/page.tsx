@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Zap, Loader2 } from "lucide-react"
+import { Loader2 } from "lucide-react"
+import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 
@@ -46,7 +47,7 @@ export default function LoginPage() {
       <Card className="w-full max-w-md bg-slate-900 border-slate-800 text-slate-50">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <Zap className="w-10 h-10 text-blue-500 fill-blue-500" />
+            <Image src="/logo.png" alt="RepsBrief" width={48} height={48} className="rounded-xl" />
           </div>
           <CardTitle className="text-2xl font-bold">Welcome back</CardTitle>
           <CardDescription className="text-slate-400">Login to your RepsBrief account</CardDescription>

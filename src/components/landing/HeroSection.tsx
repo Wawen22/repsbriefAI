@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Sparkles, Zap, Users, Calendar, Layout, CheckCircle2 } from "lucide-react"
 import Link from "next/link"
@@ -55,6 +55,19 @@ function EmailCaptureForm() {
 }
 
 export function HeroSection() {
+  const [briefCount, setBriefCount] = useState<number | null>(null)
+
+  useEffect(() => {
+    fetch('/api/stats')
+      .then(r => r.json())
+      .then(data => {
+        if (typeof data.briefCount === 'number' && data.briefCount > 0) {
+          setBriefCount(data.briefCount)
+        }
+      })
+      .catch(() => { /* silently fail — fallback text shown */ })
+  }, [])
+
   return (
     <section className="relative pt-24 pb-32 lg:pt-48 lg:pb-56 overflow-hidden text-center">
       {/* Background Decor */}
@@ -106,7 +119,11 @@ export function HeroSection() {
                 <div key={i} className={`w-6 h-6 rounded-full ${c} border-2 border-black`} />
               ))}
             </div>
-            <span>2,400+ briefs generated</span>
+            <span>
+              {briefCount !== null
+                ? `${briefCount.toLocaleString()}+ briefs generated`
+                : '2,400+ briefs generated'}
+            </span>
           </div>
           <span className="hidden sm:block text-white/10">·</span>
           <div className="flex items-center gap-1.5">

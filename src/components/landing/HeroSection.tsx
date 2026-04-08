@@ -94,7 +94,7 @@ export function HeroSection() {
             </Link>
           </div>
           <p className="text-[11px] text-slate-600 font-medium">
-            Free forever · <span className="text-emerald-500 font-bold">Pro includes 7-day free trial</span> · No credit card required
+            Free plan forever · No credit card required · <span className="text-emerald-500 font-bold">Pro: 7-day trial, then $19/mo</span>
           </p>
         </div>
 

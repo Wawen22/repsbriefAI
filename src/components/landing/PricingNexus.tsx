@@ -70,7 +70,7 @@ export function PricingNexus() {
                   <span className="text-7xl font-black text-white">$19</span>
                   <span className="text-blue-400/50 font-bold uppercase text-xs tracking-widest">/mo after trial</span>
                 </div>
-                <p className="text-xs text-slate-500 mt-2 font-medium">No credit card required to start.</p>
+                <p className="text-xs text-slate-500 mt-2 font-medium">Card required · Cancel anytime, no questions asked.</p>
               </div>
               <div className="space-y-5 mb-12 flex-1">
                 {[

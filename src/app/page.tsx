@@ -224,37 +224,34 @@ export default function LandingPage() {
               <p className="text-slate-500 max-w-sm font-light text-lg leading-relaxed">
                 The strategic operating system for creators and content agencies who refuse to be average.
               </p>
-              <div className="flex gap-4">
-                 {[1,2,3].map(i => <div key={i} className="w-10 h-10 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition-all" />)}
-              </div>
             </div>
-            
+
             <div className="md:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-12 text-left">
                <div className="space-y-6">
                   <h5 className="text-[10px] font-black uppercase tracking-widest text-white">Platform</h5>
                   <ul className="space-y-4 text-sm text-slate-500 font-medium">
-                     <li className="hover:text-blue-400 cursor-pointer transition-colors uppercase tracking-widest text-[10px] font-black">Strategic Studio</li>
-                     <li className="hover:text-blue-400 cursor-pointer transition-colors uppercase tracking-widest text-[10px] font-black">Editorial Calendar</li>
-                     <li className="hover:text-blue-400 cursor-pointer transition-colors uppercase tracking-widest text-[10px] font-black">AI Brand Voice</li>
-                     <li className="hover:text-blue-400 cursor-pointer transition-colors uppercase tracking-widest text-[10px] font-black">Multi-player Hub</li>
+                     <li><Link href="#studio" className="hover:text-blue-400 transition-colors uppercase tracking-widest text-[10px] font-black">Strategic Studio</Link></li>
+                     <li><Link href="#features" className="hover:text-blue-400 transition-colors uppercase tracking-widest text-[10px] font-black">Editorial Calendar</Link></li>
+                     <li><Link href="#features" className="hover:text-blue-400 transition-colors uppercase tracking-widest text-[10px] font-black">AI Brand Voice</Link></li>
+                     <li><Link href="#pricing" className="hover:text-blue-400 transition-colors uppercase tracking-widest text-[10px] font-black">Multi-player Hub</Link></li>
                   </ul>
                </div>
                <div className="space-y-6">
                   <h5 className="text-[10px] font-black uppercase tracking-widest text-white">Company</h5>
                   <ul className="space-y-4 text-sm text-slate-500 font-medium">
-                     <li className="hover:text-blue-400 cursor-pointer transition-colors uppercase tracking-widest text-[10px] font-black">About Studio</li>
-                     <li className="hover:text-blue-400 cursor-pointer transition-colors uppercase tracking-widest text-[10px] font-black">Ecosystem</li>
-                     <li className="hover:text-blue-400 cursor-pointer transition-colors uppercase tracking-widest text-[10px] font-black">Agency Partners</li>
+                     <li><Link href="/signup" className="hover:text-blue-400 transition-colors uppercase tracking-widest text-[10px] font-black">Get Started</Link></li>
+                     <li><Link href="#integrations" className="hover:text-blue-400 transition-colors uppercase tracking-widest text-[10px] font-black">Ecosystem</Link></li>
                      <li><Link href="/privacy" className="hover:text-blue-400 transition-colors uppercase tracking-widest text-[10px] font-black">Privacy Policy</Link></li>
+                     <li><Link href="/terms" className="hover:text-blue-400 transition-colors uppercase tracking-widest text-[10px] font-black">Terms of Service</Link></li>
                   </ul>
                </div>
                <div className="space-y-6">
                   <h5 className="text-[10px] font-black uppercase tracking-widest text-white">Scale</h5>
                   <ul className="space-y-4 text-sm text-slate-500 font-medium">
-                     <li className="hover:text-blue-400 cursor-pointer transition-colors uppercase tracking-widest text-[10px] font-black">Starter Plan</li>
-                     <li className="hover:text-blue-400 cursor-pointer transition-colors uppercase tracking-widest text-[10px] font-black">Pro Creator</li>
-                     <li className="hover:text-blue-400 cursor-pointer transition-colors uppercase tracking-widest text-[10px] font-black">Team Access</li>
-                     <li className="hover:text-blue-400 cursor-pointer transition-colors uppercase tracking-widest text-[10px] font-black">Enterprise</li>
+                     <li><Link href="#pricing" className="hover:text-blue-400 transition-colors uppercase tracking-widest text-[10px] font-black">Starter Plan</Link></li>
+                     <li><Link href="#pricing" className="hover:text-blue-400 transition-colors uppercase tracking-widest text-[10px] font-black">Pro Creator</Link></li>
+                     <li><Link href="#pricing" className="hover:text-blue-400 transition-colors uppercase tracking-widest text-[10px] font-black">Team Access</Link></li>
+                     <li><Link href="/signup" className="hover:text-blue-400 transition-colors uppercase tracking-widest text-[10px] font-black">Start Free →</Link></li>
                   </ul>
                </div>
             </div>

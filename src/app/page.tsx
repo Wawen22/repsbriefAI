@@ -5,6 +5,7 @@ import {
   LayoutGrid, Calendar, Globe, FileText
 } from "lucide-react"
 import Link from "next/link"
+import Image from "next/image"
 import { HeroSection } from "@/components/landing/HeroSection"
 import { FeaturesGrid } from "@/components/landing/FeaturesGrid"
 import { PricingNexus } from "@/components/landing/PricingNexus"
@@ -211,9 +212,13 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-12 gap-20 mb-24">
             <div className="md:col-span-5 space-y-8 text-left">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
-                  <Zap className="w-5 h-5 text-white fill-white" />
-                </div>
+                <Image
+                  src="/logo.png"
+                  alt="RepsBrief"
+                  width={44}
+                  height={44}
+                  className="rounded-xl"
+                />
                 <span className="text-2xl font-black tracking-tighter text-white uppercase italic">RepsBrief</span>
               </div>
               <p className="text-slate-500 max-w-sm font-light text-lg leading-relaxed">

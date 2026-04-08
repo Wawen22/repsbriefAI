@@ -5,8 +5,10 @@ import { createClient as createServiceClient } from '@supabase/supabase-js'
 import { notFound } from 'next/navigation'
 import { IdeaObject } from '@/types/niche'
 import { Badge } from '@/components/ui/badge'
-import { Sparkles, ArrowRight, Zap, TrendingUp } from 'lucide-react'
+import { Sparkles, ArrowRight, TrendingUp } from 'lucide-react'
+import Image from 'next/image'
 import Link from 'next/link'
+import type { Metadata } from 'next'
 
 export const dynamic = 'force-dynamic'
 
@@ -15,6 +17,45 @@ function getServiceClient() {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}): Promise<Metadata> {
+  const { id } = await params
+  const supabase = getServiceClient()
+
+  const { data: share } = await supabase
+    .from('shared_strategies')
+    .select('idea_data, creator_name')
+    .eq('id', id)
+    .single()
+
+  if (!share) return {}
+
+  const idea = share.idea_data as IdeaObject
+  const title = `"${idea.title}" — shared by ${share.creator_name}`
+  const description = idea.hook || 'A trend-backed content strategy from RepsBrief.'
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: `https://repsbrief.com/s/${id}`,
+      siteName: 'RepsBrief',
+      images: [{ url: '/logo.png', width: 512, height: 512, alt: 'RepsBrief' }],
+    },
+    twitter: {
+      card: 'summary',
+      title,
+      description,
+      images: ['/logo.png'],
+    },
+  }
 }
 
 const FORMAT_COLORS: Record<string, string> = {
@@ -57,7 +98,7 @@ export default async function SharedStrategyPage({
           {/* Top nav */}
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center gap-2">
-              <Zap className="w-5 h-5 text-blue-400 fill-blue-400/20" />
+              <Image src="/logo.png" alt="RepsBrief" width={24} height={24} className="rounded-md" />
               <span className="text-sm font-black text-white tracking-tight">RepsBrief</span>
             </Link>
             <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.08]">
@@ -130,7 +171,7 @@ export default async function SharedStrategyPage({
               <span>·</span>
               <span className="text-emerald-500/80">✓ Pro: 7-day trial</span>
               <span>·</span>
-              <span className="text-emerald-500/80">✓ No credit card</span>
+              <span className="text-emerald-500/80">✓ Cancel anytime</span>
             </div>
           </div>
 

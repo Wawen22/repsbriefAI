@@ -27,8 +27,8 @@ export class OpenRouterImageProvider implements ImageProvider {
         model: this.model,
         prompt,
         n: 1,
-        // Cast to satisfy OpenAI types; OpenRouter accepts all these sizes
         size: size as '1024x1024',
+        response_format: 'url',
       })
 
       const url = response.data?.[0]?.url

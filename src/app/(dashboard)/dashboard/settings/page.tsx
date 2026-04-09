@@ -1,7 +1,7 @@
 // src/app/(dashboard)/dashboard/settings/page.tsx
 
 import { redirect } from "next/navigation"
-import { Fingerprint, ShieldCheck, Target, Users, User, Link2, Activity, CreditCard, Zap, Check } from "lucide-react"
+import { Fingerprint, ShieldCheck, Target, Users, User, Link2, Activity, CreditCard, Check } from "lucide-react"
 import { BrandVoiceSettings } from "@/components/settings/BrandVoiceSettings"
 import { NicheSwitcher } from "@/components/settings/NicheSwitcher"
 import { TeamWorkspaceSettings } from "@/components/settings/TeamWorkspaceSettings"
@@ -9,6 +9,7 @@ import { IntegrationsSettings } from "@/components/settings/IntegrationsSettings
 import { AutomationLogsSettings } from "@/components/settings/AutomationLogsSettings"
 import { LogoutButton } from "@/components/ui/LogoutButton"
 import { UpgradeToProButton } from "@/components/settings/UpgradeToProButton"
+import { UpgradeToTeamButton } from "@/components/settings/UpgradeToTeamButton"
 import { ManageBillingButton } from "@/components/settings/ManageBillingButton"
 import { ReferralCard } from "@/components/dashboard/ReferralCard"
 import { Badge } from "@/components/ui/badge"
@@ -381,13 +382,7 @@ export default async function SettingsPage({
                   <ManageBillingButton />
                 </div>
               ) : (
-                <a
-                  href="/api/stripe/checkout?plan=team"
-                  className="h-10 flex items-center justify-center gap-2 rounded-2xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-black uppercase tracking-widest transition-all hover:scale-[1.02]"
-                >
-                  <Zap className="w-3.5 h-3.5" />
-                  Upgrade to Team
-                </a>
+                <UpgradeToTeamButton className="h-10 w-full flex items-center justify-center gap-2 rounded-2xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-black uppercase tracking-widest transition-all hover:scale-[1.02]" />
               )}
             </div>
 

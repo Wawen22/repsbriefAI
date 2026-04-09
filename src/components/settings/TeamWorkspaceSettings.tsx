@@ -53,6 +53,25 @@ export function TeamWorkspaceSettings() {
   const [isSwitching, setIsSwitching] = useState<string | null>(null)
   const [isSavingBranding, setIsSavingBranding] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
+  const [isUpgrading, setIsUpgrading] = useState(false)
+
+  const handleUpgradeToTeam = async () => {
+    try {
+      setIsUpgrading(true)
+      const res = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan: 'team' }),
+      })
+      if (!res.ok) throw new Error('Unable to start checkout')
+      const session = await res.json()
+      if (session?.url) window.location.href = session.url
+    } catch (error) {
+      console.error('Upgrade error:', error)
+    } finally {
+      setIsUpgrading(false)
+    }
+  }
 
   // Branding states
   const [logoUrl, setLogoUrl] = useState('')
@@ -254,8 +273,12 @@ export function TeamWorkspaceSettings() {
                 Upgrade to the <b>Team Plan</b> to replace RepsBrief branding with your agency logo and colors on all shared strategy briefs.
               </p>
             </div>
-            <Button className="bg-blue-600 hover:bg-blue-500 text-white rounded-full px-8 h-12 font-black text-xs uppercase tracking-widest">
-              Upgrade to Team
+            <Button
+              onClick={handleUpgradeToTeam}
+              disabled={isUpgrading}
+              className="bg-blue-600 hover:bg-blue-500 text-white rounded-full px-8 h-12 font-black text-xs uppercase tracking-widest"
+            >
+              {isUpgrading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Upgrade to Team'}
             </Button>
           </div>
         ) : !canEditBranding ? (
@@ -488,8 +511,12 @@ export function TeamWorkspaceSettings() {
                 Add editors, strategists, or clients to your workspace. The Team Plan unlocks real-time collaboration.
               </p>
             </div>
-            <Button variant="outline" className="rounded-full border-white/10 text-white font-bold text-xs uppercase tracking-widest h-10 px-6">
-               Upgrade
+            <Button
+              onClick={handleUpgradeToTeam}
+              disabled={isUpgrading}
+              className="rounded-full bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs uppercase tracking-widest h-10 px-6"
+            >
+              {isUpgrading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Upgrade'}
             </Button>
           </div>
         ) : (

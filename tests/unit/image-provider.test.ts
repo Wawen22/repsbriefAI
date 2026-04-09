@@ -28,9 +28,15 @@ describe('generateIdeaImagePrompt', () => {
     expect(prompt).toContain('Before/after split screen, gym lighting')
   })
 
-  it('omits keyVisuals section when field is absent', () => {
+  it('omits keyVisuals section when field is undefined', () => {
     const idea: IdeaObject = { ...BASE_IDEA, keyVisuals: undefined }
     const prompt = generateIdeaImagePrompt(idea)
+    expect(prompt).not.toContain('Visual style:')
+  })
+
+  it('omits keyVisuals section when key is not present', () => {
+    const { keyVisuals: _kv, ...ideaWithoutKey } = BASE_IDEA
+    const prompt = generateIdeaImagePrompt(ideaWithoutKey as IdeaObject)
     expect(prompt).not.toContain('Visual style:')
   })
 

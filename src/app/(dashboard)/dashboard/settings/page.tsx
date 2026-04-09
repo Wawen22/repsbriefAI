@@ -1,9 +1,8 @@
 // src/app/(dashboard)/dashboard/settings/page.tsx
 
 import { redirect } from "next/navigation"
-import { Fingerprint, ShieldCheck, Target, Users, User, Link2, Activity, CreditCard, Check } from "lucide-react"
+import { Fingerprint, ShieldCheck, Users, User, Link2, Activity, CreditCard, Check } from "lucide-react"
 import { BrandVoiceSettings } from "@/components/settings/BrandVoiceSettings"
-import { NicheSwitcher } from "@/components/settings/NicheSwitcher"
 import { TeamWorkspaceSettings } from "@/components/settings/TeamWorkspaceSettings"
 import { IntegrationsSettings } from "@/components/settings/IntegrationsSettings"
 import { AutomationLogsSettings } from "@/components/settings/AutomationLogsSettings"
@@ -105,10 +104,6 @@ export default async function SettingsPage({
           <div className="mx-1.5 hidden h-5 w-px shrink-0 bg-white/[0.08] sm:block" aria-hidden />
 
           {/* Content */}
-          <TabsTrigger value="niche" className={triggerClasses}>
-            <Target className="h-4 w-4" />
-            Niche
-          </TabsTrigger>
           <TabsTrigger value="voice" className={triggerClasses}>
             <Fingerprint className="h-4 w-4" />
             Brand Voice
@@ -186,22 +181,6 @@ export default async function SettingsPage({
             <div className="border-t border-white/[0.06] pt-4">
               <LogoutButton />
             </div>
-          </div>
-        </TabsContent>
-
-        {/* ─── Niche ─── */}
-        <TabsContent value="niche" className="mt-5 rounded-3xl border border-white/[0.06] bg-white/[0.02] p-6 md:p-8">
-          <div className="mb-6 space-y-1">
-            <div className="flex items-center gap-2 text-slate-300">
-              <Target className="h-4 w-4 text-blue-400" />
-              <h2 className="text-lg font-semibold text-white">Content Niche</h2>
-            </div>
-            <p className="text-sm text-slate-500">
-              Select the niche used for trend scouting and brief generation.
-            </p>
-          </div>
-          <div className="space-y-5">
-            <NicheSwitcher currentNiche={profile.active_niche || 'fitness'} />
           </div>
         </TabsContent>
 

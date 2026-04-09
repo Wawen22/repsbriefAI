@@ -59,6 +59,7 @@ type IdeaWorkflowMeta = IdeaObject & {
 
 import { exportStrategyToNotionAction } from "@/app/actions/notion-export"
 import { useUpgradeModal } from "@/components/ui/UpgradeModal"
+import { GenerateVisualButton } from '@/components/brief/GenerateVisualButton'
 
 // Small inline badge shown on locked buttons
 function ProBadge() {
@@ -601,6 +602,12 @@ export function StrategicBriefView({
               </div>
             </div>
           </section>
+
+          {/* AI Visual Generation */}
+          <GenerateVisualButton
+            ideaHistoryId={ideaId}
+            isStarter={isStarter}
+          />
 
           {/* Phase 02: Script — gated for starter */}
           <section className="max-w-4xl mx-auto space-y-12">

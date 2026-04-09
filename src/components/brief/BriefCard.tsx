@@ -9,7 +9,6 @@ import {
   Sparkles,
   Trash2,
   CalendarDays,
-  Star,
   ChevronRight,
   Maximize2,
   ShieldCheck,
@@ -181,13 +180,14 @@ export function BriefCard({
                      e.stopPropagation()
                      setIsPerformanceOpen(true)
                    }}
+                   title="Growth feedback"
                  >
-                   <Star className="w-3 h-3" />
+                   <TrendingUp className="w-3 h-3" />
                  </Button>
                )}
-               <Button 
-                  variant="ghost" 
-                  size="icon" 
+               <Button
+                  variant="ghost"
+                  size="icon"
                   className="h-6 w-6 rounded-md text-slate-600 hover:text-rose-500 hover:bg-rose-500/10"
                   onClick={handleDelete}
                   disabled={isDeleting}
@@ -273,30 +273,39 @@ export function BriefCard({
                 )}
               </div>
               <div className="flex items-center gap-2">
-                 {isHistory || !ideaId ? (
-                   <SaveIdeaButton title={idea.title} ideaData={idea} niche={idea.niche} initialSaved={isSaved} />
-                 ) : (
-                   <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-8 w-8 rounded-full text-slate-500 hover:text-rose-500 hover:bg-rose-500/10"
-                      onClick={handleDelete}
-                      disabled={isDeleting}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                 )}
+                 {/* Save/unsave toggle — always visible */}
+                 <SaveIdeaButton
+                   title={idea.title}
+                   ideaData={idea}
+                   niche={idea.niche}
+                   initialSaved={isSaved}
+                   dbId={ideaId}
+                 />
+                 {/* Performance insights — only when idea is persisted */}
                  {ideaId && (
                    <Button
                      variant="ghost"
                      size="icon"
-                     className="h-8 w-8 rounded-full text-slate-500 hover:text-emerald-400 hover:bg-emerald-500/10"
+                     className="h-8 w-8 rounded-full text-slate-600 hover:text-emerald-400 hover:bg-emerald-500/10"
                      onClick={(e) => {
                        e.stopPropagation()
                        setIsPerformanceOpen(true)
                      }}
+                     title="Growth feedback"
                    >
-                     <Star className="w-4 h-4" />
+                     <TrendingUp className="w-4 h-4" />
+                   </Button>
+                 )}
+                 {/* Delete — only for saved/history ideas */}
+                 {(isHistory || ideaId) && (
+                   <Button
+                     variant="ghost"
+                     size="icon"
+                     className="h-8 w-8 rounded-full text-slate-600 hover:text-rose-500 hover:bg-rose-500/10"
+                     onClick={handleDelete}
+                     disabled={isDeleting}
+                   >
+                     <Trash2 className="w-4 h-4" />
                    </Button>
                  )}
               </div>
@@ -379,9 +388,6 @@ export function BriefCard({
               </Button>
             </div>
 
-            <div className="px-4 text-[9px] font-black text-slate-600 uppercase tracking-widest">
-               Studio Mode
-            </div>
           </div>
         </CardContent>
       </Card>

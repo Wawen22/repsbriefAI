@@ -84,7 +84,6 @@ Piani: `starter` (free) | `pro` ($19/mo) | `team` ($39/mo)
 ```
 STRIPE_PRICE_PRO_MONTHLY=price_1TH3ecQ8w32NjQAk0KMEetVv
 STRIPE_PRICE_TEAM_MONTHLY=price_1TH3ecQ8w32NjQAkpJYZtYq9
-STRIPE_WEBHOOK_SECRET=whsec_A3tNpDermwvOkV2FT8N4vouOxns8OrHI
 Webhook endpoint: https://repsbrief.com/api/stripe/webhook
 ```
 Tutte le chiavi Stripe sono in **live mode**. Il prodotto Starter $9 è stato archiviato (inactive).

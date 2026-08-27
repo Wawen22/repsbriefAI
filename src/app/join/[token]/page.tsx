@@ -1,6 +1,6 @@
 // src/app/join/[token]/page.tsx
 
-import { createClient } from "@/lib/supabase/server"
+import { getSupabaseAdmin } from "@/lib/supabase"
 import { redirect } from "next/navigation"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -12,10 +12,10 @@ export const dynamic = 'force-dynamic'
 
 export default async function JoinTeamPage({ params }: { params: Promise<{ token: string }> }) {
   const { token } = await params
-  const supabase = await createClient()
+  const supabaseAdmin = getSupabaseAdmin('app/join/[token]')
   
   // Get invite details
-  const { data: invite } = await supabase
+  const { data: invite } = await supabaseAdmin
     .from('team_invitations')
     .select('*, teams(name)')
     .eq('token', token)

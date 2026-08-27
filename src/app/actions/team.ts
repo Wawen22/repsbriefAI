@@ -1,6 +1,8 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { getSupabaseAdmin } from '@/lib/supabase'
+import { normalizeInvitationEmail, parseInvitationRole } from '@/lib/team-invitations'
 import { revalidatePath } from 'next/cache'
 import { Resend } from 'resend'
 
@@ -81,6 +83,12 @@ export async function createTeamInvitationAction(email: string, role: string = '
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Unauthorized' }
 
+  const invitationEmail = normalizeInvitationEmail(email)
+  if (!invitationEmail) return { error: 'Enter a valid email address' }
+
+  const invitationRole = parseInvitationRole(role)
+  if (!invitationRole) return { error: 'Invalid invitation role' }
+
   const { data: profile } = await supabase
     .from('profiles')
     .select('current_team_id, plan')
@@ -100,9 +108,9 @@ export async function createTeamInvitationAction(email: string, role: string = '
     .from('team_invitations')
     .insert({
       team_id: profile.current_team_id,
-      email: email.toLowerCase().trim(),
+      email: invitationEmail,
       invited_by: user.id,
-      role: role
+      role: invitationRole
     })
     .select('token')
     .single()
@@ -118,7 +126,7 @@ export async function createTeamInvitationAction(email: string, role: string = '
   try {
     await resend.emails.send({
       from: 'RepsBrief <onboarding@resend.dev>',
-      to: [email],
+      to: [invitationEmail],
       subject: `You've been invited to join ${team?.name} on RepsBrief`,
       html: `
         <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
@@ -147,42 +155,20 @@ export async function acceptInvitationAction(token: string) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Please login first' }
 
-  // 1. Get invite
-  const { data: invite, error: fetchErr } = await supabase
-    .from('team_invitations')
-    .select('*')
-    .eq('token', token)
-    .eq('status', 'pending')
-    .single()
+  const userEmail = normalizeInvitationEmail(user.email ?? '')
+  if (!userEmail) return { error: 'Your account does not have a valid email address' }
 
-  if (fetchErr || !invite) return { error: 'Invitation not found or already used' }
-  if (new Date(invite.expires_at) < new Date()) return { error: 'Invitation expired' }
+  const supabaseAdmin = getSupabaseAdmin('actions/team/acceptInvitation')
+  const { error } = await supabaseAdmin.rpc('accept_team_invitation', {
+    p_token: token,
+    p_user_id: user.id,
+    p_user_email: userEmail,
+  })
 
-  // 2. Add member
-  const { error: joinErr } = await supabase
-    .from('team_members')
-    .insert({
-      team_id: invite.team_id,
-      user_id: user.id,
-      role: invite.role
-    })
-
-  if (joinErr) {
-    if (joinErr.code === '23505') return { error: 'You are already a member of this team' }
-    return { error: 'Failed to join team' }
+  if (error) {
+    console.error('Failed to accept invitation:', error)
+    return { error: 'Invitation not found, expired, already used, or addressed to another email' }
   }
-
-  // 3. Mark invite as accepted
-  await supabase
-    .from('team_invitations')
-    .update({ status: 'accepted' })
-    .eq('id', invite.id)
-
-  // 4. Update current profile team
-  await supabase
-    .from('profiles')
-    .update({ current_team_id: invite.team_id })
-    .eq('id', user.id)
 
   revalidatePath('/', 'layout')
   return { success: true }

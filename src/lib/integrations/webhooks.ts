@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server"
 import { getSupabaseAdmin } from "@/lib/supabase"
+import { isSafeWebhookUrl } from "@/lib/integrations/webhook-security"
 import crypto from "crypto"
 
 /**
@@ -301,10 +302,16 @@ export const triggerWebhooks = async (
     }
 
     try {
+      if (!(await isSafeWebhookUrl(webhook.url))) {
+        throw new Error('Webhook URL is not reachable in a safe way')
+      }
+
       const response = await fetch(webhook.url, {
         method: 'POST',
         headers,
         body,
+        redirect: 'error',
+        signal: AbortSignal.timeout(10_000),
       })
 
       // Log dell'invio (opzionale, ma utile per debug)

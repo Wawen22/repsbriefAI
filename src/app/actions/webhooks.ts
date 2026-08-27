@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 import { triggerWebhooks } from "@/lib/integrations/webhooks"
+import { isSafeWebhookUrl } from "@/lib/integrations/webhook-security"
 
 type WebhookChannel = "generic" | "slack" | "discord"
 type TeamRole = "owner" | "admin" | "member"
@@ -10,15 +11,6 @@ type TeamRole = "owner" | "admin" | "member"
 function normalizeChannel(channel: string): WebhookChannel {
   if (channel === "discord") return "discord"
   return channel === "slack" ? "slack" : "generic"
-}
-
-function isValidHttpUrl(value: string) {
-  try {
-    const parsed = new URL(value)
-    return parsed.protocol === "https:" || parsed.protocol === "http:"
-  } catch {
-    return false
-  }
 }
 
 async function ensureTeamAdmin(supabase: Awaited<ReturnType<typeof createClient>>, teamId: string, userId: string) {
@@ -52,7 +44,9 @@ export async function addWebhookAction(
   const normalizedName = name.trim() || (normalizedChannel === "slack" ? "Slack Notifications" : "Webhook")
 
   if (!teamId) return { success: false, error: "Team non valido" }
-  if (!isValidHttpUrl(normalizedUrl)) return { success: false, error: "URL non valido" }
+  if (!(await isSafeWebhookUrl(normalizedUrl))) {
+    return { success: false, error: "URL non valido o non raggiungibile in modo sicuro" }
+  }
   if (events.length === 0) return { success: false, error: "Seleziona almeno un evento" }
   if (normalizedChannel === "slack" && !normalizedUrl.startsWith("https://hooks.slack.com/services/")) {
     return { success: false, error: "URL Slack non valido. Usa un Incoming Webhook Slack." }

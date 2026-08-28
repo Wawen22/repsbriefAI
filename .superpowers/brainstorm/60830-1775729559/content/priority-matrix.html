@@ -1,0 +1,74 @@
+<h2>Quale spec apriamo prima?</h2>
+<p class="subtitle">Stima impatto revenue vs sforzo implementativo — scegli da dove partire</p>
+
+<div style="overflow-x:auto; margin-bottom: 2rem;">
+  <table style="width:100%; border-collapse:collapse; font-size:0.95rem;">
+    <thead>
+      <tr style="border-bottom: 1px solid #333;">
+        <th style="text-align:left; padding:10px 12px; color:#888;">Area</th>
+        <th style="text-align:center; padding:10px 12px; color:#888;">Impatto Revenue</th>
+        <th style="text-align:center; padding:10px 12px; color:#888;">Sforzo</th>
+        <th style="text-align:center; padding:10px 12px; color:#888;">Quando pagherà</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="border-bottom: 1px solid #222;">
+        <td style="padding:12px; font-weight:600;">⚡ D — UX & Conversion rate</td>
+        <td style="text-align:center; padding:12px; color:#4ade80;">⬆⬆⬆ Altissimo</td>
+        <td style="text-align:center; padding:12px; color:#facc15;">Medio</td>
+        <td style="text-align:center; padding:12px; color:#888;">Immediato</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #222;">
+        <td style="padding:12px; font-weight:600;">🖼️ A — Generazione immagini</td>
+        <td style="text-align:center; padding:12px; color:#4ade80;">⬆⬆ Alto</td>
+        <td style="text-align:center; padding:12px; color:#facc15;">Medio</td>
+        <td style="text-align:center; padding:12px; color:#888;">Post-lancio</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #222;">
+        <td style="padding:12px; font-weight:600;">📊 B — PostHog Analytics</td>
+        <td style="text-align:center; padding:12px; color:#60a5fa;">⬆ Medio (fondamentale)</td>
+        <td style="text-align:center; padding:12px; color:#4ade80;">Basso</td>
+        <td style="text-align:center; padding:12px; color:#888;">Immediato</td>
+      </tr>
+      <tr>
+        <td style="padding:12px; font-weight:600;">🎨 E — Nuovi formati</td>
+        <td style="text-align:center; padding:12px; color:#60a5fa;">⬆ Medio</td>
+        <td style="text-align:center; padding:12px; color:#f87171;">Alto</td>
+        <td style="text-align:center; padding:12px; color:#888;">Medio termine</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<p class="subtitle">Il mio suggerimento: <strong>PostHog prima</strong> (1 ora, ti dà dati per tutto il resto), poi <strong>UX/Conversion</strong> (massimizza i free→pro), poi <strong>Image gen</strong> (upsell differenziante). Ma scegli tu.</p>
+
+<div class="options">
+  <div class="option" data-choice="ux-first" onclick="toggleSelect(this)">
+    <div class="letter">1</div>
+    <div class="content">
+      <h3>Inizia da UX & Conversion rate</h3>
+      <p>Massimizza il ritorno sul traffico che arriva al lancio. Ogni % in più di conversione vale molto.</p>
+    </div>
+  </div>
+  <div class="option" data-choice="posthog-first" onclick="toggleSelect(this)">
+    <div class="letter">2</div>
+    <div class="content">
+      <h3>Inizia da PostHog + poi UX</h3>
+      <p>Prima misuri, poi ottimizzi. Sforzo minimo, ritorno massimo sul dato.</p>
+    </div>
+  </div>
+  <div class="option" data-choice="imagegen-first" onclick="toggleSelect(this)">
+    <div class="letter">3</div>
+    <div class="content">
+      <h3>Inizia da Generazione immagini</h3>
+      <p>È la feature più "wow" da mostrare nel lancio. Differenzia da competitor e giustifica Pro.</p>
+    </div>
+  </div>
+  <div class="option" data-choice="formats-first" onclick="toggleSelect(this)">
+    <div class="letter">4</div>
+    <div class="content">
+      <h3>Inizia da Nuovi formati output</h3>
+      <p>Espandi l'audience (LinkedIn/Podcast creators) prima del lancio pubblico.</p>
+    </div>
+  </div>
+</div>

@@ -99,6 +99,7 @@ export function GenerateVisualButton({ ideaHistoryId, isStarter }: GenerateVisua
       {/* Generated image display */}
       {imageUrl && (
         <div className="relative rounded-[2rem] overflow-hidden border border-white/5 bg-white/[0.02]">
+          {/* eslint-disable-next-line @next/next/no-img-element -- Supabase Storage URLs are dynamic and no remote image hosts are configured. */}
           <img
             src={imageUrl}
             alt="AI-generated visual"

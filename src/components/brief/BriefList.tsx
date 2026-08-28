@@ -4,7 +4,6 @@
 
 import { IdeaObject } from "@/types/niche"
 import { BriefCard } from "./BriefCard"
-import { LockedIdeasOverlay } from "./LockedIdeasGate"
 import { Lock, Zap } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useUpgradeModal } from "@/components/ui/UpgradeModal"

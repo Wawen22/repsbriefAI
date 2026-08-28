@@ -11,7 +11,7 @@ interface ReferralCardProps {
   plan: string
 }
 
-export function ReferralCard({ referralCode, referralCount, plan }: ReferralCardProps) {
+export function ReferralCard({ referralCode, referralCount }: ReferralCardProps) {
   const [copied, setCopied] = useState(false)
   const referralUrl = `https://repsbrief.com/r/${referralCode}`
 

@@ -35,7 +35,8 @@ describe('generateIdeaImagePrompt', () => {
   })
 
   it('omits keyVisuals section when key is not present', () => {
-    const { keyVisuals: _kv, ...ideaWithoutKey } = BASE_IDEA
+    const ideaWithoutKey = { ...BASE_IDEA }
+    delete ideaWithoutKey.keyVisuals
     const prompt = generateIdeaImagePrompt(ideaWithoutKey as IdeaObject)
     expect(prompt).not.toContain('Visual style:')
   })

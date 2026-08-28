@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
-import { ArrowRight, Sparkles, Zap, Users, Calendar, Layout, CheckCircle2 } from "lucide-react"
+import { Sparkles, Zap, Users, Calendar, Layout, CheckCircle2 } from "lucide-react"
 import Link from "next/link"
 
 function EmailCaptureForm() {

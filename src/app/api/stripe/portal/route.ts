@@ -32,7 +32,7 @@ export async function POST(req: Request) {
 
     const appBaseUrl = getAppBaseUrl(req)
 
-    let customerId = profile.stripe_customer_id
+    const customerId = profile.stripe_customer_id
 
     // Verify the customer exists in live mode before creating a portal session
     try {

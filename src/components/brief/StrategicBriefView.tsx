@@ -32,7 +32,7 @@ import {
   Rss,
   BarChart2,
   Music,
-  Image,
+  Image as ImageIcon,
   ChevronDown
 } from "lucide-react"
 import { useState, useEffect } from "react"
@@ -69,9 +69,6 @@ function ProBadge() {
     </span>
   )
 }
-
-// No-op placeholder — replaced by useUpgradeModal below
-function showUpgradeToast(_featureName: string) { /* see handleLockedClick */ }
 
 // ─── Trend Intelligence Panel ──────────────────────────────────────────────
 
@@ -153,7 +150,7 @@ function TrendIntelligencePanel({ idea }: { idea: IdeaObject }) {
           {hasVisuals && (
             <div className="space-y-1.5">
               <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
-                <Image className="w-3 h-3 text-emerald-400" /> Key Visuals
+                <ImageIcon className="w-3 h-3 text-emerald-400" /> Key Visuals
               </span>
               <p className="text-[11px] text-slate-300 px-3 py-2 rounded-xl bg-white/[0.02] border border-white/5">
                 {idea.keyVisuals}

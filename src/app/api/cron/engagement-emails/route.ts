@@ -6,6 +6,7 @@ import { NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase'
 import { sendWelcomeSequenceEmail, sendBriefReadyEmail } from '@/lib/mail'
 import { NICHES } from '@/config/niches'
+import { recordDeliveryResult } from './results'
 
 export const dynamic = 'force-dynamic'
 
@@ -42,7 +43,7 @@ export async function GET(req: Request) {
   for (const user of day1Users || []) {
     if (!user.email) continue
     const r = await sendWelcomeSequenceEmail(user.email, user.full_name || '', 1)
-    r.success ? results.day1++ : results.errors++
+    recordDeliveryResult(results, 'day1', r.success)
   }
 
   // DAY 3 — users who signed up 3 days ago with NO brief generated yet
@@ -62,7 +63,7 @@ export async function GET(req: Request) {
       .maybeSingle()
     if (brief) continue // already generated — skip
     const r = await sendWelcomeSequenceEmail(user.email, user.full_name || '', 3)
-    r.success ? results.day3++ : results.errors++
+    recordDeliveryResult(results, 'day3', r.success)
   }
 
   // DAY 7 — starter users who signed up 7 days ago
@@ -76,7 +77,7 @@ export async function GET(req: Request) {
   for (const user of day7Users || []) {
     if (!user.email) continue
     const r = await sendWelcomeSequenceEmail(user.email, user.full_name || '', 7)
-    r.success ? results.day7++ : results.errors++
+    recordDeliveryResult(results, 'day7', r.success)
   }
 
   // BRIEF READY — Monday: notify all users who have a brief generated this week
@@ -103,7 +104,7 @@ export async function GET(req: Request) {
       if (!brief) continue
       const nicheLabel = NICHES[user.active_niche as string]?.label || 'content'
       const r = await sendBriefReadyEmail(user.email, user.full_name || '', nicheLabel, false)
-      r.success ? results.briefReady++ : results.errors++
+      recordDeliveryResult(results, 'briefReady', r.success)
     }
   }
 
@@ -120,7 +121,7 @@ export async function GET(req: Request) {
     if (!profile?.email) continue
     const nicheLabel = NICHES[profile.active_niche as string]?.label || 'content'
     const r = await sendBriefReadyEmail(profile.email, profile.full_name || '', nicheLabel, true)
-    r.success ? results.briefReady++ : results.errors++
+    recordDeliveryResult(results, 'briefReady', r.success)
   }
 
   console.log('[EngagementEmails] Results:', results)

@@ -52,6 +52,7 @@ import { PerformanceModal } from '@/components/dashboard/PerformanceModal'
 import { ScheduleDialog } from '@/components/calendar/ScheduleDialog'
 import { cn } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
+import { trackProductEvent } from '@/lib/analytics/events'
 
 interface BriefCardProps {
   idea: IdeaObject
@@ -108,6 +109,7 @@ export function BriefCard({
       }
       const url = `${window.location.origin}/s/${result.id}`
       await navigator.clipboard.writeText(url)
+      trackProductEvent('strategy_shared', { location: 'shared_strategy' })
       toast.success('Link copied to clipboard!')
     } catch {
       toast.error('Failed to create share link')

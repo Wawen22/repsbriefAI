@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { CheckCircle2, Lock, Zap } from "lucide-react"
 import Link from "next/link"
+import { trackProductEvent } from '@/lib/analytics/events'
 
 export function PricingNexus() {
   return (
@@ -48,7 +49,7 @@ export function PricingNexus() {
               ))}
             </div>
             <Button variant="outline" className="w-full rounded-2xl border-white/10 text-slate-400 hover:bg-white hover:text-black h-14 text-xs font-black uppercase tracking-widest transition-all" asChild>
-              <Link href="/signup">Start Simple</Link>
+              <Link href="/signup" onClick={() => trackProductEvent('signup_cta_clicked', { location: 'pricing' })}>Start Simple</Link>
             </Button>
           </div>
 
@@ -90,7 +91,7 @@ export function PricingNexus() {
                 ))}
               </div>
               <Button className="w-full rounded-2xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-black uppercase tracking-widest h-16 shadow-2xl shadow-blue-500/30 transition-all hover:scale-105 active:scale-95" asChild>
-                <Link href="/signup">Start Free Trial →</Link>
+                <Link href="/signup" onClick={() => trackProductEvent('signup_cta_clicked', { location: 'pricing' })}>Start Free Trial →</Link>
               </Button>
               <p className="text-center text-[10px] text-slate-600 font-medium mt-3">Then $19/mo · Cancel anytime</p>
             </div>

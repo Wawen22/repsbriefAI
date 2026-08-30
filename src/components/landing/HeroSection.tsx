@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Sparkles, Zap, Users, Calendar, Layout, CheckCircle2 } from "lucide-react"
 import Link from "next/link"
+import { trackProductEvent } from '@/lib/analytics/events'
 
 function EmailCaptureForm() {
   const [email, setEmail] = useState('')
@@ -18,7 +19,12 @@ function EmailCaptureForm() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
       })
-      setState(res.ok ? 'done' : 'error')
+      if (res.ok) {
+        trackProductEvent('waitlist_submitted', { location: 'hero' })
+        setState('done')
+      } else {
+        setState('error')
+      }
     } catch {
       setState('error')
     }
@@ -85,7 +91,7 @@ export function HeroSection() {
 
           <div className="flex items-center gap-3 text-slate-600 text-xs">
             <span>or</span>
-            <Link href="/signup" className="text-blue-400 hover:text-blue-300 font-bold transition-colors">
+            <Link href="/signup" onClick={() => trackProductEvent('signup_cta_clicked', { location: 'hero' })} className="text-blue-400 hover:text-blue-300 font-bold transition-colors">
               Create full account →
             </Link>
             <span>·</span>

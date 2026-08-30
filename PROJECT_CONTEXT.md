@@ -1,6 +1,6 @@
 # RepsBrief — PROJECT_CONTEXT (Single Source of Truth)
 
-Last update: 2026-03-31
+Last update: 2026-08-30
 Owner context: AI agents + team dev
 
 ## 1) Product Scope
@@ -22,7 +22,7 @@ Dominio: **repsbrief.com** (Hostinger DNS → Vercel)
 - Frontend: Next.js App Router, React, Tailwind.
 - Backend: Server Actions + API routes in `src/app/actions/*` e `src/app/api/*`.
 - DB/Auth/Storage: Supabase.
-- Billing: Stripe (piani: `starter` free, `pro` monthly, `team` monthly).
+- Billing: Stripe (launch: `starter` free, `pro` monthly; Team is held back pending validation).
 - Mail: Resend.
 - Integrations: Notion, Google Calendar, Slack, Discord, ClickUp, Trello, Webhooks (Zapier/Make).
 - Integration UX direction: OAuth-first per servizi user-facing; webhook/manual setup solo fallback tecnico.
@@ -46,17 +46,18 @@ Dominio: **repsbrief.com** (Hostinger DNS → Vercel)
   - [ ] P4.4 Observability hardening (Sentry + alerting) — backlog
   - [ ] P4.5 Publishing connectors (WordPress/Ghost) — backlog bassa priorità
   - [ ] P4.6 Cloud asset sync (Drive/Dropbox) — backlog bassa priorità
-- [ ] **Phase 6: Launch** (In corso — 2026-03-31)
+- [ ] **Phase 6: Revenue Launch** (In corso — 2026-08-30)
   - [x] Vercel deploy → https://repsbrief.com (GitHub CI/CD attivo)
-  - [x] Stripe live mode: Pro $19/mo, Team $39/mo; Starter = Free
-  - [x] Supabase prod migrations applicate (tutte, inclusa job_queue)
-  - [x] YouTube API key configurata
-  - [x] DNS repsbrief.com → 76.76.21.21 (Hostinger A record, propagazione in corso)
-  - [x] OAuth redirect URLs aggiornate a repsbrief.com per tutti i provider (Slack, Discord, Notion, Google, ClickUp, Trello)
-  - [x] Guided Onboarding Tour — interactive wizard 3-step + persistent checklist widget
-  - [ ] Trends Visualizer
-  - [ ] Shareable Strategy Links
-  - [ ] Reddit API (in attesa approvazione)
+  - [x] Stripe live mode: Pro $19/mo; Starter = Free
+  - [x] Landing pricing/copy aligned to delivered Starter and Pro entitlements
+  - [x] Trend-quality gate: no generated brief when active sources are empty, malformed, or stale
+  - [x] Canonical public shares use `/s/[id]`; legacy `/share/[id]` redirects
+  - [x] Referral customer credit has a Stripe idempotency key
+  - [ ] Resend domain verification + `RESEND_FROM_EMAIL` configured in Vercel
+  - [ ] Supabase migration history reconciled before applying current migration set
+  - [ ] Production smoke test: signup → Starter brief → Pro checkout → webhook → cancellation
+  - [ ] First cohort: recruit 10 Fitness & Nutrition creators
+  - [ ] Weekly funnel review: signup → brief → trial → paid
 
 ## 5) UI/UX Roadmap
 
@@ -64,18 +65,18 @@ Dominio: **repsbrief.com** (Hostinger DNS → Vercel)
 |:---|:---|:---:|:---:|
 | 13 | Guided Onboarding Tour | 🔴 High | ✅ Done |
 | 14 | Trends Visualizer | 🟡 Medium | ⬜ Todo |
-| 15 | Shareable Strategy Links (/s/[id]) | 🟡 Medium | 🔵 Planned |
+| 15 | Shareable Strategy Links (/s/[id]) | 🟡 Medium | ✅ Canonical route live; DB policy pending migration reconciliation |
 | 16 | Custom Theme Accents | 🟢 Low | ⬜ Todo |
-| 17 | Email Capture (Landing Hero) + Welcome Email | 🔴 High | 🔵 Planned |
-| 18 | Idea Gate — Starter sees 5/20 ideas | 🔴 High | 🔵 Planned |
-| 19 | Social Proof bar on Landing | 🔴 High | 🔵 Planned |
-| 20 | Rate Limit: Starter 1/week, Pro 1/day | 🔴 High | 🔵 Planned |
+| 17 | Email Capture (Landing Hero) + Welcome Email | 🔴 High | 🟡 Lead capture live; sending domain pending |
+| 18 | Idea Gate — Starter sees 5/20 ideas | 🔴 High | ✅ Done |
+| 19 | Social Proof bar on Landing | 🔴 High | ✅ Removed: no verified social proof yet |
+| 20 | Rate Limit: Starter 1/week, Pro 1/day | 🔴 High | ✅ Done |
 | 21 | Analytics Day-1 Insights (brief stats) | 🟡 Medium | 🔵 Planned |
 | 22 | Day 3 + Day 7 Re-engagement Emails | 🟡 Medium | 🔵 Planned |
 
 UI/UX completate: 1-12 (Generazione Immersiva, Kanban, AI Remix, Brand Voice, Timeline, Teleprompter, ecc.)
 
-**Plan:** `docs/superpowers/plans/2026-04-01-revenue-growth.md`
+**Plan:** `docs/superpowers/plans/2026-08-30-revenue-relaunch.md`
 
 ## 6) Billing Config (Live — 2026-03-31)
 
@@ -88,26 +89,24 @@ Webhook endpoint: https://repsbrief.com/api/stripe/webhook
 ```
 Tutte le chiavi Stripe sono in **live mode**. Il prodotto Starter $9 è stato archiviato (inactive).
 
-## 7) Validation Snapshot (2026-03-09)
+## 7) Validation Snapshot (2026-08-30)
 
-- [x] `npx tsc --noEmit` passes.
-- [x] `npm run build` passes.
-- [x] `npm run lint` passes con `0 errors`, `0 warnings`.
-- [x] `npm run test` passes.
-- [x] `npm run test:e2e` passes.
-- [x] `npm audit --audit-level=moderate` reports `0 vulnerabilities`.
+- [x] `npm run typecheck` passes.
+- [x] `npm run test` passes (38 tests); `npm run test:e2e` passes.
+- [x] `npm run lint` passes.
+- [x] `npm run build` passes with non-secret local placeholder environment values (the production environment supplies real values).
 
-## 8) DB / Migrations (last applied: 2026-03-09)
+## 8) DB / Migrations
 
-Tutte le migration in `supabase/migrations/` devono essere applicate in prod prima del deploy.
-Migration più recente: `20260309123000_add_job_queue_spike.sql`
+**Do not apply migrations blindly.** Production migration history currently reports only five records while the repository contains a much longer migration chain. Reconcile schema and history first; then apply `20260830110000_harden_public_share_access.sql` after staging verification.
 
 Variabili env richieste per prod: vedere `INTEGRATIONS_CHECKLIST.md`.
 
-## 9) Open Risks (aggiornato 2026-03-31)
+## 9) Open Risks (aggiornato 2026-08-30)
 
-- **OAuth redirect URLs**: tutti i provider (Notion, Google, Slack, Discord, ClickUp, Trello) hanno ancora redirect URL localhost/staging. Vanno aggiornate a `https://repsbrief.com/api/auth/<provider>/callback` nelle rispettive app console. Senza questo le integrazioni OAuth non funzionano per gli utenti prod.
-- **Reddit API**: in attesa approvazione. Lo scraper Reddit è disabilitato finché non arriva.
-- **DNS propagazione**: A record `76.76.21.21` aggiunto su Hostinger — può richiedere fino a 24h.
+- **Email**: Resend returned production delivery errors because no verified sender domain was configured. Lead persistence is safe; invitation delivery needs the manual DNS/domain step.
+- **Source reliability**: recent Reddit 403, Google Trends parsing failures, and RSS 429/404 exist. The initial beta enables only its configured source set and rejects bad source data rather than inventing a brief.
+- **Billing**: Stripe live mode has no active subscriptions yet. Validate the full webhook cycle with a live test checkout before acquisition.
+- **Data security**: public `shared_strategies` reads and authenticated queue claim access are hardened in an unapplied migration; remote migration drift blocks safe application until reconciled.
 - Queue mode feature-flagged (`WEBHOOK_DELIVERY_MODE=inline` in prod): ok per lancio, da valutare switch a `queue` con traffico crescente.
 - `supabaseAdmin` fail-fast su production se `SUPABASE_SERVICE_ROLE_KEY` manca — chiave configurata su Vercel.

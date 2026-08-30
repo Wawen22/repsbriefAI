@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Sparkles, Zap, Users, Calendar, Layout, CheckCircle2 } from "lucide-react"
 import Link from "next/link"
@@ -28,7 +28,7 @@ function EmailCaptureForm() {
     return (
       <div className="flex items-center justify-center gap-3 px-6 py-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-bold text-sm max-w-lg mx-auto">
         <CheckCircle2 className="w-5 h-5 shrink-0" />
-        Check your inbox — your free brief is waiting.
+        Check your inbox for the invitation to create your account.
       </div>
     )
   }
@@ -48,26 +48,13 @@ function EmailCaptureForm() {
         disabled={state === 'loading'}
         className="h-14 px-8 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-black uppercase tracking-widest shadow-2xl shadow-blue-500/25 transition-all hover:-translate-y-0.5 shrink-0"
       >
-        {state === 'loading' ? 'Sending...' : 'Get Free Brief →'}
+        {state === 'loading' ? 'Sending...' : 'Get Started →'}
       </Button>
     </form>
   )
 }
 
 export function HeroSection() {
-  const [briefCount, setBriefCount] = useState<number | null>(null)
-
-  useEffect(() => {
-    fetch('/api/stats')
-      .then(r => r.json())
-      .then(data => {
-        if (typeof data.briefCount === 'number' && data.briefCount > 0) {
-          setBriefCount(data.briefCount)
-        }
-      })
-      .catch(() => { /* silently fail — fallback text shown */ })
-  }, [])
-
   return (
     <section className="relative pt-24 pb-32 lg:pt-48 lg:pb-56 overflow-hidden text-center">
       {/* Background Decor */}
@@ -90,7 +77,7 @@ export function HeroSection() {
         </h1>
 
         <p className="text-xl md:text-2xl text-slate-400 mb-12 max-w-3xl mx-auto leading-relaxed font-light animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-500">
-          Move from trend discovery to a fully scheduled editorial calendar in 60 seconds. RepsBrief is the nexus where <b>Data</b> meets <b>Creation</b>.
+          Turn verified fitness trends into clear content strategies for your next post.
         </p>
 
         <div className="flex flex-col items-center gap-6 animate-in fade-in slide-in-from-bottom-16 duration-1000 delay-700">
@@ -107,11 +94,11 @@ export function HeroSection() {
             </Link>
           </div>
           <p className="text-[11px] text-slate-600 font-medium">
-            Free plan forever · No credit card required · <span className="text-emerald-500 font-bold">Pro: 7-day trial, then $19/mo</span>
+            Starter: 1 manual brief/week · 5 ideas visible · <span className="text-emerald-500 font-bold">Pro: 7-day trial, then $19/mo</span>
           </p>
         </div>
 
-        {/* Social proof */}
+        {/* Product proof */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mt-10 text-slate-500 text-xs font-bold uppercase tracking-widest animate-in fade-in duration-1000 delay-1000">
           <div className="flex items-center gap-2">
             <div className="flex -space-x-2">
@@ -119,17 +106,10 @@ export function HeroSection() {
                 <div key={i} className={`w-6 h-6 rounded-full ${c} border-2 border-black`} />
               ))}
             </div>
-            <span>
-              {briefCount !== null
-                ? `${briefCount.toLocaleString()}+ briefs generated`
-                : '2,400+ briefs generated'}
-            </span>
+            <span>Built for fitness creators</span>
           </div>
           <span className="hidden sm:block text-white/10">·</span>
-          <div className="flex items-center gap-1.5">
-            <span className="text-yellow-400">★★★★★</span>
-            <span>Loved by solo creators & agencies</span>
-          </div>
+          <span>Source-backed ideas, not generic prompts</span>
         </div>
 
         {/* Dynamic Integration Marquee (Simulated) */}

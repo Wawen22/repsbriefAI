@@ -2,9 +2,11 @@
 
 import { useState } from 'react'
 import { Button } from "@/components/ui/button"
-import { Sparkles, Zap, Users, Calendar, Layout, CheckCircle2 } from "lucide-react"
+import { Sparkles, ArrowRight, CheckCircle2, Zap } from "lucide-react"
 import Link from "next/link"
 import { trackProductEvent } from '@/lib/analytics/events'
+import { StudioMockup } from './StudioMockup'
+import { SampleBriefButton } from './SampleBriefButton'
 
 function EmailCaptureForm() {
   const [email, setEmail] = useState('')
@@ -32,29 +34,30 @@ function EmailCaptureForm() {
 
   if (state === 'done') {
     return (
-      <div className="flex items-center justify-center gap-3 px-6 py-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-bold text-sm max-w-lg mx-auto">
-        <CheckCircle2 className="w-5 h-5 shrink-0" />
-        You’re on the list. Create your account now to start your first brief.
+      <div className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-medium text-xs max-w-md mx-auto animate-in fade-in duration-300">
+        <CheckCircle2 className="w-4 h-4 shrink-0" />
+        <span>You&apos;re on the list! You can now create your account to begin.</span>
       </div>
     )
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row items-stretch gap-3 w-full max-w-lg mx-auto">
+    <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row items-center gap-2 w-full max-w-md mx-auto">
       <input
         type="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        placeholder="Enter your email"
+        placeholder="Enter your creator email..."
         required
-        className="flex-1 h-14 px-5 rounded-2xl bg-white/5 border border-white/10 text-white placeholder-slate-500 text-sm font-medium focus:outline-none focus:border-blue-500/50 transition-colors"
+        className="w-full sm:flex-1 h-10 px-3.5 rounded-md bg-white/[0.04] border border-white/[0.12] text-white placeholder-white/40 text-xs font-sans focus:outline-none focus:border-white/40 focus:bg-white/[0.06] transition-all"
       />
       <Button
         type="submit"
         disabled={state === 'loading'}
-        className="h-14 px-8 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-black uppercase tracking-widest shadow-2xl shadow-blue-500/25 transition-all hover:-translate-y-0.5 shrink-0"
+        size="sm"
+        className="w-full sm:w-auto h-10 px-4 rounded-md bg-white text-black hover:bg-white/90 text-xs font-medium transition-all shrink-0 cursor-pointer shadow-[0_1px_2px_rgba(0,0,0,0.3)]"
       >
-        {state === 'loading' ? 'Sending...' : 'Get Started →'}
+        {state === 'loading' ? 'Joining...' : 'Get Started →'}
       </Button>
     </form>
   )
@@ -62,81 +65,80 @@ function EmailCaptureForm() {
 
 export function HeroSection() {
   return (
-    <section className="relative pt-24 pb-32 lg:pt-48 lg:pb-56 overflow-hidden text-center">
-      {/* Background Decor */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full pointer-events-none -z-10">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-blue-600/10 rounded-full blur-[160px]" />
-        <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-purple-600/10 rounded-full blur-[120px]" />
-      </div>
+    <section className="relative pt-24 pb-16 md:pt-32 md:pb-24 overflow-hidden text-center">
+      {/* Background Atmosphere & Grid Pattern */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:48px_48px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-white/[0.025] rounded-full blur-[140px] pointer-events-none" />
 
-      <div className="container mx-auto px-4">
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-blue-500/30 bg-blue-500/10 text-blue-300 text-[10px] font-black uppercase tracking-[0.2em] mb-10 backdrop-blur-md animate-in fade-in slide-in-from-bottom-4 duration-1000">
-          <Sparkles className="w-3.5 h-3.5" />
-          <span>The Content Intelligence Hub — v2.0</span>
+      <div className="container mx-auto px-4 relative z-20 max-w-[1320px] flex flex-col items-center">
+        
+        {/* Top Status Pill */}
+        <div className="mb-4 inline-flex items-center gap-2 rounded-md border border-white/[0.10] bg-white/[0.03] px-3 py-1 text-xs text-white/70 backdrop-blur-md animate-in fade-in duration-700">
+          <Sparkles className="w-3.5 h-3.5 text-blue-400" />
+          <span className="font-mono text-[11px] uppercase tracking-wider text-white/80">The Strategic Content IDE — v2.0</span>
         </div>
 
-        <h1 className="text-6xl md:text-8xl lg:text-[10rem] font-black mb-8 tracking-tighter max-w-7xl mx-auto leading-[0.85] text-white animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200">
-          GENERATE.<br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-200 to-blue-500">
-            SYNC. SCALE.
+        {/* Big Display Headline */}
+        <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-[5.2rem] font-bold tracking-tight mb-5 leading-[1.08] text-white max-w-5xl animate-in fade-in duration-700 delay-150">
+          Turn Real Trends Into <br className="hidden sm:block" />
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white/90 to-white/60">
+            High-Converting Content.
           </span>
         </h1>
 
-        <p className="text-xl md:text-2xl text-slate-400 mb-12 max-w-3xl mx-auto leading-relaxed font-light animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-500">
-          Turn verified fitness trends into clear content strategies for your next post.
+        {/* Subtitle */}
+        <p className="text-base sm:text-lg md:text-xl text-white/50 max-w-3xl mb-8 font-sans leading-relaxed text-balance animate-in fade-in duration-700 delay-300">
+          Run real-time trend scrapers, script generators, and neural brand voice side by side. 
+          Editorial calendar, teleprompter, and 1-click Notion sync keep your pipeline moving.
         </p>
 
-        <div className="flex flex-col items-center gap-6 animate-in fade-in slide-in-from-bottom-16 duration-1000 delay-700">
-          <EmailCaptureForm />
+        {/* Dual Actions & Lead Capture */}
+        <div className="flex flex-col items-center gap-4 w-full max-w-lg mx-auto animate-in fade-in duration-700 delay-500">
+          
+          {/* Main Action Buttons */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full">
+            <Button
+              size="lg"
+              className="h-11 px-6 rounded-md bg-white text-black hover:bg-white/90 text-sm font-medium transition-all w-full sm:w-auto shadow-sm cursor-pointer"
+              asChild
+            >
+              <Link 
+                href="/signup" 
+                onClick={() => trackProductEvent('signup_cta_clicked', { location: 'hero' })}
+                className="flex items-center justify-center gap-2"
+              >
+                <span>Start Free Brief</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </Button>
 
-          <div className="flex items-center gap-3 text-slate-600 text-xs">
-            <span>or</span>
-            <Link href="/signup" onClick={() => trackProductEvent('signup_cta_clicked', { location: 'hero' })} className="text-blue-400 hover:text-blue-300 font-bold transition-colors">
-              Create full account →
-            </Link>
-            <span>·</span>
-            <Link href="#features" className="text-slate-500 hover:text-slate-400 font-medium transition-colors">
-              Explore features
-            </Link>
+            <SampleBriefButton />
           </div>
-          <p className="text-[11px] text-slate-600 font-medium">
-            Starter: 1 manual brief/week · 5 ideas visible · <span className="text-emerald-500 font-bold">Pro: 7-day trial, then $19/mo</span>
-          </p>
-        </div>
 
-        {/* Product proof */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mt-10 text-slate-500 text-xs font-bold uppercase tracking-widest animate-in fade-in duration-1000 delay-1000">
-          <div className="flex items-center gap-2">
-            <div className="flex -space-x-2">
-              {['bg-blue-500','bg-emerald-500','bg-purple-500','bg-orange-500'].map((c,i) => (
-                <div key={i} className={`w-6 h-6 rounded-full ${c} border-2 border-black`} />
-              ))}
-            </div>
-            <span>Built for fitness creators</span>
+          {/* Quick Email capture fallback */}
+          <div className="w-full pt-2">
+            <EmailCaptureForm />
           </div>
-          <span className="hidden sm:block text-white/10">·</span>
-          <span>Source-backed ideas, not generic prompts</span>
+
+          {/* Trust points */}
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[11px] font-mono text-white/40 pt-1">
+            <span className="flex items-center gap-1">
+              <CheckCircle2 className="w-3 h-3 text-emerald-400" /> Starter: 1 manual brief/wk (Free)
+            </span>
+            <span className="text-white/20 hidden sm:inline">·</span>
+            <span className="flex items-center gap-1">
+              <Zap className="w-3 h-3 text-blue-400" /> Pro: 7-day trial ($19/mo)
+            </span>
+            <span className="text-white/20 hidden sm:inline">·</span>
+            <span>No lock-in</span>
+          </div>
         </div>
 
-        {/* Dynamic Integration Marquee (Simulated) */}
-        <div className="mt-24 opacity-40 grayscale flex flex-wrap justify-center items-center gap-12 lg:gap-24 animate-in fade-in duration-1000 delay-1000">
-           <div className="flex items-center gap-3">
-              <Layout className="w-6 h-6" />
-              <span className="text-sm font-bold uppercase tracking-widest">Notion</span>
-           </div>
-           <div className="flex items-center gap-3">
-              <Calendar className="w-6 h-6" />
-              <span className="text-sm font-bold uppercase tracking-widest">Google Calendar</span>
-           </div>
-           <div className="flex items-center gap-3">
-              <Zap className="w-6 h-6" />
-              <span className="text-sm font-bold uppercase tracking-widest">Zapier</span>
-           </div>
-           <div className="flex items-center gap-3">
-              <Users className="w-6 h-6" />
-              <span className="text-sm font-bold uppercase tracking-widest">Slack</span>
-           </div>
+        {/* Live Interactive ADE Mockup */}
+        <div className="w-full">
+          <StudioMockup />
         </div>
+
       </div>
     </section>
   )

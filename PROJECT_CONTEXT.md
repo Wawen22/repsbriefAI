@@ -98,7 +98,7 @@ Tutte le chiavi Stripe sono in **live mode**. Il prodotto Starter $9 è stato ar
 
 ## 8) DB / Migrations
 
-**Do not apply migrations blindly.** Production migration history currently reports only five records while the repository contains a much longer migration chain. Reconcile schema and history first; then apply `20260830110000_harden_public_share_access.sql` after staging verification.
+**Do not apply migrations blindly.** Production migration history still contains only six records while the repository contains a much longer migration chain. The independently verified hardening migration `20260830095438_harden_revenue_launch_access.sql` is applied; reconcile the older history before applying any remaining local migrations.
 
 Variabili env richieste per prod: vedere `INTEGRATIONS_CHECKLIST.md`.
 
@@ -107,6 +107,6 @@ Variabili env richieste per prod: vedere `INTEGRATIONS_CHECKLIST.md`.
 - **Email**: Resend returned production delivery errors because no verified sender domain was configured. Lead persistence is safe; invitation delivery needs the manual DNS/domain step.
 - **Source reliability**: recent Reddit 403, Google Trends parsing failures, and RSS 429/404 exist. The initial beta enables only its configured source set and rejects bad source data rather than inventing a brief.
 - **Billing**: Stripe live mode has no active subscriptions yet. Validate the full webhook cycle with a live test checkout before acquisition.
-- **Data security**: public `shared_strategies` reads and authenticated queue claim access are hardened in an unapplied migration; remote migration drift blocks safe application until reconciled.
+- **Data security**: anonymous `shared_strategies` reads and public queue-claim execution were hardened in production on 2026-08-30. Older remote migration history remains incomplete and must be reconciled before further schema work.
 - Queue mode feature-flagged (`WEBHOOK_DELIVERY_MODE=inline` in prod): ok per lancio, da valutare switch a `queue` con traffico crescente.
 - `supabaseAdmin` fail-fast su production se `SUPABASE_SERVICE_ROLE_KEY` manca — chiave configurata su Vercel.

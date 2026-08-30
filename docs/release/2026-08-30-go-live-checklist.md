@@ -12,7 +12,7 @@
 1. In Resend, verify a RepsBrief sending domain and set `RESEND_FROM_EMAIL` in Vercel to a matching address, for Preview and Production. The sender must not be `onboarding@resend.dev`.
 2. In Vercel, enable Web Analytics and Speed Insights for `repsbrief`; the application components are already mounted.
 3. Reconcile Supabase migration history before applying any local migration. The remote history has only five entries while this repository contains later migrations. Use `supabase migration list`, compare against the schema, then use `supabase migration repair` only for migrations confirmed as already present.
-4. Apply all reconciled migrations, including `20260830110000_harden_public_share_access.sql`, to a staging project first. Verify that `/s/<existing-share-id>` still renders and that anonymous REST reads of `shared_strategies` are denied.
+4. The production hardening migration `20260830095438_harden_revenue_launch_access.sql` is already applied. Verify that `/s/<existing-share-id>` still renders and that anonymous REST reads of `shared_strategies` are denied.
 5. In Stripe live mode, send a test Checkout event and a duplicate delivery for the same subscription update. Confirm the profile plan changes once and the referral customer balance has exactly one $19 credit.
 6. Run a real signup, generate a Starter brief, confirm the fifth idea is the last visible one, then upgrade to Pro and cancel through the customer portal.
 

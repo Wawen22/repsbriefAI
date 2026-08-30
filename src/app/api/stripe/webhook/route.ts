@@ -104,6 +104,10 @@ async function rewardReferrer(subscription: Stripe.Subscription) {
       amount: -1900, // -$19.00 in cents
       currency: 'usd',
       description: `Referral reward — your invite converted to Pro`,
+    }, {
+      // Stripe guarantees that a retry of the same subscription conversion
+      // cannot create a second customer credit.
+      idempotencyKey: `referral-reward-${subscription.id}`,
     })
 
     console.log(`[Referral] Applied $19 credit to referrer ${referrer.id} (stripe: ${referrer.stripe_customer_id})`)

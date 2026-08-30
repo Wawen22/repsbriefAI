@@ -19,14 +19,23 @@ export async function POST(req: Request) {
       .upsert({ email: email.trim().toLowerCase(), source: 'hero' }, { onConflict: 'email', ignoreDuplicates: true })
     if (databaseError) throw databaseError
 
+    const from = process.env.RESEND_FROM_EMAIL
+    if (!from) {
+      console.warn('[Waitlist] Lead saved but RESEND_FROM_EMAIL is not configured')
+      return NextResponse.json({ success: true, emailDelivery: false })
+    }
+
     const { error: emailError } = await resend.emails.send({
-      from: 'RepsBrief <onboarding@resend.dev>',
+      from,
       to: [email.trim().toLowerCase()],
       subject: 'Create your RepsBrief account',
       html: '<p>Create your account at <a href="https://repsbrief.com/signup">repsbrief.com/signup</a>.</p>',
     })
-    if (emailError) throw emailError
-    return NextResponse.json({ success: true })
+    if (emailError) {
+      console.error('[Waitlist] Lead saved but invitation could not be sent:', emailError)
+    }
+
+    return NextResponse.json({ success: true, emailDelivery: !emailError })
   } catch (err) {
     console.error('[Waitlist] Error:', err)
     return NextResponse.json({ error: 'Failed' }, { status: 500 })

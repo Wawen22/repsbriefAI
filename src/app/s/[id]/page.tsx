@@ -151,10 +151,10 @@ export default async function SharedStrategyPage({
           <div className="rounded-3xl border border-blue-500/20 bg-gradient-to-b from-blue-500/[0.08] to-transparent p-7 space-y-5 text-center">
             <div className="space-y-1.5">
               <p className="text-white font-black text-lg tracking-tight">
-                Get 20 strategies like this — every week
+                Get source-backed strategies for your next post
               </p>
               <p className="text-slate-400 text-sm font-light">
-                AI-curated from Reddit, YouTube &amp; Google Trends. Free forever.
+                Start with one manual brief per week, then unlock daily briefs with Pro.
               </p>
             </div>
 
@@ -162,7 +162,7 @@ export default async function SharedStrategyPage({
               href="/signup"
               className="flex items-center justify-center gap-2 w-full h-13 py-4 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-black uppercase tracking-widest shadow-2xl shadow-blue-500/25 transition-all hover:scale-[1.02] group"
             >
-              Start Free — Get My Brief
+              Start Free — Create My Brief
               <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
             </Link>
 

@@ -28,7 +28,7 @@ function EmailCaptureForm() {
     return (
       <div className="flex items-center justify-center gap-3 px-6 py-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-bold text-sm max-w-lg mx-auto">
         <CheckCircle2 className="w-5 h-5 shrink-0" />
-        Check your inbox for the invitation to create your account.
+        You’re on the list. Create your account now to start your first brief.
       </div>
     )
   }

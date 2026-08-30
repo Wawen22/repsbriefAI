@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     template: '%s | RepsBrief',
   },
   description:
-    'Generate high-impact weekly content briefs powered by real Reddit, YouTube, and Google trends. Built for solo creators and content studios.',
+    'Turn verified fitness trends into clear content briefs and source-backed ideas. Built for creators who need a sharper next post.',
   keywords: ['content brief', 'content strategy', 'AI content', 'trend analysis', 'content creator tools'],
   authors: [{ name: 'RepsBrief' }],
   creator: 'RepsBrief',
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     url: 'https://repsbrief.com',
     title: 'RepsBrief — AI Content Briefs from Real Trends',
     description:
-      'Generate high-impact weekly content briefs powered by real Reddit, YouTube, and Google trends.',
+      'Turn verified fitness trends into clear content briefs and source-backed ideas.',
     siteName: 'RepsBrief',
     images: [
       {
@@ -46,8 +46,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary',
     title: 'RepsBrief — AI Content Briefs from Real Trends',
-    description:
-      'Generate high-impact weekly content briefs powered by real Reddit, YouTube, and Google trends.',
+    description: 'Turn verified fitness trends into clear content briefs and source-backed ideas.',
     images: ['/logo.png'],
   },
   robots: {

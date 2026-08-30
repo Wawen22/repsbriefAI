@@ -5,10 +5,10 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { getSupabaseAdmin } from '@/lib/supabase'
 import { dispatchWebhookEvent } from '@/lib/jobs/webhookQueue'
-import { NICHES } from '@/config/niches'
+import { ENABLED_TREND_SOURCES, NICHES } from '@/config/niches'
+import { getUsableTrends } from '@/lib/trends/quality'
 import { scrapeNiche } from '../../scraper'
 import { generateBrief } from '../briefGenerator'
-import { TrendItem } from '@/types/niche'
 
 // Allow up to 60s for scraping + generation on Vercel Pro
 export const maxDuration = 60
@@ -97,29 +97,49 @@ export async function POST() {
       .eq('niche', nicheId)
       .eq('week_date', weekDate)
 
-    let allTrends: TrendItem[] = []
+    let trendQuality = getUsableTrends(cachedTrends, {
+      now: new Date(),
+      allowedSources: ENABLED_TREND_SOURCES,
+    })
 
-    if (cachedTrends && cachedTrends.length > 0) {
+    if (trendQuality.ok) {
       // Use cached data — fast path
-      console.log(`[GenerateNow] Using cached trends for ${nicheId} (${cachedTrends.length} sources)`)
-      allTrends = cachedTrends.flatMap((t: { data: TrendItem[] }) => t.data)
+      console.log(`[GenerateNow] Using cached trends for ${nicheId} (${trendQuality.sources.join(', ')})`)
     } else {
-      // No cache — scrape fresh (slower path)
-      console.log(`[GenerateNow] No cache found, running fresh scrape for ${nicheId}...`)
+      // Missing or degraded cache — scrape fresh before rejecting generation.
+      console.log(`[GenerateNow] Trend cache unavailable (${trendQuality.reason}), running fresh scrape for ${nicheId}...`)
       try {
         await scrapeNiche(niche)
       } catch (scrapeErr) {
-        console.error('[GenerateNow] Scrape failed, but will try to generate with base knowledge:', scrapeErr)
+        console.error('[GenerateNow] Fresh scrape failed:', scrapeErr)
       }
 
       const { data: freshTrends } = await supabaseAdmin
         .from('trends_cache')
-        .select('data')
+        .select('data, source')
         .eq('niche', nicheId)
         .eq('week_date', weekDate)
 
-      allTrends = freshTrends?.flatMap((t: { data: TrendItem[] }) => t.data) || []
+      trendQuality = getUsableTrends(freshTrends, {
+        now: new Date(),
+        allowedSources: ENABLED_TREND_SOURCES,
+      })
     }
+
+    if (!trendQuality.ok) {
+      console.error(`[GenerateNow] No usable trends for ${nicheId}: ${trendQuality.reason}`)
+      return NextResponse.json(
+        {
+          error: 'trends_unavailable',
+          message: 'Fresh trend data is temporarily unavailable. Please try again shortly.',
+          reason: trendQuality.reason,
+          retryable: true,
+        },
+        { status: 503, headers: { 'Retry-After': '300' } }
+      )
+    }
+
+    const allTrends = trendQuality.trends
 
     // 5. Load user's idea history for deduplication and performance learning
     const { data: history } = await supabaseAdmin
@@ -139,7 +159,7 @@ export async function POST() {
       .slice(0, 5) // Send top 5 to keep prompt clean
 
     // 6. Generate brief via AI abstraction layer
-    console.log(`[GenerateNow] Generating brief for user ${user.id} (${nicheId}), trends: ${allTrends.length}, performers: ${highPerformers.length}...`)
+    console.log(`[GenerateNow] Generating brief for user ${user.id} (${nicheId}), trends: ${allTrends.length}, sources: ${trendQuality.sources.join(', ')}, performers: ${highPerformers.length}...`)
 
     let ideas
     try {

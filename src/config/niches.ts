@@ -1,6 +1,10 @@
 // src/config/niches.ts
 
-import { NicheConfig } from '../types/niche'
+import type { NicheConfig, TrendItem } from '../types/niche'
+
+// Reddit and Google Trends stay implemented but are disabled until they use
+// authenticated, supported upstream APIs.
+export const ENABLED_TREND_SOURCES = ['youtube', 'rss'] as const satisfies readonly TrendItem['source'][]
 
 export const NICHES: Record<string, NicheConfig> = {
   fitness: {

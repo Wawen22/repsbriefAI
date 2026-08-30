@@ -1,14 +1,15 @@
 // src/app/api/cron/weeklyBrief/route.ts
 
 import { NextResponse } from 'next/server'
-import { NICHES } from '@/config/niches'
+import { ENABLED_TREND_SOURCES, NICHES } from '@/config/niches'
 import { scrapeNiche } from '../../scraper'
 import { generateBrief } from '../../generator/briefGenerator'
 import { getSupabaseAdmin } from '@/lib/supabase'
+import { getUsableTrends } from '@/lib/trends/quality'
 import { dispatchWebhookEvent } from '@/lib/jobs/webhookQueue'
 import { sendBrief } from '../../email/sendBrief'
 import { ACTIVE_PAID_PLANS } from '@/lib/billing'
-import type { NicheConfig, TrendItem } from '@/types/niche'
+import type { NicheConfig } from '@/types/niche'
 
 export const dynamic = 'force-dynamic'
 
@@ -57,13 +58,21 @@ export async function GET(req: Request) {
         // Load trends from cache
         const { data: trends, error: trendsError } = await supabaseAdmin
           .from('trends_cache')
-          .select('data')
+          .select('data, source')
           .eq('niche', nicheId)
           .eq('week_date', weekDate)
 
         if (trendsError) throw trendsError
 
-        const allTrends = (trends?.flatMap((trendRow: { data: TrendItem[] }) => trendRow.data) || []) as TrendItem[]
+        const trendQuality = getUsableTrends(trends, {
+          now: new Date(),
+          allowedSources: ENABLED_TREND_SOURCES,
+        })
+        if (!trendQuality.ok) {
+          throw new Error(`Fresh trend data unavailable (${trendQuality.reason})`)
+        }
+
+        const allTrends = trendQuality.trends
         
         // Get user's idea history
         const { data: history } = await supabaseAdmin

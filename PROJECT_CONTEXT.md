@@ -96,12 +96,11 @@ Webhook endpoint: https://repsbrief.com/api/stripe/webhook
 ```
 Tutte le chiavi Stripe sono in **live mode**. Il prodotto Starter $9 è stato archiviato (inactive).
 
-## 7) Validation Snapshot (2026-09-01)
-
+- [x] UI/UX Design Unification (2026-09-01): Completely refactored internal application interface to match Landing Page Dark IDE Studio aesthetic (#000000, hairline borders border-white/[0.08], monospace metadata chips, Linear/Vercel polish across app shell, sidebar, dashboard, brief cards, studio view, kanban, history, analytics, and settings).
 - [x] Pnpm 11.25.0 is declared in `package.json` and is the sole deployment package manager; `package-lock.json` was removed to prevent npm/pnpm resolution drift.
 - [x] `pnpm-lock.yaml` retains `stripe: ^20.3.1` in the manifest but pins its direct resolution to 20.3.1. The installed generated `ApiVersion` is exactly `2026-01-28.clover`, matching `src/lib/stripe.ts` and fixing Vercel's TypeScript failure.
 - [x] `pnpm install --frozen-lockfile` passed; explicit pnpm 11 build-policy decisions deny pending third-party lifecycle scripts without changing dependency versions.
-- [x] `pnpm test` passed: 15 files, 74 tests; `pnpm run typecheck` and `pnpm run lint` passed.
+- [x] `pnpm test` passed: 15 files, 74 tests; `pnpm run typecheck` and `pnpm run lint` passed (0 errors, 0 warnings).
 - [x] `pnpm run build` passed with harmless Supabase, Stripe, Resend, OpenAI, and app-URL placeholders.
 
 ## 8) DB / Migrations & Reconciliation Baseline

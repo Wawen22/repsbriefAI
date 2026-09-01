@@ -79,11 +79,12 @@ RepsBrief è una piattaforma SaaS multi-tenant (`Next.js + Supabase`) per creato
 | **fix/security-cost-controls** | ✅ **Integrated locally** | Senior Full-Stack / 🔴 P0 | Zod gates and rate limits integrated; remote images remain fail-closed (data URL raster only). |
 | **fix/revenue-truthfulness** | ✅ **Integrated locally** | Senior Full-Stack / 🔴 P0 | Active-source copy, mail safeguards, `/s/[id]`, and `/r/[code]` Route Handler integrated. |
 | **feat-landing-interactive-studio** | ✅ **Merged & Pushed** | Senior Full-Stack / 🔴 P0 | Interactive 4-tab ADE Studio Mockup (Radar, Generator, Brand Voice, Sync) with dynamic state & micro-interactions. |
+| **feat-app-design-unification** | ✅ **Merged to main** | Senior Full-Stack / 🔴 P0 | Complete UI/UX refactor of dashboard, studio views, cards, kanban, history, analytics, settings to match landing Dark IDE aesthetic. |
 | **ci-pnpm-alignment** | ✅ **Merged & Pushed** | DevOps / 🔴 P0 | GitHub Actions CI updated to pnpm setup and build placeholders matching canonical deployment. |
 | **feat/apify-trend-ingestion** | ⬜ In attesa | Senior Full-Stack / 🟡 P1 | Pipeline ingestion asincrona, adapter normalizzati, deduplica e provenance trend. |
 | **Resend Sender Domain** | ⬜ In attesa | DevOps / 🔴 P0 | Configurazione DNS e variabile `RESEND_FROM_EMAIL` su Vercel. |
 | **Supabase Remote DDL Apply** | ⏸️ **Bloccato** | Team Dev / 🔴 P0 | Create and verify a production backup, then obtain explicit authorization before executing Delta DDL or aligning `schema_migrations`. |
-| **Release Validation** | ✅ **Verified locally** | Senior Full-Stack / 🔴 P0 | `pnpm install --frozen-lockfile`, 15 test files / 74 tests, typecheck, lint, and a clean placeholder-backed build pass. No dependency upgrades or audit remediation was run. |
+| **Release Validation** | ✅ **Verified locally** | Senior Full-Stack / 🔴 P0 | `pnpm install --frozen-lockfile`, 15 test files / 74 tests, typecheck, lint (0 warnings), and a clean placeholder-backed build pass. |
 
 ---
 

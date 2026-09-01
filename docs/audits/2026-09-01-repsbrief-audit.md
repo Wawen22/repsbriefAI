@@ -1,5 +1,10 @@
 # Audit RepsBrief — stato al 1 settembre 2026
 
+> Aggiornamento operativo: 1 settembre 2026. Questa baseline conserva i
+> rilievi originali; le checkbox sotto riflettono esclusivamente gli interventi
+> integrati e validati localmente. I gate di produzione restano aperti finché
+> non sono verificati nel deploy live.
+
 ## Scopo e snapshot
 
 Questo documento è la baseline operativa per i prossimi worktree. Descrive lo
@@ -28,8 +33,10 @@ tracciabilità e veridicità dei dati trend rispetto alle promesse commerciali.
   restituito `briefCount: 23` durante l'audit.
 - I test locali eseguiti hanno superato: 10 file / 38 test unitari e 1 smoke
   e2e di import route.
-- Il comando pnpm standard è bloccato nell'ambiente di audit dalla policy sui
-  build script non approvati; non è stato modificato alcun lockfile o package.
+- `pnpm` è ora il package manager canonico (`packageManager: pnpm@11.25.0`):
+  install frozen, 74 test, typecheck, lint e build placeholder sono passati.
+  Il precedente doppio lockfile npm/pnpm è stato eliminato per evitare derive
+  di versioni tra locale e Vercel.
 - `npm audit --omit=dev` ha rilevato 24 vulnerabilità: 1 critical, 9 high,
   13 moderate e 1 low. I pacchetti da aggiornare con un lavoro dedicato sono
   principalmente Next.js, axios, jsPDF, sharp, PostCSS e dipendenze Sentry.
@@ -52,13 +59,13 @@ tracciabilità e veridicità dei dati trend rispetto alle promesse commerciali.
 - La storia delle migration nel repository non è riconciliata con Supabase
   remoto. **Non applicare migration** prima di un confronto di baseline e di
   una migration repair esplicitamente autorizzata.
-- Il modello team-first è parziale: i brief rimangono user-scoped e la Brand
-  Voice è scritta sul team, ma la generazione on-demand legge ancora
-  `profiles.brand_voice`.
-- Esistono due flussi per la condivisione pubblica (`createShareAction` e
-  `shareIdeaAction`), uno legacy e uno team-aware: vanno unificati.
-- `updateActiveNicheAction` accetta una stringa arbitraria, invece di limitare
-  la scelta alle nicchie attive configurate.
+- Il modello team-first è ancora parziale: i brief rimangono user-scoped. La
+  generazione Brand Voice ora usa però il team corrente e non fallback legacy
+  sul profilo.
+- I flussi share sono stati consolidati su `/s/[id]`; il referral usa ora un
+  Route Handler dedicato `/r/[code]`.
+- `updateActiveNicheAction` ora limita la scelta alle nicchie attive
+  configurate.
 
 ## Scraping: stato reale e decisione Apify
 
@@ -125,26 +132,26 @@ Configurazione iniziale da preparare (senza committare segreti):
 
 ### P0 — da correggere prima di acquisizione
 
-- [ ] Landing, dashboard, loading state e e-mail dichiarano Reddit, Google
-  Trends, PubMed citations, transcript o real-time scraping che non sono
+- [x] Landing, dashboard, loading state ed e-mail non dichiarano più Reddit,
+  Google Trends, PubMed citations, transcript o real-time scraping non
   disponibili nella pipeline attiva.
-- [ ] Pro viene descritto come "daily automated briefs", mentre il cron di
-  generazione è settimanale. O si implementa automazione giornaliera, oppure
-  si comunica correttamente "daily manual generation".
-- [ ] Il cron e-mail del lunedì può notificare agli Starter un brief storico,
-  anche se il cron di generazione produce brief solo per piani paid.
-- [ ] Resend usa ancora `onboarding@resend.dev` hardcoded/fallback in inviti,
-  brief e lifecycle e-mail. Serve dominio verificato e un solo
-  `RESEND_FROM_EMAIL` in produzione.
-- [ ] `/r/[code]` imposta un cookie durante il rendering di una Server
-  Component: spostare la logica in Route Handler, poi redirigere.
+- [x] La copy Pro non descrive più "daily automated briefs" quando il cron di
+  generazione è settimanale; comunica correttamente la generazione manuale.
+- [x] Il cron e-mail del lunedì filtra gli Starter ai brief creati nel giorno,
+  evitando notifiche per brief storici.
+- [x] Il mittente e-mail è centralizzato su `RESEND_FROM_EMAIL` e fallisce
+  chiuso in produzione; resta necessario verificare il dominio Resend e
+  configurare la variabile su Vercel.
+- [x] `/r/[code]` usa un Route Handler per impostare il cookie e redirigere,
+  senza mutare cookie durante il rendering di una Server Component.
 
 ### P1 — sicurezza, costi e affidabilità
 
-- [ ] Validazione Zod, limiti input, controllo piano e rate limit server-side
+- [x] Validazione Zod, limiti input, controllo piano e rate limit server-side
   per AI Remix, Brand Voice e image generation.
-- [ ] Proteggere download immagini del provider con timeout, content-type,
-  limite byte e mitigazione SSRF.
+- [x] Download immagini del provider protetto fail-closed: accetta solo data
+  URL raster PNG/JPEG/WebP fino a 10 MiB; URL remoti disabilitati finché non
+  esiste DNS pinning verificabile.
 - [ ] Upgrade dipendenze vulnerabili con test, senza `npm audit fix --force`.
 - [ ] Sentry/alerting su errore sorgente, freshness cache, errore AI, webhook
   Stripe, fallimento e-mail e queue dead-letter.
@@ -160,16 +167,18 @@ Configurazione iniziale da preparare (senza committare segreti):
 
 ## Sequenza operativa approvata
 
-1. Correggere truthfulness, e-mail, referral e cron.
-2. Stabilizzare feed esistenti e introdurre pipeline Apify asincrona.
-3. Aggiungere provenance del trend, test e osservabilità.
-4. Hardening costi/sicurezza e upgrade dipendenze.
-5. Riconciliare Supabase con un'operazione controllata.
-6. Eseguire smoke test live completo, poi reclutare 10 creator fitness.
+1. [x] Correggere truthfulness, e-mail, referral e cron.
+2. [ ] Stabilizzare feed esistenti e introdurre pipeline Apify asincrona.
+3. [ ] Aggiungere provenance del trend, test e osservabilità.
+4. [ ] Hardening costi/sicurezza completato; remediation delle dipendenze
+   vulnerabili ancora aperta.
+5. [ ] Audit Supabase completato; riconciliazione remota ancora bloccata da
+   backup e Delta DDL autorizzato.
+6. [ ] Eseguire smoke test live completo, poi reclutare 10 creator fitness.
 
 ## Worktree consigliati e prompt ORCA ADE
 
-### 1. `fix/revenue-truthfulness`
+### 1. `fix/revenue-truthfulness` — completato e integrato
 
 ```text
 Leggi integralmente AGENTS.md, PROJECT_CONTEXT.md e docs/audits/2026-09-01-repsbrief-audit.md. Implementa il revenue-truthfulness hardening senza cambiare il modello dati.
@@ -179,7 +188,7 @@ Allinea landing, dashboard loading states, FAQ, pricing, sample brief ed e-mail 
 Non applicare migration. Mantieni TypeScript e AI abstraction. Aggiorna PROJECT_CONTEXT.md; se INIT_PROMPT.md è ancora assente, crealo con checklist e link a questo audit. Esegui test, typecheck, lint e build.
 ```
 
-### 2. `feat/apify-trend-ingestion`
+### 2. `feat/apify-trend-ingestion` — ancora da avviare
 
 ```text
 Leggi integralmente AGENTS.md, PROJECT_CONTEXT.md e docs/audits/2026-09-01-repsbrief-audit.md. Implementa una pipeline TypeScript di ingestion trend affidabile, con Apify opzionale e mai nella request utente di generazione.
@@ -189,7 +198,7 @@ Definisci adapter normalizzati; conserva YouTube e RSS con timeout, retry limita
 Aggiorna PROJECT_CONTEXT.md; se INIT_PROMPT.md è ancora assente, crealo con checklist e link a questo audit. Esegui la verifica completa.
 ```
 
-### 3. `fix/security-cost-controls`
+### 3. `fix/security-cost-controls` — completato e integrato
 
 ```text
 Leggi integralmente AGENTS.md, PROJECT_CONTEXT.md e docs/audits/2026-09-01-repsbrief-audit.md. Esegui hardening mirato di sicurezza e controllo costi.
@@ -199,7 +208,7 @@ Aggiungi validazione Zod, limiti di dimensione, controlli piano e rate limit ser
 Non applicare migration Supabase. Aggiorna PROJECT_CONTEXT.md; se INIT_PROMPT.md è ancora assente, crealo con checklist e link a questo audit. Esegui test, typecheck, lint, build e audit.
 ```
 
-### 4. `chore/supabase-baseline-audit`
+### 4. `chore/supabase-baseline-audit` — completato e integrato (solo audit)
 
 ```text
 Leggi integralmente AGENTS.md, PROJECT_CONTEXT.md, docs/audits/2026-09-01-repsbrief-audit.md e tutte le migration Supabase. Produci un audit di riconciliazione tra repository e ambiente remoto.
@@ -212,7 +221,8 @@ Aggiorna PROJECT_CONTEXT.md; se INIT_PROMPT.md è ancora assente, crealo con che
 ## Gate prima del primo cohort
 
 - [ ] Sender domain Resend verificato e tutte le e-mail inviate da esso.
-- [ ] Copy live coerente con fonti e entitlement realmente disponibili.
+- [x] Copy nel ramo integrato coerente con fonti e entitlement realmente
+  disponibili; verificare il deploy Vercel prima di considerarlo live.
 - [ ] Pipeline trend con almeno due fonti sane o fallback trasparente.
 - [ ] Signup → referral → Starter brief → Pro checkout → webhook →
   cancellation verificati in produzione.

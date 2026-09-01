@@ -61,7 +61,7 @@ RepsBrief è una piattaforma SaaS multi-tenant (`Next.js + Supabase`) per creato
   - [x] Security/cost controls integrated locally: schemas, paid-plan gates, and fail-closed remote image policy
   - [x] **Supabase Baseline Reconciliation Audit** ([audit documentato](docs/audits/2026-09-01-supabase-reconciliation-audit.md))
   - [x] Local integration completed with ordered no-ff merges; no push and no Supabase migration execution
-  - [ ] Restore a consistent `package-lock.json` before dependency-backed release validation (`npm ci` currently fails)
+  - [x] Restored a consistent `package-lock.json` and completed dependency-backed release validation: `npm ci`, 74 tests, typecheck, lint, and a clean placeholder-backed build pass. The approved Webpack closure changes `enhanced-resolve` 5.20.1 → 5.24.5 and `tapable` 2.3.0 → 2.3.3; `package.json` remains unchanged. Residual production audit: 24 findings (1 critical, 9 high, 13 moderate, 1 low).
   - [ ] Create and verify a production backup, then obtain authorization for the Delta DDL (`teams.brand_voice`, `idea_images`) and `schema_migrations` reconciliation
   - [ ] Resend domain verification + `RESEND_FROM_EMAIL` configurato in Vercel
   - [ ] Worktree `feat/apify-trend-ingestion`: pipeline asincrona trend
@@ -82,7 +82,7 @@ RepsBrief è una piattaforma SaaS multi-tenant (`Next.js + Supabase`) per creato
 | **feat/apify-trend-ingestion** | ⬜ In attesa | Senior Full-Stack / 🟡 P1 | Pipeline ingestion asincrona, adapter normalizzati, deduplica e provenance trend. |
 | **Resend Sender Domain** | ⬜ In attesa | DevOps / 🔴 P0 | Configurazione DNS e variabile `RESEND_FROM_EMAIL` su Vercel. |
 | **Supabase Remote DDL Apply** | ⏸️ **Bloccato** | Team Dev / 🔴 P0 | Create and verify a production backup, then obtain explicit authorization before executing Delta DDL or aligning `schema_migrations`. |
-| **Release Validation** | ⏸️ **Bloccato** | Senior Full-Stack / 🔴 P0 | `npm ci` reports package-lock mismatch, so test/typecheck/lint/build cannot load their CLIs; `npm audit --omit=dev` reports 23 vulnerabilities. |
+| **Release Validation** | ✅ **Verified locally** | Senior Full-Stack / 🔴 P0 | `npm ci`, 15 test files / 74 tests, typecheck, lint, and a clean placeholder-backed build pass after lockfile reconciliation. Approved required transitive moves: `enhanced-resolve` 5.20.1 → 5.24.5 and `tapable` 2.3.0 → 2.3.3. Residual production audit: 24 vulnerabilities (1 critical, 9 high, 13 moderate, 1 low); no audit fix was run. |
 
 ---
 

@@ -96,10 +96,12 @@ Tutte le chiavi Stripe sono in **live mode**. Il prodotto Starter $9 è stato ar
 
 ## 7) Validation Snapshot (2026-09-01)
 
-- [x] Required `npm ci` clean-install check performed: it fails because `package-lock.json` is out of sync with `package.json` (including Webpack dependency entries); the lockfile was intentionally not rewritten during integration.
-- [ ] `npm run test`, `npm run typecheck`, and `npm run lint` are blocked because the failed clean install leaves `vitest`, `tsc`, and `eslint` unavailable.
-- [ ] `npm run build` with harmless placeholders is blocked because the failed clean install leaves `next` unavailable.
-- [x] `npm audit --omit=dev` performed: 23 vulnerabilities (1 critical, 8 high, 13 moderate, 1 low) remain for follow-up.
+- [x] Lockfile reconciled with `npm install --package-lock-only --ignore-scripts --no-audit` (npm 10.9.2 / Node 22.17.0). It restores the missing Webpack peer closure and makes only the approved required transitive moves: `enhanced-resolve` 5.20.1 → 5.24.5 and `tapable` 2.3.0 → 2.3.3; `package.json` is unchanged.
+- [x] Required `npm ci` clean-install check passed after the reconciliation.
+- [x] `npm run test` passed: 15 files, 74 tests.
+- [x] `npm run typecheck` and `npm run lint` passed.
+- [x] Clean `npm run build` passed with harmless Supabase, Stripe, Resend, OpenAI, and app-URL placeholders.
+- [x] `npm audit --omit=dev` performed: 24 vulnerabilities (1 critical, 9 high, 13 moderate, 1 low) remain for follow-up. No audit remediation was applied.
 
 ## 8) DB / Migrations & Reconciliation Baseline
 
@@ -125,4 +127,4 @@ Variabili env richieste per prod: vedere `INTEGRATIONS_CHECKLIST.md`.
 - `supabaseAdmin` fail-fast su production se `SUPABASE_SERVICE_ROLE_KEY` manca — chiave configurata su Vercel.
 - Security/cost controls (2026-09-01): AI Remix, Brand Voice e image generation richiedono `UPSTASH_REDIS_REST_URL` e `UPSTASH_REDIS_REST_TOKEN` per rate limiting distribuito; senza configurazione rispondono fail-closed. Nessuna migration Supabase è stata applicata.
 - Image provider safety (2026-09-01): i download remoti HTTPS sono disabilitati fail-closed per evitare DNS rebinding; sono accettati solo data URL raster PNG/JPEG/WebP fino a 10 MiB. Follow-up obbligatorio: trasporto HTTP Node con DNS pinning verificabile prima di riabilitare URL remoti.
-- Dependency integrity (2026-09-01): `npm ci` is blocked by a `package-lock.json` / `package.json` mismatch. The remaining production audit contains 23 findings (including 1 critical); do not treat dependency-backed validation as passing until the lockfile is reconciled and the audit is remediated.
+- Dependency integrity (2026-09-01): `package-lock.json` is reconciled and `npm ci`, tests, typecheck, lint, and a clean placeholder-backed build pass. The approved Webpack peer closure requires `enhanced-resolve` 5.24.5 and `tapable` 2.3.3. The remaining production audit contains 24 findings (1 critical, 9 high, 13 moderate, 1 low); dependency-backed validation passes, but release risk remains until those findings are remediated through a separately authorized dependency update.

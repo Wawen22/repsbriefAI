@@ -6,7 +6,8 @@ Audit baseline: [2026-09-01 RepsBrief audit](docs/audits/2026-09-01-repsbrief-au
 
 - [x] Security/cost-control design and implementation plan documented.
 - [x] Input schemas, paid-plan gates, team Brand Voice hardening, and distributed rate-limit integration added.
-- [ ] Complete release verification and assess remaining dependency audit findings; DNS pinning remains open.
+- [x] Remote image URL fetching disabled fail-closed pending verified DNS pinning.
+- [ ] Complete release verification and assess remaining dependency audit findings; implement verified Node DNS pinning before re-enabling remote image URLs.
 
 ## Task Status Tracking
 

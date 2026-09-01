@@ -6,15 +6,10 @@ import { redirect } from "next/navigation"
 import { IdeaObject } from "@/types/niche"
 import { BriefList } from "@/components/brief/BriefList"
 import { NichePicker } from "@/components/niche/NichePicker"
+import { CommandCenter } from "@/components/dashboard/CommandCenter"
 import { AddIdeaModal } from "@/components/ui/AddIdeaModal"
-import { GenerateNowButton } from "@/components/dashboard/GenerateNowButton"
-import { StrategicStats } from "@/components/dashboard/StrategicStats"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { 
-  Sparkles, 
-  CalendarDays,
-  Zap
-} from "lucide-react"
+import { CalendarDays, Zap } from "lucide-react"
 import { stripe } from "@/lib/stripe"
 import { resolvePlanFromPriceId } from "@/lib/billing"
 import { OnboardingModal } from "@/components/dashboard/OnboardingModal"
@@ -173,55 +168,21 @@ export default async function DashboardPage({
             <span>Week of {briefDate}</span>
           </div>
         )}
+        <AddIdeaModal compact />
       </div>
 
-      {/* Main Action Header */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 text-left">
-        <div className="space-y-1.5 text-left">
-          <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10.5px] font-mono uppercase tracking-wider bg-white/[0.04] border border-white/[0.08] text-white/60">
-            <Sparkles className="w-3 h-3 text-blue-400" />
-            <span>Weekly Strategic Brief</span>
-          </div>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white leading-tight">
-            The Content Studio
-          </h1>
-          <p className="text-white/50 text-sm md:text-base font-sans max-w-xl">
-            20 high-impact content strategies, AI-synthesized from verified YouTube and RSS signals.
-          </p>
-        </div>
+      <CommandCenter
+        ideas={ideas}
+        hasBrief={hasBrief}
+        savedIdeaCount={savedHashes.size}
+        plan={userPlan}
+        niche={activeNiche}
+        briefDate={briefDate}
+        alreadyGeneratedToday={alreadyGeneratedToday}
+      />
 
-        <div className="shrink-0 text-left">
-          <AddIdeaModal />
-        </div>
-      </header>
-
-      {!hasBrief ? (
-        <div className="relative py-20 flex flex-col items-center justify-center text-center overflow-hidden rounded-2xl border border-white/[0.08] bg-[#070707] shadow-[0_20px_60px_rgba(0,0,0,0.8)]">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.04),transparent_70%)] pointer-events-none" />
-          
-          <div className="relative z-10 space-y-6 max-w-md text-center px-4">
-            <div className="size-16 rounded-xl bg-white/[0.04] border border-white/[0.10] flex items-center justify-center mx-auto shadow-xl group hover:border-white/20 transition-all">
-               <Sparkles className="w-8 h-8 text-blue-400 group-hover:scale-110 transition-transform" />
-            </div>
-            
-            <div className="space-y-2 text-center">
-              <h2 className="text-2xl font-bold text-white tracking-tight">Your Briefing is Ready to Compile</h2>
-              <p className="text-white/50 text-sm leading-relaxed font-sans">
-                Scan active YouTube videos and peer-reviewed RSS feeds for your niche.
-              </p>
-            </div>
-
-            <div className="pt-2 flex flex-col items-center gap-2.5 text-center">
-              <GenerateNowButton alreadyGeneratedToday={alreadyGeneratedToday} plan={userPlan} />
-              <p className="text-[10px] text-white/35 font-mono uppercase tracking-wider">Takes ~30 seconds to analyze</p>
-            </div>
-          </div>
-        </div>
-      ) : (
+      {hasBrief && (
         <div className="space-y-8">
-          {/* Strategic Impact Stats Section */}
-          <StrategicStats ideas={ideas} niche={activeNiche} />
-
           <Tabs defaultValue="all" className="space-y-6">
             {/* Pill Filter Bar */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">

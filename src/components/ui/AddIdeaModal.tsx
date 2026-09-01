@@ -17,7 +17,7 @@ import { Badge } from '@/components/ui/badge'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 
-export function AddIdeaModal() {
+export function AddIdeaModal({ compact = false }: { compact?: boolean }) {
   const [open, setOpen] = useState(false)
   const [title, setTitle] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -49,10 +49,15 @@ export function AddIdeaModal() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-blue-600 hover:bg-blue-500 text-white rounded-full px-6 font-bold shadow-lg shadow-blue-500/20 transition-all hover:scale-105 active:scale-95 group relative overflow-hidden text-sm">
+        <Button className={cn(
+          'group relative h-9 overflow-hidden rounded-md border transition-colors',
+          compact
+            ? 'border-white/[0.08] bg-transparent px-3 text-xs font-medium text-white/60 hover:bg-white/[0.05] hover:text-white'
+            : 'bg-blue-600 px-6 text-sm font-bold text-white shadow-lg shadow-blue-500/20 hover:scale-105 hover:bg-blue-500 active:scale-95'
+        )}>
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite] pointer-events-none" />
-          <Plus className="w-4 h-4 mr-2 group-hover:rotate-90 transition-transform" />
-          Add My Idea
+          <Plus className="mr-2 w-4 h-4 transition-transform group-hover:rotate-90" />
+          {compact ? 'Capture idea' : 'Add My Idea'}
         </Button>
       </DialogTrigger>
       

@@ -104,7 +104,7 @@ Tutte le chiavi Stripe sono in **live mode**. Il prodotto Starter $9 è stato ar
 - [x] `pnpm install --frozen-lockfile` passed; explicit pnpm 11 build-policy decisions deny pending third-party lifecycle scripts without changing dependency versions.
 - [x] `pnpm test` passed: 15 files, 74 tests; `pnpm run typecheck` and `pnpm run lint` passed (0 errors, 0 warnings).
 - [x] `pnpm run build` passed with harmless Supabase, Stripe, Resend, OpenAI, and app-URL placeholders.
-- [x] Studio Command Center redesign: dashboard now provides one data-backed decision canvas, an honest workflow rail, and brief evidence/inventory without simulated momentum (2026-09-01).
+- [x] Studio Command Center redesign: dashboard now provides one data-backed decision canvas, active-brief-only workflow completion, source/format evidence, inventory navigation, and a safe calendar path without simulated momentum (2026-09-01).
 
 ## 8) DB / Migrations & Reconciliation Baseline
 

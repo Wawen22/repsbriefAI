@@ -8,6 +8,8 @@ import { BriefList } from "@/components/brief/BriefList"
 import { NichePicker } from "@/components/niche/NichePicker"
 import { CommandCenter } from "@/components/dashboard/CommandCenter"
 import { AddIdeaModal } from "@/components/ui/AddIdeaModal"
+import { getBriefIntelligence } from "@/lib/dashboard/brief-intelligence"
+import { getSavedIdeaCountForCurrentBrief } from "@/lib/dashboard/workflow"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { CalendarDays, Zap } from "lucide-react"
 import { stripe } from "@/lib/stripe"
@@ -138,6 +140,11 @@ export default async function DashboardPage({
       .map(row => [row.idea_hash, row.id])
   )
   const savedHashes = new Set(savedIdsMap.keys())
+  const currentBriefIdeaHashes = new Set(
+    rawIdeas.map((idea) => Buffer.from(idea.title.trim()).toString('base64').substring(0, 64))
+  )
+  const savedIdeaCount = getSavedIdeaCountForCurrentBrief(currentBriefIdeaHashes, savedHashes)
+  const briefIntelligence = getBriefIntelligence(ideas)
   
   const activeNiche = profile?.active_niche || 'fitness'
   const userPlan = profile?.plan || 'starter'
@@ -157,8 +164,8 @@ export default async function DashboardPage({
           <NichePicker />
           <div className="h-3.5 w-px bg-white/[0.10]" />
           <div className="flex items-center gap-1.5 text-[11px] font-mono text-white/40 uppercase tracking-wider">
-            <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span>Trend Feed Active</span>
+            <span className={`size-1.5 rounded-full ${briefIntelligence.sourceLabels.length ? 'bg-emerald-400' : 'bg-white/25'}`} />
+            <span>{briefIntelligence.sourceLabels.length ? `${briefIntelligence.sourceLabels.join(' + ')} verified` : 'Awaiting source verification'}</span>
           </div>
         </div>
         
@@ -174,7 +181,7 @@ export default async function DashboardPage({
       <CommandCenter
         ideas={ideas}
         hasBrief={hasBrief}
-        savedIdeaCount={savedHashes.size}
+        savedIdeaCount={savedIdeaCount}
         plan={userPlan}
         niche={activeNiche}
         briefDate={briefDate}
@@ -182,7 +189,7 @@ export default async function DashboardPage({
       />
 
       {hasBrief && (
-        <div className="space-y-8">
+        <div id="brief-inventory" className="scroll-mt-6 space-y-8">
           <Tabs defaultValue="all" className="space-y-6">
             {/* Pill Filter Bar */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">

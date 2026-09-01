@@ -1,4 +1,4 @@
-import { getWorkflowSteps } from '@/lib/dashboard/workflow'
+import { getSavedIdeaCountForCurrentBrief, getWorkflowSteps } from '@/lib/dashboard/workflow'
 import { getBriefIntelligence } from '@/lib/dashboard/brief-intelligence'
 
 describe('dashboard workflow', () => {
@@ -19,11 +19,22 @@ describe('dashboard workflow', () => {
     expect(getWorkflowSteps({ hasBrief: true, savedIdeaCount: 1 }).find((step) => step.id === 'ideas')?.state).toBe('complete')
   })
 
+  it('counts only saved ideas that belong to the current brief', () => {
+    expect(getSavedIdeaCountForCurrentBrief(
+      new Set(['current-one', 'current-two']),
+      new Set(['older-brief', 'manual-idea', 'current-two'])
+    )).toBe(1)
+  })
+
   it('derives source labels and the leading format from the brief ideas', () => {
     expect(getBriefIntelligence([
       { title: 'One', hook: 'Hook', description: 'Description', format: 'Reel', whyItWorks: 'Why', sources: ['youtube', 'rss'] },
       { title: 'Two', hook: 'Hook', description: 'Description', format: 'Reel', whyItWorks: 'Why', sources: ['youtube'] },
       { title: 'Three', hook: 'Hook', description: 'Description', format: 'Carousel', whyItWorks: 'Why', sources: ['reddit'] },
-    ])).toEqual({ sourceLabels: ['YouTube', 'RSS', 'Reddit'], topFormat: 'Reel' })
+    ])).toEqual({
+      sourceLabels: ['YouTube', 'RSS', 'Reddit'],
+      topFormat: 'Reel',
+      formatCounts: { Reel: 2, Carousel: 1 },
+    })
   })
 })

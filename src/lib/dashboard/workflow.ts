@@ -11,6 +11,13 @@ interface WorkflowInput {
   savedIdeaCount: number
 }
 
+export function getSavedIdeaCountForCurrentBrief(
+  currentBriefIdeaHashes: ReadonlySet<string>,
+  savedIdeaHashes: ReadonlySet<string>
+): number {
+  return [...currentBriefIdeaHashes].filter((hash) => savedIdeaHashes.has(hash)).length
+}
+
 export function getWorkflowSteps({ hasBrief, savedIdeaCount }: WorkflowInput): WorkflowStep[] {
   const hasSavedIdeas = savedIdeaCount > 0
 

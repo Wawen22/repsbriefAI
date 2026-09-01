@@ -31,7 +31,7 @@ export function CommandCenter({ ideas, hasBrief, savedIdeaCount, plan, niche, br
         alreadyGeneratedToday={alreadyGeneratedToday}
       />
       <WorkflowRail hasBrief={hasBrief} savedIdeaCount={savedIdeaCount} />
-      {hasBrief && <BriefIntelligence ideaCount={ideas.length} niche={niche} sourceLabels={intelligence.sourceLabels} topFormat={intelligence.topFormat} briefDate={briefDate} />}
+      {hasBrief && <BriefIntelligence ideaCount={ideas.length} niche={niche} sourceLabels={intelligence.sourceLabels} formatCounts={intelligence.formatCounts} topFormat={intelligence.topFormat} briefDate={briefDate} />}
     </section>
   )
 }
@@ -60,11 +60,16 @@ export function CommandCenterHero({ hasBrief, ideaCount, plan, niche, briefDate,
               : 'Generate a verified strategic brief from active sources, then choose what to produce first.'}
           </p>
         </div>
-        <div className="shrink-0">
+        <div className="flex flex-wrap items-center gap-3 shrink-0">
           {hasBrief ? (
-            <Link href="/dashboard/ideas" className="inline-flex h-11 items-center gap-2 rounded-md bg-white px-5 text-xs font-medium text-black transition-colors hover:bg-white/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white">
-              Review ideas <ArrowRight className="size-3.5" />
-            </Link>
+            <>
+              <Link href="#brief-inventory" className="inline-flex h-11 items-center gap-2 rounded-md bg-white px-5 text-xs font-medium text-black transition-colors hover:bg-white/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white">
+                Review ideas <ArrowRight className="size-3.5" />
+              </Link>
+              <Link href="/dashboard/calendar" className="inline-flex h-11 items-center rounded-md border border-white/[0.12] px-4 text-xs font-medium text-white/65 transition-colors hover:bg-white/[0.05] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white">
+                Open calendar
+              </Link>
+            </>
           ) : (
             <GenerateNowButton alreadyGeneratedToday={alreadyGeneratedToday} plan={plan} />
           )}
@@ -98,11 +103,12 @@ interface BriefIntelligenceProps {
   ideaCount: number
   niche: string
   sourceLabels: string[]
+  formatCounts: Record<string, number>
   topFormat?: string
   briefDate: string | null
 }
 
-export function BriefIntelligence({ ideaCount, niche, sourceLabels, topFormat, briefDate }: BriefIntelligenceProps) {
+export function BriefIntelligence({ ideaCount, niche, sourceLabels, formatCounts, topFormat, briefDate }: BriefIntelligenceProps) {
   return (
     <div className="grid gap-3 md:grid-cols-2">
       <div className="rounded-lg border border-white/[0.08] bg-white/[0.02] p-4">
@@ -110,6 +116,13 @@ export function BriefIntelligence({ ideaCount, niche, sourceLabels, topFormat, b
         <p className="mt-2 text-sm text-white/75">
           {sourceLabels.length ? sourceLabels.join(' · ') : 'Source attribution is unavailable for this brief.'}
         </p>
+        <div className="mt-3 flex flex-wrap gap-1.5">
+          {Object.entries(formatCounts).map(([format, count]) => (
+            <span key={format} className="rounded border border-white/[0.08] bg-white/[0.03] px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-white/55">
+              {format} {count}
+            </span>
+          ))}
+        </div>
       </div>
       <div className="rounded-lg border border-white/[0.08] bg-white/[0.02] p-4">
         <p className="font-mono text-[10px] uppercase tracking-wider text-white/40">This week&apos;s inventory</p>

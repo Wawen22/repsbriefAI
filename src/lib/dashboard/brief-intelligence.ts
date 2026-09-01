@@ -21,5 +21,6 @@ export function getBriefIntelligence(ideas: IdeaObject[]) {
   return {
     sourceLabels: [...sources].map((source) => sourceLabels[source]),
     topFormat,
+    formatCounts: Object.fromEntries(formats),
   }
 }

@@ -6,9 +6,8 @@
 
 ## Tasks
 
-- [ ] Write failing unit tests for workflow state derivation, then add `src/lib/dashboard/workflow.ts`.
-- [ ] Add `CommandCenterHero`, `WorkflowRail` and `BriefIntelligence` components.
-- [ ] Replace the current dashboard header/stat grid with the command center composition; retain tabs and BriefList.
-- [ ] Remove fabricated momentum UI from StrategicStats or retire it after its data-backed replacement.
-- [ ] Validate typecheck, lint, tests, production build with documented placeholders; update project context and merge only after review.
-
+- [x] Write failing unit tests for workflow state derivation, then add `src/lib/dashboard/workflow.ts`.
+- [x] Add `CommandCenterHero`, `WorkflowRail` and `BriefIntelligence` components.
+- [x] Replace the current dashboard header/stat grid with the command center composition; retain tabs and BriefList.
+- [x] Remove fabricated momentum UI from StrategicStats or retire it after its data-backed replacement.
+- [x] Validate typecheck, lint, tests, production build with documented placeholders; update project context and commit after review fixes (no merge performed).

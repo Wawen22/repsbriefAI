@@ -80,6 +80,7 @@ RepsBrief è una piattaforma SaaS multi-tenant (`Next.js + Supabase`) per creato
 | **fix/revenue-truthfulness** | ✅ **Integrated locally** | Senior Full-Stack / 🔴 P0 | Active-source copy, mail safeguards, `/s/[id]`, and `/r/[code]` Route Handler integrated. |
 | **feat-landing-interactive-studio** | ✅ **Merged & Pushed** | Senior Full-Stack / 🔴 P0 | Interactive 4-tab ADE Studio Mockup (Radar, Generator, Brand Voice, Sync) with dynamic state & micro-interactions. |
 | **feat-app-design-unification** | ✅ **Merged to main** | Senior Full-Stack / 🔴 P0 | Complete UI/UX refactor of dashboard, studio views, cards, kanban, history, analytics, settings to match landing Dark IDE aesthetic. |
+| **feat-public-design-system** | 🟡 **In validation** | Senior Full-Stack / 🔴 P0 | Extends Dark IDE Studio primitives to auth, invitation, public sharing and legal routes without changing application behaviour. |
 | **ci-pnpm-alignment** | ✅ **Merged & Pushed** | DevOps / 🔴 P0 | GitHub Actions CI updated to pnpm setup and build placeholders matching canonical deployment. |
 | **feat/apify-trend-ingestion** | ⬜ In attesa | Senior Full-Stack / 🟡 P1 | Pipeline ingestion asincrona, adapter normalizzati, deduplica e provenance trend. |
 | **Resend Sender Domain** | ⬜ In attesa | DevOps / 🔴 P0 | Configurazione DNS e variabile `RESEND_FROM_EMAIL` su Vercel. |

@@ -9,6 +9,7 @@ import { Sparkles, ArrowRight, TrendingUp } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import type { Metadata } from 'next'
+import { PublicStudioShell, publicStudioClasses } from '@/components/layout/PublicStudioShell'
 
 export const dynamic = 'force-dynamic'
 
@@ -86,14 +87,13 @@ export default async function SharedStrategyPage({
   const formatColor = FORMAT_COLORS[idea.format] || FORMAT_COLORS.Idea
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <PublicStudioShell contentClassName="max-w-2xl">
       {/* Ambient background */}
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-blue-600/6 rounded-full blur-[150px]" />
       </div>
 
-      <div className="relative z-10 flex flex-col items-center min-h-screen px-4 py-16">
-        <div className="w-full max-w-xl space-y-8">
+      <div className="w-full space-y-8">
 
           {/* Top nav */}
           <div className="flex items-center justify-between">
@@ -119,7 +119,7 @@ export default async function SharedStrategyPage({
           </div>
 
           {/* Strategy card */}
-          <div className="bg-white/[0.02] border border-white/[0.08] rounded-3xl p-7 space-y-6">
+          <div className={`${publicStudioClasses.surface} p-6 sm:p-7 space-y-6`}>
             <div className="flex items-start justify-between gap-4">
               <h1 className="text-2xl font-black tracking-tight leading-tight text-white">
                 {idea.title}
@@ -148,7 +148,7 @@ export default async function SharedStrategyPage({
           </div>
 
           {/* Viral CTA block */}
-          <div className="rounded-3xl border border-blue-500/20 bg-gradient-to-b from-blue-500/[0.08] to-transparent p-7 space-y-5 text-center">
+          <div className={`${publicStudioClasses.surface} p-6 sm:p-7 space-y-5 text-center`}>
             <div className="space-y-1.5">
               <p className="text-white font-black text-lg tracking-tight">
                 Get source-backed strategies for your next post
@@ -160,7 +160,7 @@ export default async function SharedStrategyPage({
 
             <Link
               href="/signup"
-              className="flex items-center justify-center gap-2 w-full h-13 py-4 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-black uppercase tracking-widest shadow-2xl shadow-blue-500/25 transition-all hover:scale-[1.02] group"
+              className={`flex items-center justify-center gap-2 w-full h-11 text-xs group ${publicStudioClasses.primaryAction}`}
             >
               Start Free — Create My Brief
               <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
@@ -180,7 +180,6 @@ export default async function SharedStrategyPage({
             Powered by RepsBrief — AI Content Intelligence
           </p>
         </div>
-      </div>
-    </div>
+    </PublicStudioShell>
   )
 }

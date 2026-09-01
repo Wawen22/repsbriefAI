@@ -15,6 +15,7 @@
     2. La tabella `public.teams` è priva delle colonne `brand_voice` (TEXT) e `writing_samples` (TEXT[]), previste da `20260305170000_move_persona_to_teams.sql`.
     3. La function RPC `public.update_team_brand_voice` è presente in remoto con `SECURITY DEFINER`, ma **fallisce a runtime** con errore SQL `column "writing_samples" of relation "teams" does not exist` se invocata.
     4. La tabella `public.idea_history` mantiene policy RLS legacy utente ("Users can view/update/delete own history") ridondanti rispetto alla policy unificata "Team members can manage team ideas".
+  - **Nota di Sicurezza (`claim_queue_jobs`):** La function `public.claim_queue_jobs` risulta definita con `SECURITY DEFINER` e `search_path = public` (anziché `search_path = ''`). I permessi di esecuzione sono già ristretti al solo `service_role` (da `20260830095438`), quindi non vi è esposizione pubblica immediata e non blocca questo audit; tuttavia il lock di `search_path` va inserito tra le verifiche prioritarie del worktree `fix/security-cost-controls` prima di qualsiasi modifica al database.
   - **Regola sul tracking:** **NON inserire indiscriminatamente tutti i 38 identificatori in `schema_migrations`.** Ogni migrazione viene classificata singolarmente secondo il suo stato effettivo.
 
 ---
@@ -69,7 +70,7 @@ Ogni migrazione nel repository appartiene a una di queste 4 categorie:
 | 33 | `20260401120000_create_waitlist_emails.sql` | 🟢 **1. Confermata applicata** | Tabella `waitlist_emails`, vincolo unique e policy service-role only presenti. |
 | 34 | `20260402100000_fix_handle_new_user_create_workspace.sql` | 🔵 **4. Superata** | Trigger auto-creazione workspace su signup, superato e arricchito dal referral system in 35. |
 | 35 | `20260403120000_add_referral_system.sql` | 🟢 **1. Confermata applicata** | Colonne `referral_code`, `referred_by_code`, `referral_count`, indici e trigger function finale `handle_new_user()` presenti. |
-| 36 | `20260409120000_create_idea_images.sql` | 🔴 **2. Mancante** | Tabella `idea_images`, RLS, bucket `idea-images` e 4 storage policies **completamente assenti**. |
+| 36 | `20260409120000_create_idea_images.sql` | 🔴 **2. Mancante** | Tabella `idea_images`, RLS e bucket `idea-images` **completamente assenti**. |
 | 37 | `20260827170000_secure_team_invitations.sql` | 🟢 **1. Confermata applicata** | Check constraint ruolo, RLS hardenata, RPC `accept_team_invitation` (registrata su remoto come `20260827143650`). |
 | 38 | `20260830095438_harden_revenue_launch_access.sql` | 🟢 **1. Confermata applicata** | RLS share pubbliche, revoke `claim_queue_jobs`, lock `search_path = ''` su funzioni (registrata come `20260830095438`). |
 
@@ -100,19 +101,19 @@ Ogni migrazione nel repository appartiene a una di queste 4 categorie:
 
 ### 4.2 Storage Buckets e Policy
 
-| Bucket | Nel Repo | Su Remoto | Public | Storage Policies Attive |
+| Bucket | Nel Repo | Su Remoto | Public | Storage Policies Attive / Proposte |
 | :--- | :---: | :---: | :---: | :--- |
 | `logos` | ✅ | ✅ | `true` | Public Read (`Public Access`), Authenticated Insert (`Authenticated Upload`), Authenticated Delete (`Authenticated Delete`) |
-| `idea-images` | ✅ | ❌ | `true` | **Mancano tutte e 4 le policy:** Public Read, Authenticated Upload, Delete, Update (Cat. 2) |
+| `idea-images` | ✅ | ❌ | `true` | **Piano consigliato:** Public Read (`Public read idea images`), **nessuna policy client di scrittura** (upload server-side con service-role). Policy path-based opzionali solo se richiesto client upload futuro. |
 
 ### 4.3 PL/pgSQL Function, RPC e Triggers
 
-| Function | Signature | Security | search_path | Execute Grants | Stato Remoto |
+| Function | Signature | Security | search_path | Execute Grants | Stato Remoto & Hardening Note |
 | :--- | :--- | :---: | :---: | :--- | :--- |
 | `handle_new_user` | `() RETURNS trigger` | `SECURITY DEFINER` | `""` (vuoto) | `service_role` (REVOKED da PUBLIC/anon/authenticated) | **Conforme** (versione 35) |
 | `get_my_teams` | `() RETURNS SETOF uuid` | `SECURITY DEFINER` | `""` (vuoto) | `authenticated` | **Conforme** (versione 37) |
 | `accept_team_invitation` | `(text, uuid, text) RETURNS uuid` | `SECURITY DEFINER` | `""` (vuoto) | `service_role` | **Conforme** (versione 37) |
-| `claim_queue_jobs` | `(text, int4, text) RETURNS SETOF job_queue` | `SECURITY DEFINER` | `public` | `service_role` | **Conforme** (versione 38) |
+| `claim_queue_jobs` | `(text, int4, text) RETURNS SETOF job_queue` | `SECURITY DEFINER` | `public` | `service_role` | Conforme nei permessi; **search_path = public** da chiudere in `fix/security-cost-controls` |
 | `update_team_brand_voice` | `(uuid, text[], text) RETURNS void` | `SECURITY DEFINER` | `""` (vuoto) | `authenticated` | ⚠️ **FALLISCE**: mancano colonne `teams` (Cat. 3) |
 | `update_calendar_updated_at` | `() RETURNS trigger` | Invoker | `""` (vuoto) | Default | **Conforme** |
 | `update_updated_at_column` | `() RETURNS trigger` | Invoker | `""` (vuoto) | Default | **Conforme** |
@@ -188,10 +189,13 @@ WHERE p.current_team_id = t.id
 ```
 
 ### Fase 3: Applicazione DDL Idempotente per Elementi Mancanti (Categoria 2)
-Applicare la migrazione `20260409120000_create_idea_images.sql`:
+Applicare la tabella `idea_images` e il bucket storage `idea-images`.
+
+> [!NOTE]
+> **Architettura Upload Immagini:** L'upload attuale delle immagini generate avviene server-side tramite `service_role` (con `supabaseAdmin`). Il piano raccomanda pertanto **nessuna policy client di scrittura** (`INSERT`, `UPDATE`, `DELETE`) per utenti autenticati su `storage.objects`, garantendo minima superficie di attacco.
 
 ```sql
--- Crea tabella idea_images
+-- 1. Crea tabella idea_images
 CREATE TABLE IF NOT EXISTS public.idea_images (
   id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id         UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
@@ -212,50 +216,56 @@ DO $$ BEGIN
   END IF;
 END $$;
 
--- Crea bucket storage idea-images e policy
+-- 2. Crea bucket storage idea-images
 INSERT INTO storage.buckets (id, name, public)
 VALUES ('idea-images', 'idea-images', true)
 ON CONFLICT (id) DO NOTHING;
 
+-- 3. Policy di lettura pubblica (CDN / render web)
 DO $$ BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname = 'storage' AND policyname = 'Public read idea images') THEN
-    CREATE POLICY "Public read idea images" ON storage.objects FOR SELECT USING (bucket_id = 'idea-images');
-  END IF;
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname = 'storage' AND policyname = 'Authenticated upload idea images') THEN
-    CREATE POLICY "Authenticated upload idea images" ON storage.objects FOR INSERT TO authenticated WITH CHECK (bucket_id = 'idea-images');
-  END IF;
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname = 'storage' AND policyname = 'Authenticated delete idea images') THEN
-    CREATE POLICY "Authenticated delete idea images" ON storage.objects FOR DELETE TO authenticated USING (bucket_id = 'idea-images');
-  END IF;
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname = 'storage' AND policyname = 'Authenticated update idea images') THEN
-    CREATE POLICY "Authenticated update idea images" ON storage.objects FOR UPDATE TO authenticated USING (bucket_id = 'idea-images');
+    CREATE POLICY "Public read idea images" 
+      ON storage.objects FOR SELECT 
+      USING (bucket_id = 'idea-images');
   END IF;
 END $$;
+
+-- [OPZIONALE FUTURO] Solo se in futuro si abilitasse upload diretto dal client browser:
+-- Contratto del path obbligatorio: `<auth.uid()>/<image_name>`
+-- DO $$ BEGIN
+--   IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname = 'storage' AND policyname = 'User path-based upload idea images') THEN
+--     CREATE POLICY "User path-based upload idea images"
+--       ON storage.objects FOR INSERT TO authenticated
+--       WITH CHECK (
+--         bucket_id = 'idea-images' 
+--         AND (storage.foldername(name))[1] = (SELECT auth.uid()::text)
+--       );
+--   END IF;
+-- END $$;
 ```
 
 ### Fase 4: Esecuzione Test di Validazione Post-DDL
 Eseguire la suite statica SQL `supabase/tests/2026-09-01-reconciliation-verification.sql`.  
 Tutti i controlli devono risultare superati (16 tabelle, colonne `teams.brand_voice`, 2 bucket, funzioni e permessi).
 
-### Fase 5: Riconciliazione Puntuale di `schema_migrations` (Item-by-Item)
-Solo **dopo** che le Fasi 2, 3 e 4 sono completate e verificate:
-1. Registrare le versioni delle migrazioni di Categoria 1, Categoria 2 e Categoria 3 risolte.
-2. Per le 6 migrazioni già registrate con timestamp differente (es. `20260222210108`, `20260827143650`), mantenere o normalizzare le chiavi di versione in accordo con la CLI Supabase scelta per i deploy futuri.
-3. Per le migrazioni di Categoria 4 (Superate), registrare la versione solo se strettamente richiesto dal runner CLI per marcare la cronologia completa senza re-esecuzione.
+### Fase 5: Allineamento Item-by-Item di `schema_migrations` (Senza normalizzazione forzata)
+Solo **dopo** che le Fasi 2, 3 e 4 sono completate e convalidate:
+1. **Nessuna normalizzazione automatica dei timestamp:** Le 6 righe già presenti su remoto (`20260222210108`, `20260222212027`, `20260222221557`, `20260222221957`, `20260827143650`, `20260830095438`) non vengono alterate o rimosse alla cieca.
+2. **Simulazione a secco:** Qualunque inserimento o riparazione in `supabase_migrations.schema_migrations` deve essere simulata a secco contro la lista remota effettiva.
+3. **Autorizzazione separata:** Ogni singola versione da marcare come applicata richiederà autorizzazione esplicita per evitare conflitti con la CLI Supabase durante i successivi `supabase db push`.
 
 ---
 
-## 7. Piano di Rollback
+## 7. Piano di Rollback (Procedura di Emergenza)
 
-Se durante l'applicazione del delta DDL si riscontrassero anomalie:
+> [!CAUTION]
+> **Procedura di Emergenza Pre-Utilizzo (Zero Dati Utente):**
+> I comandi di rollback sottostanti con `DROP TABLE public.idea_images` e `ALTER TABLE public.teams DROP COLUMN ...` costituiscono **esclusivamente una procedura di emergenza pre-utilizzo**, da impiegare unicamente in caso di fallimento immediato durante i test di migrazione. **NON devono mai essere eseguiti dopo che la tabella o le colonne contengono dati utente reali in produzione**, per evitare perdite irreversibili di dati.
 
 ```sql
--- Rollback Delta DDL
+-- Rollback Delta DDL (Solo pre-utilizzo / emergenza)
 -- 1. Rimozione policy storage idea-images
 DROP POLICY IF EXISTS "Public read idea images" ON storage.objects;
-DROP POLICY IF EXISTS "Authenticated upload idea images" ON storage.objects;
-DROP POLICY IF EXISTS "Authenticated delete idea images" ON storage.objects;
-DROP POLICY IF EXISTS "Authenticated update idea images" ON storage.objects;
 
 -- 2. Rimozione bucket idea-images
 DELETE FROM storage.buckets WHERE id = 'idea-images';
@@ -263,7 +273,7 @@ DELETE FROM storage.buckets WHERE id = 'idea-images';
 -- 3. Rimozione tabella idea_images
 DROP TABLE IF EXISTS public.idea_images;
 
--- 4. Rimozione colonne teams
+-- 4. Rimozione colonne teams (Solo se vuote / pre-utilizzo)
 ALTER TABLE public.teams 
   DROP COLUMN IF EXISTS brand_voice,
   DROP COLUMN IF EXISTS writing_samples;

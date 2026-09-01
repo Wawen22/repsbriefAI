@@ -22,11 +22,11 @@ RepsBrief è una piattaforma SaaS multi-tenant (`Next.js + Supabase`) per creato
 
 ## 2. Document Reference & Key Audits
 
-- 📋 [AGENTS.md](file:///home/rnebili/Progetti/repsbrief/chore-supabase-baseline-audit/AGENTS.md) — Protocolli, ruoli e workflow degli agenti AI.
-- 📖 [PROJECT_CONTEXT.md](file:///home/rnebili/Progetti/repsbrief/chore-supabase-baseline-audit/PROJECT_CONTEXT.md) — Single Source of Truth sullo stato del progetto e dell'architettura.
-- 🔍 [docs/audits/2026-09-01-repsbrief-audit.md](file:///home/rnebili/Progetti/repsbrief/chore-supabase-baseline-audit/docs/audits/2026-09-01-repsbrief-audit.md) — Audit generale pre-lancio paid-beta e roadmap worktree ORCA ADE.
-- 🗄️ [docs/audits/2026-09-01-supabase-reconciliation-audit.md](file:///home/rnebili/Progetti/repsbrief/chore-supabase-baseline-audit/docs/audits/2026-09-01-supabase-reconciliation-audit.md) — Audit di riconciliazione tra le 38 migration del repository e i 6 record remoti su Supabase (`qptnloozpjvcqqrfbmnj`).
-- 🧪 [supabase/tests/2026-09-01-reconciliation-verification.sql](file:///home/rnebili/Progetti/repsbrief/chore-supabase-baseline-audit/supabase/tests/2026-09-01-reconciliation-verification.sql) — Suite di test statici SQL di validazione dello schema post-allineamento.
+- 📋 [AGENTS.md](AGENTS.md) — Protocolli, ruoli e workflow degli agenti AI.
+- 📖 [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md) — Single Source of Truth sullo stato del progetto e dell'architettura.
+- 🔍 [docs/audits/2026-09-01-repsbrief-audit.md](docs/audits/2026-09-01-repsbrief-audit.md) — Audit generale pre-lancio paid-beta e roadmap worktree ORCA ADE.
+- 🗄️ [docs/audits/2026-09-01-supabase-reconciliation-audit.md](docs/audits/2026-09-01-supabase-reconciliation-audit.md) — Audit di riconciliazione tra le 38 migration del repository e i 6 record remoti su Supabase (`qptnloozpjvcqqrfbmnj`).
+- 🧪 [supabase/tests/2026-09-01-reconciliation-verification.sql](supabase/tests/2026-09-01-reconciliation-verification.sql) — Suite di test statici SQL di validazione dello schema post-allineamento.
 
 ---
 
@@ -56,7 +56,7 @@ RepsBrief è una piattaforma SaaS multi-tenant (`Next.js + Supabase`) per creato
   - [x] Trend-quality gate: blocco brief su fonti vuote/malformate/stale
   - [x] Canonical public shares `/s/[id]` con redirect da legacy `/share/[id]`
   - [x] Referral customer credit con idempotency key
-  - [x] **Supabase Baseline Reconciliation Audit** ([audit documentato](file:///home/rnebili/Progetti/repsbrief/chore-supabase-baseline-audit/docs/audits/2026-09-01-supabase-reconciliation-audit.md))
+  - [x] **Supabase Baseline Reconciliation Audit** ([audit documentato](docs/audits/2026-09-01-supabase-reconciliation-audit.md))
   - [ ] Esecuzione autorizzata del Delta DDL (`teams.brand_voice`, `idea_images`) e allineamento `schema_migrations`
   - [ ] Resend domain verification + `RESEND_FROM_EMAIL` configurato in Vercel
   - [ ] Worktree `fix/revenue-truthfulness`: allineamento copy/fonti reali

@@ -113,6 +113,7 @@ Variabili env richieste per prod: vedere `INTEGRATIONS_CHECKLIST.md`.
 ## 9) Open Risks (aggiornato 2026-09-01)
 
 - **Database**: `teams.brand_voice` e `idea_images` mancano su remoto; `schema_migrations` traccia solo 6 versioni su 38. La riconciliazione è pronta ma richiede approvazione esplicita per l'applicazione.
+- **Security / Functions**: `claim_queue_jobs` ha `SECURITY DEFINER` con `search_path = public` (permessi già ristretti a service_role); da hardenare a `search_path = ''` nel worktree `fix/security-cost-controls`.
 - **Email**: Resend ha generato errori di delivery per mancanza di dominio mittente verificato (`RESEND_FROM_EMAIL`). Richiede passaggio manuale DNS.
 - **Source reliability**: YouTube e RSS sono le uniche fonti attive; Examine ha restituito 429 e RP/T-Nation 404. La pipeline asincrona Apify è pianificata nel worktree `feat/apify-trend-ingestion`.
 - **Billing**: Stripe live mode attivo ma senza abbonamenti reali. Validare ciclo webhook completo prima dell'acquisizione coorte.

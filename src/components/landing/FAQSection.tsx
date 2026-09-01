@@ -7,11 +7,11 @@ import { cn } from '@/lib/utils'
 const FAQS = [
   {
     question: "What is RepsBrief and how is it different from ChatGPT?",
-    answer: "ChatGPT generates generic text based on static training data. RepsBrief is an end-to-end content development environment: it continuously scrapes live Reddit, Google Trends, YouTube, and RSS signals, uses a neural brand voice engine to write scripts in your exact style, and gives you a studio with a teleprompter, editorial calendar, and 1-click Notion/Google Calendar sync."
+    answer: "RepsBrief turns fresh YouTube and RSS signals into content strategies you generate from your studio. It also includes Brand Voice, a teleprompter, an editorial calendar, and available integrations."
   },
   {
-    question: "How do the real-time trend scrapers work?",
-    answer: "Our automated scraper cluster ingests discussions and search volume spikes across fitness subreddits, Google Trends, and research journals every morning. It filters out low-signal noise and surfaces verified breakout topics with source links and scientific citations."
+    question: "Which trend sources are active?",
+    answer: "The current brief pipeline uses YouTube and RSS feeds. RepsBrief checks that available source data is fresh and valid before generating a brief."
   },
   {
     question: "How does Neural Brand Voice cloning work?",
@@ -19,7 +19,7 @@ const FAQS = [
   },
   {
     question: "How does the 7-day free trial on Pro work?",
-    answer: "When you sign up for the Pro Creator plan, you get full, unrestricted access to daily automated briefs, all 20 trend strategies, the studio teleprompter, and brand voice features for 7 days. You can cancel at any time with a single click inside your account settings."
+    answer: "When you sign up for the Pro Creator plan, you can manually generate a fresh brief each day, unlock all 20 strategies, and use the teleprompter and Brand Voice features for 7 days. You can cancel at any time in account settings."
   },
   {
     question: "Can I collaborate with my video editor and team?",
@@ -96,4 +96,3 @@ export function FAQSection() {
     </section>
   )
 }
-

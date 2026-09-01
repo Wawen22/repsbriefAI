@@ -1,7 +1,6 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { getSupabaseAdmin } from '@/lib/supabase'
 import { IdeaObject } from '@/types/niche'
 
 export async function createShareAction(
@@ -14,15 +13,15 @@ export async function createShareAction(
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('full_name')
+    .select('full_name, current_team_id')
     .eq('id', user.id)
     .single()
 
-  const supabaseAdmin = getSupabaseAdmin('actions/share')
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await supabase
     .from('shared_strategies')
     .insert({
       user_id: user.id,
+      team_id: profile?.current_team_id || null,
       idea_data: idea,
       niche,
       creator_name: profile?.full_name || user.email?.split('@')[0] || 'Creator',

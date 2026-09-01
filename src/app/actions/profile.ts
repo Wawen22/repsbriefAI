@@ -3,6 +3,9 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { getAIProvider } from '@/lib/ai'
+import { parseActiveNiche, parseBrandVoiceSamples } from '@/lib/security/schemas'
+import { requirePaidPlan } from '@/lib/security/entitlements'
+import { checkRateLimit } from '@/lib/security/rate-limit'
 
 type ServerSupabaseClient = Awaited<ReturnType<typeof createClient>>
 
@@ -28,54 +31,11 @@ async function persistTeamBrandVoice(
     return { success: true as const }
   }
 
-  const isMissingFunction =
-    rpcResult.error.code === '42883' ||
-    rpcResult.error.message?.toLowerCase().includes('update_team_brand_voice')
-
-  if (!isMissingFunction) {
-    const isMissingColumn = rpcResult.error.code === '42703'
-    if (!isMissingColumn) {
-      return { success: false as const, error: rpcResult.error }
-    }
-  }
-
-  const teamFallback = await supabase
-    .from('teams')
-    .update({
-      brand_voice: brandVoice,
-    })
-    .eq('id', teamId)
-
-  if (!teamFallback.error) {
-    return { success: true as const }
-  }
-
-  // Legacy fallback for environments where team persona columns/policies are not aligned yet.
-  const profilePayload: { brand_voice: string | null; writing_samples?: string[] | null } = {
-    brand_voice: brandVoice,
-  }
-  profilePayload.writing_samples = writingSamples
-
-  const profileFallback = await supabase
-    .from('profiles')
-    .update(profilePayload)
-    .eq('id', userId)
-
-  if (!profileFallback.error) {
-    return { success: true as const }
-  }
-
-  return {
-    success: false as const,
-    error: {
-      code: profileFallback.error.code,
-      message: `Team fallback failed: ${teamFallback.error.message}. Profile fallback failed: ${profileFallback.error.message}`,
-    },
-  }
+  return { success: false as const, error: rpcResult.error }
 }
 
 export async function updateActiveNicheAction(nicheId: string) {
-  if (!nicheId) return { error: 'Niche ID is required' }
+  try { parseActiveNiche(nicheId) } catch { return { error: 'Invalid niche' } }
 
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -97,13 +57,15 @@ revalidatePath('/dashboard')
 }
 
 export async function analyzeBrandVoiceAction(samples: string[]) {
-  if (!samples || samples.length === 0) return { error: 'At least one sample is required' }
+  try { samples = parseBrandVoiceSamples(samples) } catch { return { error: 'Provide 1–5 writing samples of up to 2000 characters each.' } }
 
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Unauthorized' }
 
-  const teamId = await getCurrentTeamId(supabase, user.id)
+  const { data: profile } = await supabase.from('profiles').select('current_team_id, plan').eq('id', user.id).single()
+  if (!requirePaidPlan(profile?.plan).allowed) return { error: 'Upgrade to Pro to use Brand Voice' }
+  const teamId = profile?.current_team_id
   if (!teamId) return { error: 'No active workspace' }
 
   const { data: membership, error: membershipError } = await supabase
@@ -121,6 +83,10 @@ export async function analyzeBrandVoiceAction(samples: string[]) {
   if (!['owner', 'admin'].includes(membership.role)) {
     return { error: 'Only workspace owners/admins can update Brand Voice' }
   }
+
+  const limited = await checkRateLimit('brandVoice', teamId)
+  if (limited.unavailable) return { error: 'Brand Voice is temporarily unavailable. Please try again later.' }
+  if (!limited.allowed) return { error: `Rate limit reached. Try again in ${limited.retryAfterSeconds} seconds.` }
 
   const ai = getAIProvider()
   

@@ -22,7 +22,7 @@ interface TabOption {
 }
 
 const TABS: TabOption[] = [
-  { id: 'radar', label: 'Real-time Trend Radar', pill: 'Live Data' },
+  { id: 'radar', label: 'Trend Signal Review', pill: 'Source Data' },
   { id: 'generator', label: 'AI Strategy Generator', pill: 'Neural Core' },
   { id: 'persona', label: 'Neural Brand Voice', pill: 'Zero Fluff' },
   { id: 'sync', label: 'Multi-Channel Sync', pill: '1-Click' },
@@ -131,10 +131,8 @@ export function StudioMockup() {
                 {/* Scraper Sources */}
                 <div className="space-y-1.5">
                   {[
-                    { source: 'Reddit r/fitness', metric: '+380% vol', color: 'text-orange-400', active: true },
-                    { source: 'Google Trends: "Zone 2"', metric: 'Breakout', color: 'text-blue-400', active: true },
-                    { source: 'YouTube: Hypertrophy', metric: '42.1k views/h', color: 'text-red-400', active: true },
-                    { source: 'PubMed RSS Feeds', metric: '14 new papers', color: 'text-emerald-400', active: true },
+                    { source: 'YouTube: Hypertrophy', metric: 'Video signal', color: 'text-red-400', active: true },
+                    { source: 'RSS: Fitness research', metric: 'Article signal', color: 'text-amber-400', active: true },
                   ].map((s, idx) => (
                     <div
                       key={idx}
@@ -335,4 +333,3 @@ export function StudioMockup() {
     </div>
   )
 }
-

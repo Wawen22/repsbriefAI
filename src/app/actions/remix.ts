@@ -5,8 +5,12 @@ import { createClient } from "@/lib/supabase/server"
 import { getAIProvider } from "@/lib/ai"
 import { IdeaObject } from "@/types/niche"
 import { jsonrepair } from "jsonrepair"
+import { parseRemixInput } from '@/lib/security/schemas'
+import { requirePaidPlan } from '@/lib/security/entitlements'
+import { checkRateLimit } from '@/lib/security/rate-limit'
 
 export async function remixScriptAction(idea: IdeaObject, instruction: string) {
+  try { ({ idea, instruction } = parseRemixInput({ idea, instruction }) as { idea: IdeaObject; instruction: string }) } catch { return { success: false, error: 'Invalid remix input' } }
   const supabase = await createClient()
   
   const { data: { user } } = await supabase.auth.getUser()
@@ -14,11 +18,18 @@ export async function remixScriptAction(idea: IdeaObject, instruction: string) {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('current_team_id')
+    .select('current_team_id, plan')
     .eq('id', user.id)
     .single()
 
   if (!profile?.current_team_id) return { success: false, error: 'No active workspace' }
+  if (!requirePaidPlan(profile.plan).allowed) return { success: false, error: 'Upgrade to Pro to use AI Remix' }
+
+  const { data: membership } = await supabase.from('team_members').select('role').eq('team_id', profile.current_team_id).eq('user_id', user.id).maybeSingle()
+  if (!membership) return { success: false, error: 'You do not have access to this workspace' }
+  const limited = await checkRateLimit('remix', user.id)
+  if (limited.unavailable) return { success: false, error: 'AI Remix is temporarily unavailable. Please try again later.' }
+  if (!limited.allowed) return { success: false, error: `Rate limit reached. Try again in ${limited.retryAfterSeconds} seconds.` }
 
   const { data: team } = await supabase
     .from('teams')

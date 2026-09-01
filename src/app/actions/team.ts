@@ -5,8 +5,9 @@ import { getSupabaseAdmin } from '@/lib/supabase'
 import { normalizeInvitationEmail, parseInvitationRole } from '@/lib/team-invitations'
 import { revalidatePath } from 'next/cache'
 import { Resend } from 'resend'
+import { getEmailSender } from '@/lib/mail'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+const resend = new Resend(process.env.RESEND_API_KEY || 're_missing')
 
 export async function switchTeamAction(teamId: string) {
   const supabase = await createClient()
@@ -122,10 +123,12 @@ export async function createTeamInvitationAction(email: string, role: string = '
 
   // Send Email via Resend
   const inviteLink = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/join/${invite.token}`
+  const from = getEmailSender()
+  if (!from) return { error: 'Email sender is not configured' }
   
   try {
     await resend.emails.send({
-      from: 'RepsBrief <onboarding@resend.dev>',
+      from,
       to: [invitationEmail],
       subject: `You've been invited to join ${team?.name} on RepsBrief`,
       html: `

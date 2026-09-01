@@ -9,6 +9,7 @@ import { ENABLED_TREND_SOURCES, NICHES } from '@/config/niches'
 import { getUsableTrends } from '@/lib/trends/quality'
 import { scrapeNiche } from '../../scraper'
 import { generateBrief } from '../briefGenerator'
+import { parseActiveNiche } from '@/lib/security/schemas'
 
 // Allow up to 60s for scraping + generation on Vercel Pro
 export const maxDuration = 60
@@ -37,7 +38,7 @@ export async function POST() {
     // 2. Load user profile including brand voice
     const { data: profile, error: profileError } = await supabaseAdmin
       .from('profiles')
-      .select('active_niche, plan, brand_voice, current_team_id')
+      .select('active_niche, plan, current_team_id')
       .eq('id', user.id)
       .single()
 
@@ -45,7 +46,10 @@ export async function POST() {
       return NextResponse.json({ error: 'Profile not found' }, { status: 404 })
     }
 
-    const nicheId = profile.active_niche || 'fitness'
+    let nicheId: string
+    try { nicheId = parseActiveNiche(profile.active_niche) } catch {
+      return NextResponse.json({ error: 'Invalid active niche' }, { status: 400 })
+    }
     const niche = NICHES[nicheId]
 
     if (!niche) {
@@ -70,7 +74,7 @@ export async function POST() {
       rateLimitSince = new Date(now)
       rateLimitSince.setDate(now.getDate() - daysSinceMonday)
       rateLimitSince.setHours(0, 0, 0, 0)
-      rateLimitMessage = 'Starter plan includes 1 brief per week. Upgrade to Pro for daily briefs.'
+      rateLimitMessage = 'Starter plan includes 1 manual brief per week. Upgrade to Pro for daily manual generation.'
     }
 
     const { data: existingInWindow } = await supabaseAdmin
@@ -164,7 +168,12 @@ export async function POST() {
     let ideas
     try {
       // Pass the high-performers to enable the feedback loop
-      ideas = await generateBrief(allTrends, historyTitles, niche, profile.brand_voice, highPerformers)
+      let brandVoice: string | null = null
+      if (profile.current_team_id) {
+        const { data: team } = await supabaseAdmin.from('teams').select('brand_voice').eq('id', profile.current_team_id).maybeSingle()
+        brandVoice = team?.brand_voice ?? null
+      }
+      ideas = await generateBrief(allTrends, historyTitles, niche, brandVoice, highPerformers)
     } catch (genErr: unknown) {
       const message = genErr instanceof Error ? genErr.message : 'Brief generation failed. Please try again.'
       const stack = genErr instanceof Error ? genErr.stack : String(genErr)

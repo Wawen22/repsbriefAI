@@ -87,7 +87,7 @@ export function StrategicStats({ ideas, niche }: StrategicStatsProps) {
            <h4 className="text-xl font-bold text-white tracking-tight">20 <span className="text-slate-500 font-medium text-sm">Scripts ready</span></h4>
         </div>
         <div className="flex items-center gap-2">
-           {['Reddit', 'YouTube', 'Trends'].map(s => (
+           {['YouTube', 'RSS'].map(s => (
              <span key={s} className="text-[9px] font-bold text-slate-500 px-1.5 py-0.5 rounded bg-white/5">{s}</span>
            ))}
         </div>

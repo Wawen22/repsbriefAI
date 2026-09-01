@@ -99,7 +99,7 @@ Tutte le chiavi Stripe sono in **live mode**. Il prodotto Starter $9 è stato ar
 
 ## Task Status Tracking
 
-- [x] Stripe Node 20.3.1 TypeScript blocker resolved without changing Stripe package versions, pricing IDs, webhook behavior, or migrations; build remains environment-blocked by the pre-existing external `node_modules` symlink (2026-09-01).
+- [x] Stripe Node 20.3.1 TypeScript blocker resolved without changing Stripe package versions, pricing IDs, webhook behavior, or migrations; test, typecheck, lint, and a placeholder-environment build pass (2026-09-01).
 
 ## 8) DB / Migrations
 

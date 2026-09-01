@@ -56,12 +56,12 @@ RepsBrief è una piattaforma SaaS multi-tenant (`Next.js + Supabase`) per creato
   - [x] Trend-quality gate: blocco brief su fonti vuote/malformate/stale
   - [x] Canonical public shares `/s/[id]` con redirect da legacy `/share/[id]`
   - [x] Referral customer credit con idempotency key
-  - [x] Stripe client API version pinned to `2026-01-28.clover`
+  - [x] Pnpm is canonical for deployment: `pnpm-lock.yaml` pins Stripe 20.3.1, whose generated API type accepts the retained `2026-01-28.clover` client literal; the conflicting npm lockfile was removed, fixing Vercel TypeScript builds
   - [x] Revenue truthfulness integrated locally: active YouTube/RSS copy, canonical shares, and referral Route Handler
   - [x] Security/cost controls integrated locally: schemas, paid-plan gates, and fail-closed remote image policy
   - [x] **Supabase Baseline Reconciliation Audit** ([audit documentato](docs/audits/2026-09-01-supabase-reconciliation-audit.md))
   - [x] Local integration completed with ordered no-ff merges; no push and no Supabase migration execution
-  - [x] Restored a consistent `package-lock.json` and completed dependency-backed release validation: `npm ci`, 74 tests, typecheck, lint, and a clean placeholder-backed build pass. The approved Webpack closure changes `enhanced-resolve` 5.20.1 → 5.24.5 and `tapable` 2.3.0 → 2.3.3; `package.json` remains unchanged. Residual production audit: 24 findings (1 critical, 9 high, 13 moderate, 1 low).
+  - [x] Completed pnpm-backed release validation: frozen install, 74 tests, typecheck, lint, and a clean placeholder-backed build all pass. `package.json` declares pnpm 11.25.0; explicit pnpm build-policy decisions deny unapproved third-party lifecycle scripts.
   - [ ] Create and verify a production backup, then obtain authorization for the Delta DDL (`teams.brand_voice`, `idea_images`) and `schema_migrations` reconciliation
   - [ ] Resend domain verification + `RESEND_FROM_EMAIL` configurato in Vercel
   - [ ] Worktree `feat/apify-trend-ingestion`: pipeline asincrona trend
@@ -75,14 +75,14 @@ RepsBrief è una piattaforma SaaS multi-tenant (`Next.js + Supabase`) per creato
 | Task / Worktree | Stato | Owner / Priorità | Note |
 | :--- | :---: | :---: | :--- |
 | **integration-release-hardening** | ✅ **Integrated locally** | Senior Full-Stack / 🔴 P0 | Ordered no-ff integration of Stripe, security, revenue truthfulness, and audit branches; no push or migration execution. |
-| **fix-stripe-sdk-version** | ✅ **Integrated locally** | Senior Full-Stack / 🔴 P0 | Stripe API version preserved at `2026-01-28.clover`. |
+| **fix-pnpm-stripe-consistency** | ✅ **Verified locally** | Senior Full-Stack / 🔴 P0 | Pnpm is canonical; lock resolution is Stripe 20.3.1 and its generated `2026-01-28.clover` API type matches the preserved client literal, fixing Vercel TypeScript builds. |
 | **fix/security-cost-controls** | ✅ **Integrated locally** | Senior Full-Stack / 🔴 P0 | Zod gates and rate limits integrated; remote images remain fail-closed (data URL raster only). |
 | **fix/revenue-truthfulness** | ✅ **Integrated locally** | Senior Full-Stack / 🔴 P0 | Active-source copy, mail safeguards, `/s/[id]`, and `/r/[code]` Route Handler integrated. |
 | **chore/supabase-baseline-audit** | ✅ **Integrated locally** | Senior Full-Stack / 🔴 P0 | Audit and static SQL test suite only; neither was executed. |
 | **feat/apify-trend-ingestion** | ⬜ In attesa | Senior Full-Stack / 🟡 P1 | Pipeline ingestion asincrona, adapter normalizzati, deduplica e provenance trend. |
 | **Resend Sender Domain** | ⬜ In attesa | DevOps / 🔴 P0 | Configurazione DNS e variabile `RESEND_FROM_EMAIL` su Vercel. |
 | **Supabase Remote DDL Apply** | ⏸️ **Bloccato** | Team Dev / 🔴 P0 | Create and verify a production backup, then obtain explicit authorization before executing Delta DDL or aligning `schema_migrations`. |
-| **Release Validation** | ✅ **Verified locally** | Senior Full-Stack / 🔴 P0 | `npm ci`, 15 test files / 74 tests, typecheck, lint, and a clean placeholder-backed build pass after lockfile reconciliation. Approved required transitive moves: `enhanced-resolve` 5.20.1 → 5.24.5 and `tapable` 2.3.0 → 2.3.3. Residual production audit: 24 vulnerabilities (1 critical, 9 high, 13 moderate, 1 low); no audit fix was run. |
+| **Release Validation** | ✅ **Verified locally** | Senior Full-Stack / 🔴 P0 | `pnpm install --frozen-lockfile`, 15 test files / 74 tests, typecheck, lint, and a clean placeholder-backed build pass. No dependency upgrades or audit remediation was run. |
 
 ---
 

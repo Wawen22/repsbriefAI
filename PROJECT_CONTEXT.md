@@ -1,6 +1,6 @@
 # RepsBrief — PROJECT_CONTEXT (Single Source of Truth)
 
-Last update: 2026-08-30
+Last update: 2026-09-01
 Owner context: AI agents + team dev
 
 ## 1) Product Scope
@@ -110,3 +110,4 @@ Variabili env richieste per prod: vedere `INTEGRATIONS_CHECKLIST.md`.
 - **Data security**: anonymous `shared_strategies` reads and public queue-claim execution were hardened in production on 2026-08-30. Older remote migration history remains incomplete and must be reconciled before further schema work.
 - Queue mode feature-flagged (`WEBHOOK_DELIVERY_MODE=inline` in prod): ok per lancio, da valutare switch a `queue` con traffico crescente.
 - `supabaseAdmin` fail-fast su production se `SUPABASE_SERVICE_ROLE_KEY` manca — chiave configurata su Vercel.
+- Security/cost controls (2026-09-01): AI Remix, Brand Voice e image generation richiedono `UPSTASH_REDIS_REST_URL` e `UPSTASH_REDIS_REST_TOKEN` per rate limiting distribuito; senza configurazione rispondono fail-closed. Nessuna migration Supabase è stata applicata.

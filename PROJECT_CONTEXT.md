@@ -53,6 +53,7 @@ Dominio: **repsbrief.com** (Hostinger DNS → Vercel)
   - [x] Trend-quality gate: no generated brief when active sources are empty, malformed, or stale
   - [x] Canonical public shares use `/s/[id]`; legacy `/share/[id]` redirects
   - [x] Referral customer credit has a Stripe idempotency key
+  - [x] Stripe Node 20.3.1 API-version TypeScript blocker resolved by aligning the client literal to its generated API version (`2026-01-28.clover`); typecheck/test/lint pass (2026-09-01)
   - [ ] Resend domain verification + `RESEND_FROM_EMAIL` configured in Vercel
   - [ ] Supabase migration history reconciled before applying current migration set
   - [ ] Production smoke test: signup → Starter brief → Pro checkout → webhook → cancellation
@@ -95,6 +96,10 @@ Tutte le chiavi Stripe sono in **live mode**. Il prodotto Starter $9 è stato ar
 - [x] `npm run test` passes (38 tests); `npm run test:e2e` passes.
 - [x] `npm run lint` passes.
 - [x] `npm run build` passes with non-secret local placeholder environment values (the production environment supplies real values).
+
+## Task Status Tracking
+
+- [x] Stripe Node 20.3.1 TypeScript blocker resolved without changing Stripe package versions, pricing IDs, webhook behavior, or migrations; test, typecheck, lint, and a placeholder-environment build pass (2026-09-01).
 
 ## 8) DB / Migrations
 

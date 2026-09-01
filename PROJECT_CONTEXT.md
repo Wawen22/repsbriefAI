@@ -96,10 +96,10 @@ Tutte le chiavi Stripe sono in **live mode**. Il prodotto Starter $9 è stato ar
 
 ## 7) Validation Snapshot (2026-09-01)
 
-- [x] `npm run typecheck` passes.
-- [x] `npm run test` passes (38 tests); `npm run test:e2e` passes.
-- [x] `npm run lint` passes.
-- [x] `npm run build` passes with non-secret local placeholder environment values (the production environment supplies real values).
+- [x] Required `npm ci` clean-install check performed: it fails because `package-lock.json` is out of sync with `package.json` (including Webpack dependency entries); the lockfile was intentionally not rewritten during integration.
+- [ ] `npm run test`, `npm run typecheck`, and `npm run lint` are blocked because the failed clean install leaves `vitest`, `tsc`, and `eslint` unavailable.
+- [ ] `npm run build` with harmless placeholders is blocked because the failed clean install leaves `next` unavailable.
+- [x] `npm audit --omit=dev` performed: 23 vulnerabilities (1 critical, 8 high, 13 moderate, 1 low) remain for follow-up.
 
 ## 8) DB / Migrations & Reconciliation Baseline
 
@@ -125,3 +125,4 @@ Variabili env richieste per prod: vedere `INTEGRATIONS_CHECKLIST.md`.
 - `supabaseAdmin` fail-fast su production se `SUPABASE_SERVICE_ROLE_KEY` manca — chiave configurata su Vercel.
 - Security/cost controls (2026-09-01): AI Remix, Brand Voice e image generation richiedono `UPSTASH_REDIS_REST_URL` e `UPSTASH_REDIS_REST_TOKEN` per rate limiting distribuito; senza configurazione rispondono fail-closed. Nessuna migration Supabase è stata applicata.
 - Image provider safety (2026-09-01): i download remoti HTTPS sono disabilitati fail-closed per evitare DNS rebinding; sono accettati solo data URL raster PNG/JPEG/WebP fino a 10 MiB. Follow-up obbligatorio: trasporto HTTP Node con DNS pinning verificabile prima di riabilitare URL remoti.
+- Dependency integrity (2026-09-01): `npm ci` is blocked by a `package-lock.json` / `package.json` mismatch. The remaining production audit contains 23 findings (including 1 critical); do not treat dependency-backed validation as passing until the lockfile is reconciled and the audit is remediated.

@@ -60,6 +60,8 @@ RepsBrief è una piattaforma SaaS multi-tenant (`Next.js + Supabase`) per creato
   - [x] Revenue truthfulness integrated locally: active YouTube/RSS copy, canonical shares, and referral Route Handler
   - [x] Security/cost controls integrated locally: schemas, paid-plan gates, and fail-closed remote image policy
   - [x] **Supabase Baseline Reconciliation Audit** ([audit documentato](docs/audits/2026-09-01-supabase-reconciliation-audit.md))
+  - [x] Local integration completed with ordered no-ff merges; no push and no Supabase migration execution
+  - [ ] Restore a consistent `package-lock.json` before dependency-backed release validation (`npm ci` currently fails)
   - [ ] Create and verify a production backup, then obtain authorization for the Delta DDL (`teams.brand_voice`, `idea_images`) and `schema_migrations` reconciliation
   - [ ] Resend domain verification + `RESEND_FROM_EMAIL` configurato in Vercel
   - [ ] Worktree `feat/apify-trend-ingestion`: pipeline asincrona trend
@@ -80,6 +82,7 @@ RepsBrief è una piattaforma SaaS multi-tenant (`Next.js + Supabase`) per creato
 | **feat/apify-trend-ingestion** | ⬜ In attesa | Senior Full-Stack / 🟡 P1 | Pipeline ingestion asincrona, adapter normalizzati, deduplica e provenance trend. |
 | **Resend Sender Domain** | ⬜ In attesa | DevOps / 🔴 P0 | Configurazione DNS e variabile `RESEND_FROM_EMAIL` su Vercel. |
 | **Supabase Remote DDL Apply** | ⏸️ **Bloccato** | Team Dev / 🔴 P0 | Create and verify a production backup, then obtain explicit authorization before executing Delta DDL or aligning `schema_migrations`. |
+| **Release Validation** | ⏸️ **Bloccato** | Senior Full-Stack / 🔴 P0 | `npm ci` reports package-lock mismatch, so test/typecheck/lint/build cannot load their CLIs; `npm audit --omit=dev` reports 23 vulnerabilities. |
 
 ---
 

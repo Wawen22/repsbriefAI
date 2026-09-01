@@ -16,8 +16,8 @@ const LOGOS = [
   { name: 'YouTube', icon: Youtube, desc: 'Shorts & Long-form' },
   { name: 'Instagram', icon: Instagram, desc: 'Reels & Carousels' },
   { name: 'TikTok', icon: Flame, desc: 'Viral Sounds' },
-  { name: 'Google Trends', icon: Globe, desc: 'Breakout Topics' },
-  { name: 'Reddit Ingestion', icon: Radio, desc: 'Community Discussions' },
+  { name: 'YouTube', icon: Globe, desc: 'Video Signals' },
+  { name: 'RSS Feeds', icon: Radio, desc: 'Article Signals' },
   { name: 'Notion Database', icon: Share2, desc: 'Content Hub' },
   { name: 'Google Calendar', icon: Calendar, desc: 'Auto Scheduling' },
   { name: 'Zapier & Make', icon: Zap, desc: '6,000+ App Sync' },
@@ -61,4 +61,3 @@ export function LogosMarquee() {
     </section>
   )
 }
-

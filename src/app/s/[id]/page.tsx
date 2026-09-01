@@ -154,7 +154,7 @@ export default async function SharedStrategyPage({
                 Get source-backed strategies for your next post
               </p>
               <p className="text-slate-400 text-sm font-light">
-                Start with one manual brief per week, then unlock daily briefs with Pro.
+                Start with one manual brief per week, then unlock daily manual generation with Pro.
               </p>
             </div>
 

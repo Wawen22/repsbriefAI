@@ -10,8 +10,8 @@ import { cn } from '@/lib/utils'
 import { useUpgradeModal } from '@/components/ui/UpgradeModal'
 
 const STEPS = [
-  { id: 'scrape', label: 'Signal Extraction', icon: Search, sub: 'Scraping Reddit & YouTube view velocity...' },
-  { id: 'trends', label: 'Trend Correlation', icon: BarChart3, sub: 'Cross-referencing Google Trends data...' },
+  { id: 'scrape', label: 'Signal Extraction', icon: Search, sub: 'Collecting available YouTube and RSS signals...' },
+  { id: 'trends', label: 'Trend Review', icon: BarChart3, sub: 'Checking fresh source data for your brief...' },
   { id: 'analyze', label: 'AI Synthesis', icon: Brain, sub: 'Clustering topics and drafting hooks...' },
   { id: 'finalize', label: 'Brief Validation', icon: Database, sub: 'Optimizing for high-engagement formats...' },
 ]
@@ -58,9 +58,9 @@ export function GenerateNowButton({ alreadyGeneratedToday = false, plan }: Gener
       const resPromise = fetch('/api/generator/generate-now', { method: 'POST' })
       
       // Add logs dynamically
-      setTimeout(() => setLogs(prev => [...prev, '> Accessing Reddit API...', '> Scanning r/fitness, r/nutrition...']), 2000)
+      setTimeout(() => setLogs(prev => [...prev, '> Checking available YouTube signals...', '> Reading configured RSS feeds...']), 2000)
       setTimeout(() => setLogs(prev => [...prev, '> YouTube Data API connected.', '> High view-velocity detected in 14 videos.']), 5000)
-      setTimeout(() => setLogs(prev => [...prev, '> Cross-referencing Google Trends breakout queries...']), 9000)
+      setTimeout(() => setLogs(prev => [...prev, '> Validating freshness and quality of source data...']), 9000)
       setTimeout(() => setLogs(prev => [...prev, '> Passing 42 raw signals to AI Strategist...']), 14000)
 
       const res = await resPromise
@@ -98,15 +98,15 @@ export function GenerateNowButton({ alreadyGeneratedToday = false, plan }: Gener
           <span>
             {isStarter
               ? 'Weekly brief generated. Next one available Monday.'
-              : 'Daily brief already generated. New ideas available tomorrow.'}
+              : 'Your daily manual brief limit has been reached. Try again tomorrow.'}
           </span>
         </div>
         {isStarter && (
           <button
-            onClick={() => openUpgrade('Daily Briefs')}
+            onClick={() => openUpgrade('Daily manual briefs')}
             className="text-xs text-blue-400 hover:text-blue-300 font-bold uppercase tracking-widest transition-colors"
           >
-            Upgrade to Pro for daily briefs →
+            Upgrade to Pro for daily manual briefs →
           </button>
         )}
       </div>

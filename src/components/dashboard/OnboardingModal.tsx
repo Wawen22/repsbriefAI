@@ -39,7 +39,7 @@ const STEPS = [
     icon: <Zap className="w-10 h-10 text-blue-400" />,
     glowColor: 'bg-blue-600/[0.05]',
     title: 'Generate Your First Brief',
-    description: '20 content strategies built from live trends — Reddit, YouTube, Google Trends. Hit generate and watch the engine work in real time.',
+    description: 'Generate 20 content strategies informed by available YouTube and RSS signals.',
     cta: 'Generate Now',
     ctaStyle: 'bg-blue-600 hover:bg-blue-500 shadow-blue-500/20',
   },

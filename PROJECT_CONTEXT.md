@@ -54,6 +54,9 @@ Dominio: **repsbrief.com** (Hostinger DNS → Vercel)
   - [x] Canonical public shares use `/s/[id]`; legacy `/share/[id]` redirects
   - [x] Referral customer credit has a Stripe idempotency key
   - [x] Stripe Node 20.3.1 API-version TypeScript blocker resolved by aligning the client literal to its generated API version (`2026-01-28.clover`); typecheck/test/lint pass (2026-09-01)
+  - [x] Revenue truthfulness hardening: copy reflects active YouTube/RSS sources; public shares use `/s/[id]`; referral cookie uses a Route Handler
+  - [x] Engagement mail no longer notifies Starter users from historical briefs
+  - [x] Mail sender is centralized on `RESEND_FROM_EMAIL` and fails closed in production
   - [ ] Resend domain verification + `RESEND_FROM_EMAIL` configured in Vercel
   - [ ] Supabase migration history reconciled before applying current migration set
   - [ ] Production smoke test: signup → Starter brief → Pro checkout → webhook → cancellation

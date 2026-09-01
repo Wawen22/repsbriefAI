@@ -33,13 +33,13 @@ const PLANS = [
     trialBadge: "7-day free trial",
     popularBadge: "MOST POPULAR",
     features: [
-      "One fresh automated brief every day",
+      "One fresh manual brief every day",
       "All 20 trend-backed strategies unlocked",
-      "Neural brand voice & persona cloning",
+      "AI Brand Voice",
       "Integrated fullscreen teleprompter",
       "Editorial calendar & timeline",
       "Public shareable strategy links",
-      "Full PubMed & Reddit evidence citations"
+      "YouTube and RSS source signals"
     ],
     ctaText: "Start 7-Day Free Trial",
     ctaVariant: "default" as const
@@ -82,7 +82,7 @@ export function PricingNexus() {
             Simple, predictable power.
           </h2>
           <p className="text-white/50 text-base sm:text-lg font-sans">
-            Start with verified weekly trend signals, then unlock daily AI generation and multi-player workflows.
+            Start with fresh YouTube and RSS signals, then unlock daily manual generation and team workflows.
           </p>
         </div>
 

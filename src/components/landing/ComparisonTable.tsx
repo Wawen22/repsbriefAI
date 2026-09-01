@@ -4,8 +4,8 @@ import { Check, X, Sparkles } from 'lucide-react'
 
 const COMPARISON_ROWS = [
   {
-    feature: "Live Trend Scrapers (Reddit, Google, RSS)",
-    repsbrief: "Automated Daily & Hourly Ingestion",
+    feature: "Trend sources (YouTube and RSS)",
+    repsbrief: "Fresh signals when you generate",
     chatgpt: "Stale training data / Manual search",
     notion: "100% Manual research"
   },
@@ -29,13 +29,13 @@ const COMPARISON_ROWS = [
   },
   {
     feature: "Direct Google Calendar & Notion Sync",
-    repsbrief: "1-Click automated calendar distribution",
+    repsbrief: "Calendar and integration exports",
     chatgpt: "Manual copy & paste",
     notion: "Requires custom Zapier setups"
   },
   {
     feature: "Source Evidence & Scientific Backing",
-    repsbrief: "Verified PubMed & trend citations",
+    repsbrief: "Available YouTube and RSS signals",
     chatgpt: "High hallucination risk",
     notion: "Manual linking"
   }
@@ -110,4 +110,3 @@ export function ComparisonTable() {
     </section>
   )
 }
-

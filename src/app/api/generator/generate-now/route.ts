@@ -74,7 +74,7 @@ export async function POST() {
       rateLimitSince = new Date(now)
       rateLimitSince.setDate(now.getDate() - daysSinceMonday)
       rateLimitSince.setHours(0, 0, 0, 0)
-      rateLimitMessage = 'Starter plan includes 1 brief per week. Upgrade to Pro for daily briefs.'
+      rateLimitMessage = 'Starter plan includes 1 manual brief per week. Upgrade to Pro for daily manual generation.'
     }
 
     const { data: existingInWindow } = await supabaseAdmin

@@ -53,7 +53,7 @@ Dominio: **repsbrief.com** (Hostinger DNS → Vercel)
   - [x] Trend-quality gate: no generated brief when active sources are empty, malformed, or stale
   - [x] Canonical public shares use `/s/[id]`; legacy `/share/[id]` redirects
   - [x] Referral customer credit has a Stripe idempotency key
-  - [x] Stripe Node 20.3.1 API-version TypeScript blocker resolved by aligning the client literal to its generated API version (`2026-01-28.clover`); typecheck/test/lint pass (2026-09-01)
+  - [x] Pnpm is the canonical deployment package manager; its lock resolves Stripe 20.3.1, whose generated API type accepts the retained `2026-01-28.clover` client literal. The conflicting npm lockfile was removed, fixing the Vercel TypeScript deployment failure (2026-09-01)
   - [x] Revenue truthfulness hardening: copy reflects active YouTube/RSS sources; public shares use `/s/[id]`; referral cookie uses a Route Handler
   - [x] Engagement mail no longer notifies Starter users from historical briefs
   - [x] Mail sender is centralized on `RESEND_FROM_EMAIL` and fails closed in production
@@ -96,12 +96,11 @@ Tutte le chiavi Stripe sono in **live mode**. Il prodotto Starter $9 è stato ar
 
 ## 7) Validation Snapshot (2026-09-01)
 
-- [x] Lockfile reconciled with `npm install --package-lock-only --ignore-scripts --no-audit` (npm 10.9.2 / Node 22.17.0). It restores the missing Webpack peer closure and makes only the approved required transitive moves: `enhanced-resolve` 5.20.1 → 5.24.5 and `tapable` 2.3.0 → 2.3.3; `package.json` is unchanged.
-- [x] Required `npm ci` clean-install check passed after the reconciliation.
-- [x] `npm run test` passed: 15 files, 74 tests.
-- [x] `npm run typecheck` and `npm run lint` passed.
-- [x] Clean `npm run build` passed with harmless Supabase, Stripe, Resend, OpenAI, and app-URL placeholders.
-- [x] `npm audit --omit=dev` performed: 24 vulnerabilities (1 critical, 9 high, 13 moderate, 1 low) remain for follow-up. No audit remediation was applied.
+- [x] Pnpm 11.25.0 is declared in `package.json` and is the sole deployment package manager; `package-lock.json` was removed to prevent npm/pnpm resolution drift.
+- [x] `pnpm-lock.yaml` retains `stripe: ^20.3.1` in the manifest but pins its direct resolution to 20.3.1. The installed generated `ApiVersion` is exactly `2026-01-28.clover`, matching `src/lib/stripe.ts` and fixing Vercel's TypeScript failure.
+- [x] `pnpm install --frozen-lockfile` passed; explicit pnpm 11 build-policy decisions deny pending third-party lifecycle scripts without changing dependency versions.
+- [x] `pnpm test` passed: 15 files, 74 tests; `pnpm run typecheck` and `pnpm run lint` passed.
+- [x] `pnpm run build` passed with harmless Supabase, Stripe, Resend, OpenAI, and app-URL placeholders.
 
 ## 8) DB / Migrations & Reconciliation Baseline
 
@@ -127,4 +126,4 @@ Variabili env richieste per prod: vedere `INTEGRATIONS_CHECKLIST.md`.
 - `supabaseAdmin` fail-fast su production se `SUPABASE_SERVICE_ROLE_KEY` manca — chiave configurata su Vercel.
 - Security/cost controls (2026-09-01): AI Remix, Brand Voice e image generation richiedono `UPSTASH_REDIS_REST_URL` e `UPSTASH_REDIS_REST_TOKEN` per rate limiting distribuito; senza configurazione rispondono fail-closed. Nessuna migration Supabase è stata applicata.
 - Image provider safety (2026-09-01): i download remoti HTTPS sono disabilitati fail-closed per evitare DNS rebinding; sono accettati solo data URL raster PNG/JPEG/WebP fino a 10 MiB. Follow-up obbligatorio: trasporto HTTP Node con DNS pinning verificabile prima di riabilitare URL remoti.
-- Dependency integrity (2026-09-01): `package-lock.json` is reconciled and `npm ci`, tests, typecheck, lint, and a clean placeholder-backed build pass. The approved Webpack peer closure requires `enhanced-resolve` 5.24.5 and `tapable` 2.3.3. The remaining production audit contains 24 findings (1 critical, 9 high, 13 moderate, 1 low); dependency-backed validation passes, but release risk remains until those findings are remediated through a separately authorized dependency update.
+- Dependency integrity (2026-09-01): pnpm is canonical and locked to Stripe 20.3.1 so its generated API type remains aligned with the pinned client literal. Pnpm 11.25.0 explicitly denies unapproved lifecycle scripts for `@sentry/cli`, `core-js`, `msw`, `sharp`, and `unrs-resolver`; review and explicitly approve only required scripts in a separately authorized dependency-security task if future builds need them.

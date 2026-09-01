@@ -5,6 +5,10 @@ import { createClient } from '@/lib/supabase/server'
 import { getSupabaseAdmin } from '@/lib/supabase'
 import { OpenRouterImageProvider } from '@/lib/ai/providers/openrouter-image'
 import { generateIdeaImagePrompt } from '@/lib/ai/image-provider'
+import { ideaHistoryIdSchema } from '@/lib/security/schemas'
+import { requirePaidPlan } from '@/lib/security/entitlements'
+import { checkRateLimit } from '@/lib/security/rate-limit'
+import { downloadProviderImage } from '@/lib/security/image-download'
 import type { IdeaObject } from '@/types/niche'
 
 export const maxDuration = 60
@@ -15,17 +19,6 @@ function getImageProvider(): OpenRouterImageProvider {
   if (!apiKey) throw new Error('OPENROUTER_API_KEY is not set')
   const model = process.env.OPENROUTER_IMAGE_MODEL || 'bytedance-seed/seedream-4.5'
   return new OpenRouterImageProvider(apiKey, model)
-}
-
-async function fetchImageAsBuffer(url: string): Promise<Buffer> {
-  if (url.startsWith('data:')) {
-    const base64 = url.split(',')[1]
-    if (!base64) throw new Error('Invalid base64 data URL')
-    return Buffer.from(base64, 'base64')
-  }
-  const res = await fetch(url)
-  if (!res.ok) throw new Error(`Failed to fetch image: HTTP ${res.status}`)
-  return Buffer.from(await res.arrayBuffer())
 }
 
 export async function POST(req: NextRequest) {
@@ -41,12 +34,9 @@ export async function POST(req: NextRequest) {
     let ideaHistoryId: string
     try {
       const body = await req.json() as { ideaHistoryId?: unknown }
-      ideaHistoryId = body?.ideaHistoryId as string
+      ideaHistoryId = ideaHistoryIdSchema.parse(body?.ideaHistoryId)
     } catch {
       return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
-    }
-    if (!ideaHistoryId || typeof ideaHistoryId !== 'string') {
-      return NextResponse.json({ error: 'ideaHistoryId is required' }, { status: 400 })
     }
 
     const admin = getSupabaseAdmin('api/generator/generate-image')
@@ -58,7 +48,7 @@ export async function POST(req: NextRequest) {
       .eq('id', user.id)
       .single()
 
-    if (!profile || profile.plan === 'starter') {
+    if (!profile || !requirePaidPlan(profile.plan).allowed) {
       return NextResponse.json(
         { error: 'upgrade_required', upgradeUrl: '/dashboard/settings?tab=billing' },
         { status: 403 }
@@ -76,6 +66,10 @@ export async function POST(req: NextRequest) {
     if (!ideaRow) {
       return NextResponse.json({ error: 'Idea not found' }, { status: 404 })
     }
+
+    const limited = await checkRateLimit('imageGeneration', user.id)
+    if (limited.unavailable) return NextResponse.json({ error: 'rate_limit_unavailable' }, { status: 503 })
+    if (!limited.allowed) return NextResponse.json({ error: 'rate_limited', retryAfter: limited.retryAfterSeconds }, { status: 429 })
 
     const ideaData = ideaRow.idea_data as IdeaObject | null
     if (!ideaData) {
@@ -100,12 +94,12 @@ export async function POST(req: NextRequest) {
     const imageResult = await provider.generateImage(prompt)
 
     // 7. Upload to Supabase Storage
-    const imageBuffer = await fetchImageAsBuffer(imageResult.url)
+    const downloaded = await downloadProviderImage(imageResult.url)
 
     const { error: uploadError } = await admin.storage
       .from('idea-images')
-      .upload(storagePath, imageBuffer, {
-        contentType: 'image/png',
+      .upload(storagePath, downloaded.bytes, {
+        contentType: downloaded.contentType,
         upsert: true,
       })
 

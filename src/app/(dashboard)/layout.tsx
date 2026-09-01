@@ -46,24 +46,24 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="h-screen bg-black text-slate-50 flex flex-col overflow-hidden relative font-sans">
+    <div className="h-screen bg-[#000000] text-white flex flex-col overflow-hidden relative font-sans antialiased selection:bg-white/20 selection:text-white">
       <CommandPalette />
       
       {/* Mobile Top Bar */}
       <MobileNav plan={plan} userEmail={userEmail} userFullName={userFullName} />
 
-      {/* Background Gradients & Patterns */}
+      {/* Global Atmosphere & Technical Grid Background */}
       <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:32px_32px]"></div>
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-blue-600/5 blur-[120px]" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[30%] h-[50%] rounded-full bg-emerald-500/5 blur-[120px]" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:48px_48px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
+        <div className="absolute top-0 left-1/4 w-[600px] h-[400px] bg-blue-500/[0.02] blur-[140px] rounded-full" />
+        <div className="absolute bottom-0 right-1/4 w-[500px] h-[350px] bg-emerald-500/[0.015] blur-[140px] rounded-full" />
       </div>
 
       <div className="flex-1 flex overflow-hidden relative z-10">
         {/* Desktop Sidebar */}
         <DashboardSidebar plan={plan} userEmail={userEmail} userFullName={userFullName} />
 
-        <main className="flex-1 overflow-y-auto p-6 md:p-10 lg:p-12 scroll-smooth custom-scrollbar">
+        <main className="flex-1 overflow-y-auto p-5 md:p-8 lg:p-10 scroll-smooth custom-scrollbar">
           <div className="max-w-7xl mx-auto">
             {children}
           </div>

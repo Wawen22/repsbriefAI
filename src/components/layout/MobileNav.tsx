@@ -18,16 +18,16 @@ export function MobileNav({ plan, userEmail, userFullName }: { plan: string; use
   const [open, setOpen] = useState(false)
 
   return (
-    <div className="lg:hidden flex items-center justify-between px-6 h-16 border-b border-white/5 bg-black/40 backdrop-blur-xl sticky top-0 z-40">
-      <div className="flex items-center gap-2">
+    <div className="lg:hidden flex items-center justify-between px-4 h-14 border-b border-white/[0.08] bg-[#070707]/90 backdrop-blur-xl sticky top-0 z-40">
+      <div className="flex items-center gap-2.5">
         <Image
           src="/logo.png"
           alt="RepsBrief"
-          width={40}
-          height={40}
-          className="rounded-xl"
+          width={28}
+          height={28}
+          className="rounded-lg border border-white/[0.12]"
         />
-        <span className="text-lg font-bold tracking-tight text-white">RepsBrief</span>
+        <span className="text-sm font-bold tracking-tight text-white">RepsBrief</span>
       </div>
 
       <Sheet open={open} onOpenChange={setOpen}>
@@ -36,12 +36,11 @@ export function MobileNav({ plan, userEmail, userFullName }: { plan: string; use
           <SheetDescription>Access dashboard sections and account settings.</SheetDescription>
         </SheetHeader>
         <SheetTrigger asChild>
-          <Button variant="ghost" size="icon" className="text-slate-400 hover:text-white hover:bg-white/5">
-            <Menu className="w-6 h-6" />
+          <Button variant="ghost" size="icon" className="text-white/60 hover:text-white hover:bg-white/[0.05] h-8 w-8 rounded-lg">
+            <Menu className="w-4 h-4" />
           </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="p-0 bg-black border-r border-white/5 w-72">
-          {/* We reuse the sidebar but without the 'hidden lg:flex' classes */}
+        <SheetContent side="left" className="p-0 bg-[#070707] border-r border-white/[0.08] w-72">
           <div className="h-full flex flex-col">
              <DashboardSidebar plan={plan} isMobile userEmail={userEmail} userFullName={userFullName} />
           </div>

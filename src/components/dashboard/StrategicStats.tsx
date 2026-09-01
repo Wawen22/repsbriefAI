@@ -2,7 +2,6 @@
 
 import { IdeaObject } from "@/types/niche"
 import { TrendingUp, Zap, Target, PieChart, Activity } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 
 interface StrategicStatsProps {
@@ -29,27 +28,27 @@ export function StrategicStats({ ideas, niche }: StrategicStatsProps) {
   const momentum = "+14% vs last week" // Simulated for UI/UX demonstration
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 animate-in fade-in slide-in-from-top-4 duration-700 delay-100">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 animate-in fade-in slide-in-from-top-2 duration-500">
       
       {/* Widget 1: Format Intelligence */}
-      <div className="bg-white/[0.02] border border-white/10 rounded-3xl p-5 space-y-4 relative overflow-hidden group hover:bg-white/[0.04] transition-all">
+      <div className="bg-[#070707] border border-white/[0.08] hover:border-white/[0.18] rounded-xl p-4 space-y-3 relative overflow-hidden group transition-all shadow-[0_4px_20px_rgba(0,0,0,0.5)]">
         <div className="flex items-center justify-between">
-           <div className="p-2 rounded-xl bg-blue-500/10 border border-blue-500/20">
-              <PieChart className="w-4 h-4 text-blue-400" />
+           <div className="p-1.5 rounded-lg bg-blue-500/10 border border-blue-500/20">
+              <PieChart className="w-3.5 h-3.5 text-blue-400" />
            </div>
-           <Badge variant="outline" className="text-[9px] uppercase tracking-tighter border-blue-500/30 text-blue-300 bg-blue-500/5">AI Priority</Badge>
+           <span className="font-mono text-[9px] uppercase tracking-wider border border-blue-500/20 text-blue-300 bg-blue-500/5 px-2 py-0.5 rounded">AI Priority</span>
         </div>
         <div>
-           <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.2em]">Top Format</p>
-           <h4 className="text-xl font-bold text-white tracking-tight">{topFormat[0]}s <span className="text-slate-500 font-medium text-sm">({Math.round((topFormat[1]/total)*100)}%)</span></h4>
+           <p className="text-[10px] font-mono text-white/40 uppercase tracking-wider">Top Format</p>
+           <h4 className="text-lg font-bold text-white tracking-tight font-mono">{topFormat[0]}s <span className="text-white/40 font-normal text-xs">({Math.round((topFormat[1]/total)*100)}%)</span></h4>
         </div>
-        <div className="flex gap-1 h-1 w-full bg-white/5 rounded-full overflow-hidden">
+        <div className="flex gap-1 h-1 w-full bg-white/[0.06] rounded-full overflow-hidden">
            {Object.entries(formatCounts).map(([format, count], i) => (
              <div 
                key={format} 
                className={cn(
-                 "h-full transition-all duration-1000",
-                 i === 0 ? "bg-blue-500" : i === 1 ? "bg-purple-500" : i === 2 ? "bg-emerald-500" : "bg-amber-500"
+                 "h-full transition-all duration-700",
+                 i === 0 ? "bg-blue-400" : i === 1 ? "bg-purple-400" : i === 2 ? "bg-emerald-400" : "bg-amber-400"
                )}
                style={{ width: `${(count/total)*100}%` }}
              />
@@ -58,52 +57,51 @@ export function StrategicStats({ ideas, niche }: StrategicStatsProps) {
       </div>
 
       {/* Widget 2: Market Sentiment */}
-      <div className="bg-white/[0.02] border border-white/10 rounded-3xl p-5 space-y-4 relative overflow-hidden group hover:bg-white/[0.04] transition-all">
+      <div className="bg-[#070707] border border-white/[0.08] hover:border-white/[0.18] rounded-xl p-4 space-y-3 relative overflow-hidden group transition-all shadow-[0_4px_20px_rgba(0,0,0,0.5)]">
         <div className="flex items-center justify-between">
-           <div className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-              <Activity className="w-4 h-4 text-emerald-400" />
+           <div className="p-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+              <Activity className="w-3.5 h-3.5 text-emerald-400" />
            </div>
-           <Badge variant="outline" className="text-[9px] uppercase tracking-tighter border-emerald-500/30 text-emerald-300 bg-emerald-500/5">Live Signal</Badge>
+           <span className="font-mono text-[9px] uppercase tracking-wider border border-emerald-500/20 text-emerald-300 bg-emerald-500/5 px-2 py-0.5 rounded">Live Signal</span>
         </div>
         <div>
-           <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.2em]">Niche Sentiment</p>
-           <h4 className="text-xl font-bold text-white tracking-tight leading-none">{sentiment}</h4>
+           <p className="text-[10px] font-mono text-white/40 uppercase tracking-wider">Niche Velocity</p>
+           <h4 className="text-lg font-bold text-white tracking-tight font-mono leading-none truncate">{sentiment}</h4>
         </div>
-        <p className="text-[11px] text-emerald-400 font-bold flex items-center gap-1">
+        <p className="text-[10.5px] text-emerald-400 font-mono flex items-center gap-1">
            <TrendingUp className="w-3 h-3" /> {momentum} on {readableNiche}
         </p>
       </div>
 
       {/* Widget 3: Data Integrity */}
-      <div className="bg-white/[0.02] border border-white/10 rounded-3xl p-5 space-y-4 relative overflow-hidden group hover:bg-white/[0.04] transition-all">
+      <div className="bg-[#070707] border border-white/[0.08] hover:border-white/[0.18] rounded-xl p-4 space-y-3 relative overflow-hidden group transition-all shadow-[0_4px_20px_rgba(0,0,0,0.5)]">
         <div className="flex items-center justify-between">
-           <div className="p-2 rounded-xl bg-purple-500/10 border border-purple-500/20">
-              <Target className="w-4 h-4 text-purple-400" />
+           <div className="p-1.5 rounded-lg bg-purple-500/10 border border-purple-500/20">
+              <Target className="w-3.5 h-3.5 text-purple-400" />
            </div>
-           <Badge variant="outline" className="text-[9px] uppercase tracking-tighter border-purple-500/30 text-purple-300 bg-purple-500/5">Verified</Badge>
+           <span className="font-mono text-[9px] uppercase tracking-wider border border-purple-500/20 text-purple-300 bg-purple-500/5 px-2 py-0.5 rounded">Fact-Checked</span>
         </div>
         <div>
-           <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.2em]">Strategic Depth</p>
-           <h4 className="text-xl font-bold text-white tracking-tight">20 <span className="text-slate-500 font-medium text-sm">Scripts ready</span></h4>
+           <p className="text-[10px] font-mono text-white/40 uppercase tracking-wider">Strategic Depth</p>
+           <h4 className="text-lg font-bold text-white tracking-tight font-mono">20 <span className="text-white/40 font-normal text-xs">Briefs active</span></h4>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
            {['YouTube', 'RSS'].map(s => (
-             <span key={s} className="text-[9px] font-bold text-slate-500 px-1.5 py-0.5 rounded bg-white/5">{s}</span>
+             <span key={s} className="text-[9px] font-mono text-white/50 px-1.5 py-0.2 rounded bg-white/[0.04] border border-white/[0.06]">{s}</span>
            ))}
         </div>
       </div>
 
       {/* Widget 4: Quick Action / Focus */}
-      <div className="bg-blue-600/10 border border-blue-500/20 rounded-3xl p-5 space-y-4 relative overflow-hidden group hover:bg-blue-600/20 transition-all flex flex-col justify-center border-dashed">
-        <div className="absolute top-[-20%] right-[-10%] w-24 h-24 bg-blue-500/10 rounded-full blur-2xl pointer-events-none" />
-        <div className="flex items-center gap-3">
-           <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center shadow-lg shadow-blue-500/40">
-              <Zap className="w-4 h-4 text-white fill-white" />
+      <div className="bg-[#090909] border border-white/[0.12] hover:border-white/[0.22] rounded-xl p-4 space-y-2 relative overflow-hidden group transition-all flex flex-col justify-center shadow-[0_4px_20px_rgba(0,0,0,0.5)]">
+        <div className="flex items-center gap-2">
+           <div className="w-6 h-6 rounded-md bg-blue-500/20 border border-blue-500/30 flex items-center justify-center">
+              <Zap className="w-3.5 h-3.5 text-blue-400" />
            </div>
-           <p className="text-xs font-bold text-blue-100 uppercase tracking-widest">Focus Goal</p>
+           <p className="text-[10.5px] font-mono font-bold text-white uppercase tracking-wider">Weekly Target</p>
         </div>
-        <p className="text-[11px] text-slate-400 leading-relaxed font-light">
-           Aim for <span className="text-white font-bold">3 {topFormat[0]}s</span> this week to capitalize on current view velocity.
+        <p className="text-[11px] text-white/60 leading-relaxed font-sans">
+           Focus on <strong className="text-white font-medium">3 {topFormat[0]}s</strong> this week to match peak algorithm velocity.
         </p>
       </div>
 

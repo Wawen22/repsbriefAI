@@ -92,9 +92,9 @@ export function GenerateNowButton({ alreadyGeneratedToday = false, plan }: Gener
 
   if (state === 'rate_limited') {
     return (
-      <div className="flex flex-col items-center gap-3">
-        <div className="flex items-center gap-3 px-6 py-3 rounded-2xl bg-white/5 border border-white/10 text-slate-400 text-sm font-medium">
-          <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
+      <div className="flex flex-col items-center gap-2.5">
+        <div className="flex items-center gap-2.5 px-4 py-2 rounded-lg bg-[#090909] border border-white/[0.08] text-white/70 text-xs font-mono">
+          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
           <span>
             {isStarter
               ? 'Weekly brief generated. Next one available Monday.'
@@ -104,7 +104,7 @@ export function GenerateNowButton({ alreadyGeneratedToday = false, plan }: Gener
         {isStarter && (
           <button
             onClick={() => openUpgrade('Daily manual briefs')}
-            className="text-xs text-blue-400 hover:text-blue-300 font-bold uppercase tracking-widest transition-colors"
+            className="text-[11px] text-blue-400 hover:text-blue-300 font-mono uppercase tracking-wider transition-colors cursor-pointer"
           >
             Upgrade to Pro for daily manual briefs →
           </button>
@@ -115,17 +115,10 @@ export function GenerateNowButton({ alreadyGeneratedToday = false, plan }: Gener
 
   if (state === 'loading') {
     return (
-      <div className="w-full max-w-2xl bg-white/[0.03] border border-white/10 rounded-3xl p-8 space-y-10 animate-in fade-in zoom-in-95 duration-500 relative overflow-hidden shadow-2xl">
-        {/* Animated background lines */}
-        <div className="absolute inset-0 opacity-20 pointer-events-none">
-           <div className="absolute top-0 left-1/4 w-px h-full bg-gradient-to-b from-transparent via-blue-500 to-transparent animate-scan-slow" />
-           <div className="absolute top-0 left-2/4 w-px h-full bg-gradient-to-b from-transparent via-emerald-500 to-transparent animate-scan-slow delay-700" />
-           <div className="absolute top-0 left-3/4 w-px h-full bg-gradient-to-b from-transparent via-blue-500 to-transparent animate-scan-slow delay-300" />
-        </div>
-
-        <div className="flex flex-col md:flex-row gap-8 relative z-10">
+      <div className="w-full max-w-xl bg-[#090909] border border-white/[0.10] rounded-2xl p-6 space-y-6 animate-in fade-in zoom-in-95 duration-500 relative overflow-hidden shadow-2xl">
+        <div className="flex flex-col md:flex-row gap-6 relative z-10">
           {/* Steps Progress */}
-          <div className="flex-1 space-y-6">
+          <div className="flex-1 space-y-4">
             {STEPS.map((step, idx) => {
               const Icon = step.icon
               const isPast = idx < currentStep
@@ -133,24 +126,24 @@ export function GenerateNowButton({ alreadyGeneratedToday = false, plan }: Gener
               
               return (
                 <div key={step.id} className={cn(
-                  "flex items-start gap-4 transition-all duration-500",
+                  "flex items-start gap-3 transition-all duration-300",
                   isPast || isCurrent ? "opacity-100" : "opacity-30"
                 )}>
                   <div className={cn(
-                    "w-10 h-10 rounded-xl flex items-center justify-center border transition-all duration-500",
-                    isPast ? "bg-emerald-500/20 border-emerald-500/40 text-emerald-400" : 
-                    isCurrent ? "bg-blue-500/20 border-blue-500/40 text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.3)] animate-pulse" : 
-                    "bg-white/5 border-white/10 text-slate-500"
+                    "w-8 h-8 rounded-lg flex items-center justify-center border transition-all duration-300 shrink-0",
+                    isPast ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400" : 
+                    isCurrent ? "bg-blue-500/10 border-blue-500/30 text-blue-400 shadow-[0_0_12px_rgba(59,130,246,0.3)] animate-pulse" : 
+                    "bg-white/[0.04] border-white/[0.08] text-white/40"
                   )}>
-                    {isPast ? <Check className="w-5 h-5" /> : <Icon className="w-5 h-5" />}
+                    {isPast ? <Check className="w-4 h-4" /> : <Icon className="w-4 h-4" />}
                   </div>
-                  <div className="space-y-1">
+                  <div className="space-y-0.5">
                     <h4 className={cn(
-                      "font-bold text-sm tracking-tight",
-                      isCurrent ? "text-white" : isPast ? "text-emerald-400/80" : "text-slate-500"
+                      "font-mono font-semibold text-xs tracking-tight",
+                      isCurrent ? "text-white" : isPast ? "text-emerald-400/90" : "text-white/40"
                     )}>{step.label}</h4>
                     {isCurrent && (
-                      <p className="text-[11px] text-blue-400 animate-in fade-in slide-in-from-left-2 duration-500">{step.sub}</p>
+                      <p className="text-[10.5px] text-blue-400 font-mono animate-in fade-in duration-300">{step.sub}</p>
                     )}
                   </div>
                 </div>
@@ -159,30 +152,25 @@ export function GenerateNowButton({ alreadyGeneratedToday = false, plan }: Gener
           </div>
 
           {/* Terminal / Log */}
-          <div className="w-full md:w-64 bg-black/60 rounded-2xl border border-white/5 p-4 font-mono text-[10px] space-y-1.5 h-48 overflow-hidden relative">
-             <div className="absolute top-2 right-2 flex gap-1">
-                <div className="w-1.5 h-1.5 rounded-full bg-rose-500/50" />
-                <div className="w-1.5 h-1.5 rounded-full bg-amber-500/50" />
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/50" />
-             </div>
-             <div className="space-y-1 text-slate-500">
+          <div className="w-full md:w-56 bg-black rounded-xl border border-white/[0.08] p-3 font-mono text-[9.5px] space-y-1 h-40 overflow-hidden relative">
+             <div className="space-y-1 text-white/40">
                 {logs.map((log, i) => (
                   <p key={i} className={cn(
-                    "animate-in fade-in slide-in-from-bottom-1 duration-300",
-                    log.startsWith('>') ? "text-slate-400" : "text-blue-400"
+                    "truncate",
+                    log.startsWith('>') ? "text-white/60" : "text-blue-400"
                   )}>{log}</p>
                 ))}
-                <div className="w-1.5 h-3 bg-blue-500 animate-pulse inline-block align-middle ml-1" />
+                <div className="w-1.5 h-2.5 bg-blue-400 animate-pulse inline-block align-middle ml-1" />
              </div>
           </div>
         </div>
 
-        <div className="flex items-center justify-between pt-6 border-t border-white/5">
+        <div className="flex items-center justify-between pt-4 border-t border-white/[0.06]">
            <div className="flex items-center gap-2">
-              <Orbit className="w-4 h-4 text-blue-500 animate-[spin_4s_linear_infinite]" />
-              <span className="text-[10px] font-black text-slate-600 uppercase tracking-[0.2em]">Neural Engine Processing</span>
+              <Orbit className="w-3.5 h-3.5 text-blue-400 animate-[spin_4s_linear_infinite]" />
+              <span className="text-[9.5px] font-mono text-white/40 uppercase tracking-wider">AI Engine Processing</span>
            </div>
-           <p className="text-[10px] text-slate-500 font-medium italic">Estimated completion: {30 - (currentStep * 7)}s</p>
+           <p className="text-[9.5px] font-mono text-white/40">Est: {30 - (currentStep * 7)}s</p>
         </div>
       </div>
     )
@@ -190,32 +178,32 @@ export function GenerateNowButton({ alreadyGeneratedToday = false, plan }: Gener
 
   if (state === 'success') {
     return (
-      <div className="flex flex-col items-center gap-6 animate-in zoom-in-95 duration-500">
-        <div className="w-20 h-20 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center shadow-[0_0_30px_rgba(16,185,129,0.2)] animate-sparkle">
-          <CheckCircle2 className="w-10 h-10 text-emerald-400" />
+      <div className="flex flex-col items-center gap-4 animate-in zoom-in-95 duration-500">
+        <div className="w-14 h-14 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shadow-[0_0_20px_rgba(16,185,129,0.2)]">
+          <CheckCircle2 className="w-7 h-7 text-emerald-400" />
         </div>
-        <div className="text-center space-y-2">
-          <h3 className="text-2xl font-bold text-white">Strategy Brief Ready</h3>
-          <p className="text-slate-400">Your custom content plan has been deployed.</p>
+        <div className="text-center space-y-1">
+          <h3 className="text-lg font-bold text-white font-mono">Strategy Brief Ready</h3>
+          <p className="text-white/50 text-xs font-sans">Your content plan has been compiled into the Studio.</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="flex flex-col items-center gap-4">
+    <div className="flex flex-col items-center gap-3">
       <Button
         size="lg"
         onClick={handleGenerate}
-        className="group bg-blue-600 hover:bg-blue-500 text-white h-14 px-10 rounded-full text-lg font-black shadow-lg shadow-blue-500/25 transition-all hover:scale-105 active:scale-95 gap-3 animate-float"
+        className="group bg-white text-black hover:bg-white/90 h-11 px-6 rounded-xl text-xs font-mono font-bold uppercase tracking-wider shadow-lg shadow-white/10 transition-all active:scale-95 gap-2 cursor-pointer"
       >
-        <Sparkles className="w-5 h-5 group-hover:rotate-12 transition-transform" />
-        Generate My Brief Now
+        <Sparkles className="w-3.5 h-3.5 text-black group-hover:rotate-12 transition-transform" />
+        <span>Generate Strategic Brief</span>
       </Button>
 
       {state === 'error' && (
-        <p className="text-xs text-rose-400 flex items-center gap-2 bg-rose-500/10 border border-rose-500/20 px-4 py-2 rounded-full animate-in slide-in-from-top-2">
-          <AlertCircle className="w-4 h-4 shrink-0" />
+        <p className="text-xs text-rose-400 flex items-center gap-1.5 bg-rose-500/10 border border-rose-500/20 px-3 py-1.5 rounded-lg animate-in slide-in-from-top-1 font-mono">
+          <AlertCircle className="w-3.5 h-3.5 shrink-0" />
           {errorMsg || 'Generation failed — check your connection'}
         </p>
       )}

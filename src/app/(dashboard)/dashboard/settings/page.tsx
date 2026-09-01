@@ -76,68 +76,69 @@ export default async function SettingsPage({
   const currentWorkspace = team?.name || 'Personal Workspace'
   const initials = user.email?.[0]?.toUpperCase() || 'U'
 
-  const triggerClasses = "h-9 shrink-0 rounded-xl border border-transparent bg-transparent px-4 text-slate-400 hover:bg-white/[0.04] hover:text-white data-[state=active]:border-white/10 data-[state=active]:bg-white/[0.07] data-[state=active]:text-white transition-all"
+  const triggerClasses = "h-8 shrink-0 rounded-lg border border-transparent bg-transparent px-3 text-white/50 hover:bg-white/[0.04] hover:text-white data-[state=active]:bg-white data-[state=active]:text-black data-[state=active]:font-bold font-mono text-xs transition-all cursor-pointer"
 
   return (
     <div className="mx-auto max-w-5xl space-y-6 pb-16 text-white">
-      {/* Compact Header */}
+      {/* Header */}
       <header className="flex flex-wrap items-center justify-between gap-4">
-        <div className="space-y-1">
-          <h1 className="text-2xl font-bold tracking-tight md:text-3xl">Settings</h1>
-          <p className="text-sm text-slate-500">Manage your account, content strategy, and workspace.</p>
+        <div className="space-y-1.5 text-left">
+          <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10.5px] font-mono uppercase tracking-wider bg-white/[0.04] border border-white/[0.08] text-white/60">
+            <User className="w-3 h-3 text-blue-400" />
+            <span>Workspace Preferences</span>
+          </div>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white">Settings</h1>
+          <p className="text-white/50 text-sm font-sans">Manage your account, neural brand voice, integrations, and workspace.</p>
         </div>
-        <Badge variant="outline" className="border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-emerald-300">
+        <span className="border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 rounded-md text-[10px] font-mono font-bold uppercase tracking-wider text-emerald-300">
           {planLabel} Plan
-        </Badge>
+        </span>
       </header>
 
       <Tabs defaultValue={defaultTab} className="gap-0">
-        {/* Tab Navigation — grouped with separators */}
-        <TabsList className="h-auto w-full justify-start gap-0 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-1.5 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden overflow-x-auto overflow-y-hidden">
+        {/* Tab Navigation */}
+        <TabsList className="h-auto w-full justify-start gap-1 rounded-xl border border-white/[0.08] bg-[#0c0c0c] p-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden overflow-x-auto overflow-y-hidden">
           {/* Personal */}
           <TabsTrigger value="account" className={triggerClasses}>
-            <User className="h-4 w-4" />
+            <User className="h-3.5 w-3.5" />
             Account
           </TabsTrigger>
 
-          {/* Separator */}
-          <div className="mx-1.5 hidden h-5 w-px shrink-0 bg-white/[0.08] sm:block" aria-hidden />
+          <div className="mx-1 hidden h-4 w-px shrink-0 bg-white/[0.08] sm:block" aria-hidden />
 
           {/* Content */}
           <TabsTrigger value="voice" className={triggerClasses}>
-            <Fingerprint className="h-4 w-4" />
+            <Fingerprint className="h-3.5 w-3.5" />
             Brand Voice
           </TabsTrigger>
 
-          {/* Separator */}
-          <div className="mx-1.5 hidden h-5 w-px shrink-0 bg-white/[0.08] sm:block" aria-hidden />
+          <div className="mx-1 hidden h-4 w-px shrink-0 bg-white/[0.08] sm:block" aria-hidden />
 
           {/* Workspace & Connections */}
           <TabsTrigger value="workspace" className={triggerClasses}>
-            <Users className="h-4 w-4" />
+            <Users className="h-3.5 w-3.5" />
             Workspace
           </TabsTrigger>
           <TabsTrigger value="integrations" className={triggerClasses}>
-            <Link2 className="h-4 w-4" />
+            <Link2 className="h-3.5 w-3.5" />
             Integrations
           </TabsTrigger>
           <TabsTrigger value="automation-logs" className={triggerClasses}>
-            <Activity className="h-4 w-4" />
+            <Activity className="h-3.5 w-3.5" />
             Automation Logs
           </TabsTrigger>
 
-          {/* Separator */}
-          <div className="mx-1.5 hidden h-5 w-px shrink-0 bg-white/[0.08] sm:block" aria-hidden />
+          <div className="mx-1 hidden h-4 w-px shrink-0 bg-white/[0.08] sm:block" aria-hidden />
 
           {/* Billing */}
           <TabsTrigger value="billing" className={triggerClasses}>
-            <CreditCard className="h-4 w-4" />
+            <CreditCard className="h-3.5 w-3.5" />
             Billing
           </TabsTrigger>
         </TabsList>
 
         {/* ─── Account ─── */}
-        <TabsContent value="account" className="mt-5 rounded-3xl border border-white/[0.06] bg-white/[0.02] p-6 md:p-8">
+        <TabsContent value="account" className="mt-4 rounded-xl border border-white/[0.08] bg-[#070707] p-6 md:p-8 shadow-[0_4px_20px_rgba(0,0,0,0.5)]">
           <div className="space-y-6">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
               <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 text-xl font-black text-white">

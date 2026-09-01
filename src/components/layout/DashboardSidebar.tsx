@@ -80,23 +80,14 @@ export function DashboardSidebar({
       <Link key={item.name} href={item.href}>
         <div
           className={cn(
-            'group relative flex items-center gap-3 h-10 px-3 rounded-xl transition-all duration-200 cursor-pointer',
+            'group relative flex items-center gap-2.5 h-9 px-3 rounded-lg text-[13px] font-medium transition-all duration-200 cursor-pointer select-none',
             isActive
-              ? 'text-white bg-white/[0.07]'
-              : 'text-slate-400 hover:text-white hover:bg-white/[0.03]'
+              ? 'text-white bg-white/[0.08] border border-white/[0.12] shadow-[0_1px_3px_rgba(0,0,0,0.5)]'
+              : 'text-white/50 hover:text-white hover:bg-white/[0.03] border border-transparent'
           )}
         >
-          {/* Active indicator bar */}
-          <div
-            className={cn(
-              'absolute left-0 top-1/2 -translate-y-1/2 w-[3px] rounded-full transition-all duration-300',
-              isActive
-                ? 'h-5 bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]'
-                : 'h-0 bg-transparent group-hover:h-3 group-hover:bg-white/20'
-            )}
-          />
-          <Icon className={cn('w-[18px] h-[18px] shrink-0 transition-colors', isActive && 'text-blue-400')} />
-          <span className={cn('text-[13px] font-medium transition-colors', isActive && 'font-semibold')}>{item.name}</span>
+          <Icon className={cn('w-4 h-4 shrink-0 transition-colors', isActive ? 'text-blue-400' : 'text-white/40 group-hover:text-white/80')} />
+          <span className={cn('truncate transition-colors', isActive && 'font-semibold text-white')}>{item.name}</span>
         </div>
       </Link>
     )
@@ -105,59 +96,64 @@ export function DashboardSidebar({
   return (
     <aside
       className={cn(
-        'w-[260px] border-r border-white/[0.06] bg-black/50 backdrop-blur-2xl flex flex-col flex-shrink-0 relative z-20 h-full',
+        'w-[250px] border-r border-white/[0.08] bg-[#070707]/95 backdrop-blur-2xl flex flex-col flex-shrink-0 relative z-20 h-full select-none',
         !isMobile && 'hidden lg:flex'
       )}
     >
-      {/* Brand */}
-      <div className="flex items-center gap-3 px-5 h-16 shrink-0">
-        <Image
-          src="/logo.png"
-          alt="RepsBrief"
-          width={40}
-          height={40}
-          className="rounded-xl"
-        />
-        <span className="text-lg font-bold tracking-tight text-white">RepsBrief</span>
+      {/* Brand & Studio Tag */}
+      <div className="flex items-center justify-between px-4 h-14 shrink-0 border-b border-white/[0.08] bg-[#0c0c0c]/50">
+        <Link href="/dashboard" className="flex items-center gap-2.5 group">
+          <Image
+            src="/logo.png"
+            alt="RepsBrief"
+            width={28}
+            height={28}
+            className="rounded-lg border border-white/[0.12]"
+          />
+          <span className="text-sm font-bold tracking-tight text-white group-hover:text-white/90">RepsBrief</span>
+        </Link>
+        <span className="font-mono text-[9px] uppercase tracking-wider text-white/40 border border-white/[0.08] bg-white/[0.02] px-1.5 py-0.5 rounded">
+          Studio
+        </span>
       </div>
 
       {/* Scrollable content */}
-      <div className="flex-1 flex flex-col overflow-y-auto px-3 pb-2 custom-scrollbar">
+      <div className="flex-1 flex flex-col overflow-y-auto px-3 py-3 custom-scrollbar space-y-5">
         {/* Team Switcher */}
-        <div className="px-1 pt-2 pb-4">
+        <div className="px-0.5">
           <TeamSwitcher />
         </div>
 
         {/* Main Navigation */}
-        <div className="space-y-0.5">
-          <p className="px-3 mb-2 text-[10px] font-bold text-slate-600 uppercase tracking-[0.15em]">
-            Overview
+        <div className="space-y-1">
+          <p className="px-3 mb-1.5 text-[10px] font-mono uppercase tracking-wider text-white/35">
+            Core Workspace
           </p>
           {mainNav.map(renderNavItem)}
         </div>
 
         {/* Plan & Tools */}
-        <div className="space-y-0.5 mt-6">
-          <p className="px-3 mb-2 text-[10px] font-bold text-slate-600 uppercase tracking-[0.15em]">
-            Plan
+        <div className="space-y-1">
+          <p className="px-3 mb-1.5 text-[10px] font-mono uppercase tracking-wider text-white/35">
+            Studio Tools
           </p>
           {planNav.map(renderNavItem)}
         </div>
 
-        {/* Settings — standalone */}
-        <div className="mt-6 pt-4 border-t border-white/[0.06]">
+        {/* Settings */}
+        <div className="pt-2 border-t border-white/[0.06] space-y-1">
           <Link href="/dashboard/settings">
             <div
               className={cn(
-                'group relative flex items-center gap-3 h-10 px-3 rounded-xl transition-all duration-200 cursor-pointer',
+                'group relative flex items-center gap-2.5 h-9 px-3 rounded-lg text-[13px] font-medium transition-all duration-200 cursor-pointer',
                 pathname === '/dashboard/settings'
-                  ? 'text-white bg-white/[0.07]'
-                  : 'text-slate-500 hover:text-slate-200 hover:bg-white/[0.03]'
+                  ? 'text-white bg-white/[0.08] border border-white/[0.12]'
+                  : 'text-white/50 hover:text-white hover:bg-white/[0.03] border border-transparent'
               )}
             >
-              <Settings className={cn('w-[18px] h-[18px] shrink-0 transition-colors', pathname === '/dashboard/settings' && 'text-slate-300')} />
-              <span className={cn('text-[13px] font-medium transition-colors', pathname === '/dashboard/settings' && 'font-semibold text-white')}>
-                Settings
+              <Settings className={cn('w-4 h-4 shrink-0 transition-colors', pathname === '/dashboard/settings' ? 'text-white' : 'text-white/40 group-hover:text-white/80')} />
+              <span className={cn('transition-colors', pathname === '/dashboard/settings' && 'font-semibold text-white')}>
+                Settings & API
               </span>
             </div>
           </Link>
@@ -165,39 +161,37 @@ export function DashboardSidebar({
 
         {/* Upgrade CTA (free users only) */}
         {!hasPaidPlan && (
-          <div className="mt-auto pt-6 px-1">
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600/10 via-blue-500/5 to-transparent border border-blue-500/10 p-4">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
-              <div className="relative space-y-3">
-                <p className="text-[12px] font-semibold text-white">
-                  Unlock full power
-                </p>
-                <p className="text-[11px] text-slate-500 leading-relaxed">
-                  Automate your briefs, access full history, and more.
-                </p>
-                <Button
-                  size="sm"
-                  className="w-full h-8 text-[11px] bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg transition-all shadow-lg shadow-blue-600/20"
-                  onClick={handleUpgrade}
-                  disabled={isUpgrading}
-                >
-                  {isUpgrading ? (
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  ) : (
-                    <>
-                      <Sparkles className="w-3 h-3 mr-1.5" />
-                      Upgrade to Pro
-                    </>
-                  )}
-                </Button>
+          <div className="mt-auto pt-4 px-0.5">
+            <div className="relative overflow-hidden rounded-xl border border-white/[0.12] bg-[#090909] p-3.5 shadow-xl space-y-2.5">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-mono uppercase tracking-wider text-blue-400 font-semibold flex items-center gap-1">
+                  <Sparkles className="w-3 h-3" />
+                  Pro Tier
+                </span>
+                <span className="font-mono text-[9px] text-white/40">$19/mo</span>
               </div>
+              <p className="text-[11px] text-white/60 leading-relaxed font-sans">
+                Unlimited daily AI brief generation, multi-channel sync, and teleprompter mode.
+              </p>
+              <Button
+                size="sm"
+                className="w-full h-7 text-[11px] bg-white text-black hover:bg-white/90 font-medium rounded-md transition-all cursor-pointer shadow-sm"
+                onClick={handleUpgrade}
+                disabled={isUpgrading}
+              >
+                {isUpgrading ? (
+                  <Loader2 className="w-3 h-3 animate-spin" />
+                ) : (
+                  <span>Upgrade to Pro →</span>
+                )}
+              </Button>
             </div>
           </div>
         )}
       </div>
 
       {/* User Profile Badge - Bottom */}
-      <div className="shrink-0 border-t border-white/[0.06] px-3 py-3">
+      <div className="shrink-0 border-t border-white/[0.08] px-3 py-2.5 bg-[#090909]/60">
         <UserProfileMenu
           email={userEmail}
           fullName={userFullName}

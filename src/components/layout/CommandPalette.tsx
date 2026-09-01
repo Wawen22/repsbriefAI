@@ -95,93 +95,93 @@ export function CommandPalette() {
       </div>
 
       <CommandDialog open={open} onOpenChange={setOpen}>
-        <div className="bg-black border-white/10 overflow-hidden rounded-3xl shadow-[0_0_50px_-12px_rgba(59,130,246,0.3)]">
+        <div className="bg-[#090909] border border-white/[0.12] overflow-hidden rounded-2xl shadow-[0_30px_100px_-20px_rgba(0,0,0,0.95)]">
           <CommandInput 
-            placeholder="Search commands or navigation..." 
-            className="h-14 border-none focus:ring-0 text-white placeholder:text-slate-600"
+            placeholder="Search studio commands, routes, and features..." 
+            className="h-12 border-b border-white/[0.08] px-4 text-xs font-mono text-white placeholder:text-white/40 focus:ring-0"
           />
-          <CommandList className="max-h-[400px] custom-scrollbar p-2">
-            <CommandEmpty className="py-10 text-center text-slate-500 font-light">
+          <CommandList className="max-h-[380px] custom-scrollbar p-2">
+            <CommandEmpty className="py-8 text-center text-white/40 font-mono text-xs">
               No results found.
             </CommandEmpty>
             
-            <CommandGroup heading="Navigation" className="text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] px-3 pt-4 pb-2">
+            <CommandGroup heading="Workspace Navigation" className="text-[10px] font-mono uppercase tracking-wider text-white/35 px-2 pt-3 pb-1.5">
               <CommandItem 
                 onSelect={() => runCommand(() => router.push("/dashboard"))}
-                className="flex items-center gap-3 p-3 rounded-2xl cursor-pointer aria-selected:bg-white/5 aria-selected:text-white text-slate-400"
+                className="flex items-center gap-2.5 p-2 rounded-lg cursor-pointer aria-selected:bg-white/[0.08] aria-selected:text-white text-white/70 text-xs transition-colors"
               >
-                <div className="p-2 rounded-xl bg-blue-500/10 border border-blue-500/20">
-                  <LayoutGrid className="w-4 h-4 text-blue-400" />
+                <div className="p-1.5 rounded-md bg-blue-500/10 border border-blue-500/20">
+                  <LayoutGrid className="w-3.5 h-3.5 text-blue-400" />
                 </div>
-                <span className="font-semibold">This Week&apos;s Brief</span>
-                <CommandShortcut>G D</CommandShortcut>
+                <span className="font-medium">This Week&apos;s Brief</span>
+                <CommandShortcut className="font-mono text-[10px] bg-white/[0.06] px-1.5 py-0.5 rounded text-white/50">G D</CommandShortcut>
               </CommandItem>
               
               <CommandItem 
                 onSelect={() => runCommand(() => router.push("/dashboard/history"))}
-                className="flex items-center gap-3 p-3 rounded-2xl cursor-pointer aria-selected:bg-white/5 aria-selected:text-white text-slate-400"
+                className="flex items-center gap-2.5 p-2 rounded-lg cursor-pointer aria-selected:bg-white/[0.08] aria-selected:text-white text-white/70 text-xs transition-colors"
               >
-                <div className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-                  <Calendar className="w-4 h-4 text-emerald-400" />
+                <div className="p-1.5 rounded-md bg-emerald-500/10 border border-emerald-500/20">
+                  <Calendar className="w-3.5 h-3.5 text-emerald-400" />
                 </div>
-                <span className="font-semibold">History & Archive</span>
-                <CommandShortcut>G H</CommandShortcut>
+                <span className="font-medium">History & Archive</span>
+                <CommandShortcut className="font-mono text-[10px] bg-white/[0.06] px-1.5 py-0.5 rounded text-white/50">G H</CommandShortcut>
               </CommandItem>
 
               <CommandItem 
                 onSelect={() => runCommand(() => router.push("/dashboard/ideas"))}
-                className="flex items-center gap-3 p-3 rounded-2xl cursor-pointer aria-selected:bg-white/5 aria-selected:text-white text-slate-400"
+                className="flex items-center gap-2.5 p-2 rounded-lg cursor-pointer aria-selected:bg-white/[0.08] aria-selected:text-white text-white/70 text-xs transition-colors"
               >
-                <div className="p-2 rounded-xl bg-purple-500/10 border border-purple-500/20">
-                  <Star className="w-4 h-4 text-purple-400" />
+                <div className="p-1.5 rounded-md bg-purple-500/10 border border-purple-500/20">
+                  <Star className="w-3.5 h-3.5 text-purple-400" />
                 </div>
-                <span className="font-semibold">Saved Ideas Library</span>
-                <CommandShortcut>G S</CommandShortcut>
+                <span className="font-medium">Saved Ideas Library</span>
+                <CommandShortcut className="font-mono text-[10px] bg-white/[0.06] px-1.5 py-0.5 rounded text-white/50">G S</CommandShortcut>
               </CommandItem>
 
               <CommandItem 
                 onSelect={() => runCommand(() => router.push("/dashboard/settings"))}
-                className="flex items-center gap-3 p-3 rounded-2xl cursor-pointer aria-selected:bg-white/5 aria-selected:text-white text-slate-400"
+                className="flex items-center gap-2.5 p-2 rounded-lg cursor-pointer aria-selected:bg-white/[0.08] aria-selected:text-white text-white/70 text-xs transition-colors"
               >
-                <div className="p-2 rounded-xl bg-slate-500/10 border border-slate-500/20">
-                  <Settings className="w-4 h-4 text-slate-400" />
+                <div className="p-1.5 rounded-md bg-white/[0.06] border border-white/[0.10]">
+                  <Settings className="w-3.5 h-3.5 text-white/80" />
                 </div>
-                <span className="font-semibold">Account Settings</span>
-                <CommandShortcut>G ,</CommandShortcut>
+                <span className="font-medium">Account & Settings</span>
+                <CommandShortcut className="font-mono text-[10px] bg-white/[0.06] px-1.5 py-0.5 rounded text-white/50">G ,</CommandShortcut>
               </CommandItem>
             </CommandGroup>
 
-            <CommandSeparator className="my-2 bg-white/5" />
+            <CommandSeparator className="my-1.5 bg-white/[0.06]" />
 
-            <CommandGroup heading="Actions" className="text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] px-3 pt-2 pb-2">
+            <CommandGroup heading="Studio Actions" className="text-[10px] font-mono uppercase tracking-wider text-white/35 px-2 pt-1.5 pb-1.5">
               <CommandItem 
                 onSelect={() => runCommand(() => {
                   router.push("/dashboard/ideas")
                 })}
-                className="flex items-center gap-3 p-3 rounded-2xl cursor-pointer aria-selected:bg-white/5 aria-selected:text-white text-slate-400"
+                className="flex items-center gap-2.5 p-2 rounded-lg cursor-pointer aria-selected:bg-white/[0.08] aria-selected:text-white text-white/70 text-xs transition-colors"
               >
-                <div className="p-2 rounded-xl bg-white/5 border border-white/10">
-                  <Plus className="w-4 h-4 text-white" />
+                <div className="p-1.5 rounded-md bg-white/[0.06] border border-white/[0.10]">
+                  <Plus className="w-3.5 h-3.5 text-white" />
                 </div>
-                <span className="font-semibold text-white">Add New Idea</span>
-                <CommandShortcut>N</CommandShortcut>
+                <span className="font-medium text-white">Add New Idea</span>
+                <CommandShortcut className="font-mono text-[10px] bg-white/[0.06] px-1.5 py-0.5 rounded text-white/50">N</CommandShortcut>
               </CommandItem>
 
               <CommandItem 
                 onSelect={() => runCommand(handleLogout)}
-                className="flex items-center gap-3 p-3 rounded-2xl cursor-pointer aria-selected:bg-rose-500/10 aria-selected:text-rose-400 text-slate-500"
+                className="flex items-center gap-2.5 p-2 rounded-lg cursor-pointer aria-selected:bg-rose-500/10 aria-selected:text-rose-400 text-white/50 text-xs transition-colors"
               >
-                <div className="p-2 rounded-xl bg-rose-500/10 border border-rose-500/20">
-                  <LogOut className="w-4 h-4 text-rose-500" />
+                <div className="p-1.5 rounded-md bg-rose-500/10 border border-rose-500/20">
+                  <LogOut className="w-3.5 h-3.5 text-rose-400" />
                 </div>
-                <span className="font-semibold">Logout</span>
+                <span className="font-medium">Sign Out</span>
               </CommandItem>
             </CommandGroup>
 
-            <div className="p-4 mt-4 bg-blue-600/5 border border-blue-500/10 rounded-2xl flex items-center gap-3">
-               <Sparkles className="w-4 h-4 text-blue-400" />
-               <p className="text-[10px] text-slate-500 leading-tight">
-                 Tip: Use <kbd className="text-slate-300 font-mono">⌘K</kbd> anywhere to quickly jump between strategies and your library.
+            <div className="p-3 mt-3 bg-white/[0.02] border border-white/[0.06] rounded-xl flex items-center gap-2.5">
+               <Sparkles className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+               <p className="text-[10.5px] text-white/50 leading-tight font-mono">
+                 Press <kbd className="text-white bg-white/[0.08] border border-white/[0.12] px-1 py-0.2 rounded text-[10px]">⌘K</kbd> anywhere to navigate the studio.
                </p>
             </div>
           </CommandList>

@@ -160,13 +160,13 @@ export function BriefCard({
   if (variant === 'compact') {
     return (
       <Card 
-        className="group bg-white/[0.03] border-white/5 hover:border-white/20 hover:bg-white/[0.05] transition-all duration-300 rounded-2xl overflow-hidden text-left cursor-pointer border-solid"
+        className="group bg-[#070707] border-white/[0.08] hover:border-white/[0.18] hover:bg-[#0a0a0a] transition-all duration-300 rounded-xl overflow-hidden text-left cursor-pointer border-solid shadow-[0_4px_16px_rgba(0,0,0,0.4)]"
         onClick={handleNavigateToStrategy}
       >
-        <CardContent className="p-4 space-y-3">
+        <CardContent className="p-3.5 space-y-2.5">
           <div className="flex items-start justify-between gap-2">
-            <div className="flex flex-wrap items-center gap-2">
-              <Badge variant="outline" className={cn("text-[8px] font-black uppercase tracking-widest px-2 py-0 border-none", colors.bg, colors.text)}>
+            <div className="flex flex-wrap items-center gap-1.5">
+              <Badge variant="outline" className={cn("text-[8.5px] font-mono font-semibold uppercase tracking-wider px-1.5 py-0 border", colors.bg, colors.text, colors.border)}>
                 {format}
               </Badge>
               {idea.sources?.map(s => <SourceBadge key={s} source={s} />)}
@@ -177,7 +177,7 @@ export function BriefCard({
                  <Button
                    variant="ghost"
                    size="icon"
-                   className="h-6 w-6 rounded-md text-slate-600 hover:text-emerald-400 hover:bg-emerald-500/10"
+                   className="h-6 w-6 rounded-md text-white/40 hover:text-emerald-400 hover:bg-emerald-500/10"
                    onClick={(e) => {
                      e.stopPropagation()
                      setIsPerformanceOpen(true)
@@ -190,7 +190,7 @@ export function BriefCard({
                <Button
                   variant="ghost"
                   size="icon"
-                  className="h-6 w-6 rounded-md text-slate-600 hover:text-rose-500 hover:bg-rose-500/10"
+                  className="h-6 w-6 rounded-md text-white/40 hover:text-rose-400 hover:bg-rose-500/10"
                   onClick={handleDelete}
                   disabled={isDeleting}
                 >
@@ -200,25 +200,25 @@ export function BriefCard({
           </div>
           
           <h4 
-            className="text-sm font-bold text-white leading-tight group-hover:text-blue-400 transition-colors cursor-pointer"
+            className="text-xs sm:text-[13px] font-semibold text-white leading-snug group-hover:text-blue-300 transition-colors cursor-pointer"
             onClick={handleNavigateToStrategy}
           >
             {idea.title}
           </h4>
 
-          <div className="pt-1 flex items-center justify-between">
-             <div className="flex items-center gap-1.5 text-[8px] font-bold text-slate-600 uppercase tracking-tighter">
-                <div className={cn("w-1.5 h-1.5 rounded-full shadow-[0_0_5px_currentColor]", colors.text, "bg-current opacity-50")} />
+          <div className="pt-1 flex items-center justify-between border-t border-white/[0.04]">
+             <div className="flex items-center gap-1.5 text-[8.5px] font-mono text-white/40 uppercase tracking-wider">
+                <div className={cn("w-1.5 h-1.5 rounded-full shadow-[0_0_5px_currentColor]", colors.text, "bg-current opacity-70")} />
                 Studio Ready
              </div>
-             <div className="flex items-center gap-2">
+             <div className="flex items-center gap-1.5">
                 <button 
                   onClick={(e) => { e.stopPropagation(); setIsScheduleOpen(true); }}
-                  className="p-1.5 rounded-lg hover:bg-white/10 text-slate-500 hover:text-blue-400 transition-colors"
+                  className="p-1 rounded hover:bg-white/10 text-white/40 hover:text-blue-400 transition-colors"
                 >
-                  <CalendarDays className="w-3.5 h-3.5" />
+                  <CalendarDays className="w-3 h-3" />
                 </button>
-                <ChevronRight className="w-3.5 h-3.5 text-slate-700 group-hover:text-blue-500 transition-all transform group-hover:translate-x-0.5" />
+                <ChevronRight className="w-3 h-3 text-white/30 group-hover:text-white/80 transition-transform group-hover:translate-x-0.5" />
              </div>
           </div>
         </CardContent>
@@ -259,23 +259,23 @@ export function BriefCard({
         />
       )}
       
-      <Card className="group bg-white/[0.03] border-white/5 hover:border-white/10 transition-all duration-500 rounded-[2.5rem] overflow-hidden text-left flex flex-col h-full relative">
+      <Card className="group bg-[#070707] border-white/[0.08] hover:border-white/[0.18] transition-all duration-300 rounded-xl overflow-hidden text-left flex flex-col h-full relative shadow-[0_10px_30px_rgba(0,0,0,0.6)]">
         <CardContent className="p-0 text-left flex-1 flex flex-col">
-          <div className="p-8 pb-4 space-y-4">
+          <div className="p-5 sm:p-6 pb-3 space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Badge variant="outline" className={cn("text-[10px] font-black uppercase tracking-widest px-3 py-1", colors.bg, colors.text, colors.border)}>
+                <Badge variant="outline" className={cn("text-[9px] font-mono font-semibold uppercase tracking-wider px-2 py-0.5 border", colors.bg, colors.text, colors.border)}>
                   {format} Strategy
                 </Badge>
                 {approvalStatus === 'approved' && (
-                  <div className="flex items-center gap-1 text-emerald-400 px-2 py-0.5 rounded-full bg-emerald-400/10 border border-emerald-400/20">
+                  <div className="flex items-center gap-1 text-emerald-400 px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20">
                     <ShieldCheck className="w-3 h-3" />
-                    <span className="text-[8px] font-black uppercase tracking-widest">Approved</span>
+                    <span className="text-[8px] font-mono font-bold uppercase tracking-wider">Approved</span>
                   </div>
                 )}
               </div>
-              <div className="flex items-center gap-2">
-                 {/* Save/unsave toggle — always visible */}
+              <div className="flex items-center gap-1.5">
+                 {/* Save toggle */}
                  <SaveIdeaButton
                    title={idea.title}
                    ideaData={idea}
@@ -283,38 +283,37 @@ export function BriefCard({
                    initialSaved={isSaved}
                    dbId={ideaId}
                  />
-                 {/* Performance insights — only when idea is persisted */}
                  {ideaId && (
                    <Button
                      variant="ghost"
                      size="icon"
-                     className="h-8 w-8 rounded-full text-slate-600 hover:text-emerald-400 hover:bg-emerald-500/10"
+                     className="h-7 w-7 rounded-md text-white/40 hover:text-emerald-400 hover:bg-emerald-500/10"
                      onClick={(e) => {
                        e.stopPropagation()
                        setIsPerformanceOpen(true)
                      }}
                      title="Growth feedback"
                    >
-                     <TrendingUp className="w-4 h-4" />
+                     <TrendingUp className="w-3.5 h-3.5" />
                    </Button>
                  )}
-                 {/* Delete — only for saved/history ideas */}
                  {(isHistory || ideaId) && (
                    <Button
                      variant="ghost"
                      size="icon"
-                     className="h-8 w-8 rounded-full text-slate-600 hover:text-rose-500 hover:bg-rose-500/10"
+                     className="h-7 w-7 rounded-md text-white/40 hover:text-rose-400 hover:bg-rose-500/10"
                      onClick={handleDelete}
                      disabled={isDeleting}
                    >
-                     <Trash2 className="w-4 h-4" />
+                     <Trash2 className="w-3.5 h-3.5" />
                    </Button>
                  )}
               </div>
             </div>
-            {/* Title: Now clickable to navigate to Studio */}
+            
+            {/* Title */}
             <h3 
-              className="text-2xl font-bold tracking-tight text-white group-hover:text-blue-400 transition-colors duration-300 cursor-pointer"
+              className="text-lg sm:text-xl font-bold tracking-tight text-white group-hover:text-blue-300 transition-colors cursor-pointer"
               onClick={handleNavigateToStrategy}
             >
               {idea.title}
@@ -322,74 +321,74 @@ export function BriefCard({
           </div>
 
           <div 
-            className="px-8 pb-6 space-y-4 cursor-pointer flex-1 group/preview"
+            className="px-5 sm:px-6 pb-4 space-y-3 cursor-pointer flex-1 group/preview"
             onClick={() => handleNavigateToStrategy()}
           >
-            <div className="space-y-2 text-left">
-              <span className="text-[10px] font-black text-blue-500 uppercase tracking-[0.2em]">The Hook</span>
-              <p className="text-sm text-slate-200 leading-relaxed font-medium italic">&ldquo;{idea.hook}&rdquo;</p>
+            {/* Hook Box */}
+            <div className="p-3 rounded-lg border border-white/[0.08] bg-black/60 space-y-1">
+              <span className="text-[9.5px] font-mono uppercase tracking-wider text-blue-400 font-semibold block">The Hook</span>
+              <p className="text-xs text-white/90 leading-relaxed font-sans italic">&ldquo;{idea.hook}&rdquo;</p>
             </div>
             
-            <div className="space-y-2 text-left">
-              <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Strategy Preview</span>
-              <p className="text-sm text-slate-400 leading-relaxed font-light line-clamp-3 text-left">
+            <div className="space-y-1">
+              <span className="text-[9.5px] font-mono uppercase tracking-wider text-white/40 block">Strategy Breakdown</span>
+              <p className="text-xs text-white/60 leading-relaxed font-sans line-clamp-3">
                 {idea.description}
               </p>
             </div>
 
-            <div className="pt-2 flex items-center gap-2 text-blue-400 opacity-0 group-hover/preview:opacity-100 transition-all transform translate-y-2 group-hover/preview:translate-y-0 text-left">
-               <span className="text-[10px] font-black uppercase tracking-widest">Open Full Studio</span>
-               <ChevronRight className="w-3 h-3" />
+            <div className="pt-1 flex items-center gap-1.5 text-blue-400 text-[11px] font-mono font-medium">
+               <span>Open Full Studio</span>
+               <ChevronRight className="w-3 h-3 group-hover/preview:translate-x-0.5 transition-transform" />
             </div>
           </div>
 
-          <div className="px-8 pb-4 flex flex-wrap items-center gap-4 text-[9px] font-bold text-slate-600 uppercase tracking-widest text-left">
-             <div className="flex items-center gap-1.5 text-left">
-                <div className={cn("w-1 h-1 rounded-full shadow-[0_0_5px_currentColor]", colors.text, "bg-current")} />
+          <div className="px-5 sm:px-6 pb-3 flex flex-wrap items-center gap-3 text-[9px] font-mono text-white/40 uppercase tracking-wider">
+             <div className="flex items-center gap-1">
+                <div className={cn("w-1.5 h-1.5 rounded-full shadow-[0_0_5px_currentColor]", colors.text, "bg-current")} />
                 <span>AI Verified</span>
              </div>
              {idea.scriptDraft && (
-               <div className="flex items-center gap-1.5 text-left">
-                  <div className="w-1 h-1 rounded-full bg-purple-500 shadow-[0_0_5px_rgba(168,85,247,0.5)]" />
+               <div className="flex items-center gap-1">
+                  <div className="w-1.5 h-1.5 rounded-full bg-purple-400 shadow-[0_0_5px_rgba(168,85,247,0.5)]" />
                   <span>Script Ready</span>
                </div>
              )}
              {idea.sources && idea.sources.length > 0 && (
-               <div className="flex items-center gap-2 border-l border-white/5 pl-4 ml-auto sm:ml-0">
+               <div className="flex items-center gap-1.5 ml-auto">
                   {idea.sources.map(s => <SourceBadge key={s} source={s} />)}
                </div>
              )}
           </div>
 
-          <div className="p-4 bg-white/[0.02] border-t border-white/5 flex items-center justify-between gap-2 mt-auto">
-            <div className="flex items-center gap-1.5 text-left">
+          <div className="px-4 py-2.5 bg-[#090909] border-t border-white/[0.08] flex items-center justify-between gap-2 mt-auto">
+            <div className="flex items-center gap-1.5">
               <Button
                 variant="ghost"
-                className="h-10 px-4 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 text-[11px] font-black uppercase tracking-widest gap-2"
+                className="h-8 px-3 rounded-md text-white/70 hover:text-white hover:bg-white/[0.06] text-xs font-mono gap-1.5"
                 onClick={(e) => { e.stopPropagation(); handleNavigateToStrategy(e); }}
               >
-                <Maximize2 className="w-4 h-4" />
-                Open Studio
+                <Maximize2 className="w-3.5 h-3.5 text-white/50" />
+                <span>Studio</span>
               </Button>
               <Button
                 variant="ghost"
-                className="h-10 px-4 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 text-[11px] font-black uppercase tracking-widest gap-2"
+                className="h-8 px-3 rounded-md text-white/70 hover:text-white hover:bg-white/[0.06] text-xs font-mono gap-1.5"
                 onClick={(e) => { e.stopPropagation(); setIsScheduleOpen(true); }}
               >
-                <CalendarDays className="w-4 h-4 text-blue-400" />
-                Schedule
+                <CalendarDays className="w-3.5 h-3.5 text-blue-400" />
+                <span>Schedule</span>
               </Button>
               <Button
                 variant="ghost"
-                className="h-10 px-4 rounded-xl text-slate-400 hover:text-emerald-400 hover:bg-emerald-500/10 text-[11px] font-black uppercase tracking-widest gap-2"
+                className="h-8 px-3 rounded-md text-white/70 hover:text-white hover:bg-white/[0.06] text-xs font-mono gap-1.5"
                 onClick={handleShare}
                 disabled={sharing}
               >
-                <Share2 className="w-4 h-4" />
-                {sharing ? 'Copying...' : 'Share'}
+                <Share2 className="w-3.5 h-3.5 text-purple-400" />
+                <span>{sharing ? 'Copying...' : 'Share'}</span>
               </Button>
             </div>
-
           </div>
         </CardContent>
       </Card>

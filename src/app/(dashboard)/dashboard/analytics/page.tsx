@@ -6,7 +6,6 @@ import { redirect } from "next/navigation"
 import { IdeaObject } from "@/types/niche"
 import type { ComponentType, SVGProps } from "react"
 import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
   BarChart3,
@@ -119,98 +118,98 @@ export default async function AnalyticsPage() {
   const hasBriefs = totalBriefs > 0
 
   return (
-    <div className="mx-auto max-w-6xl space-y-12 pb-20 text-white">
+    <div className="mx-auto max-w-6xl space-y-8 pb-20 text-white">
 
       {/* Header */}
-      <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-        <div className="space-y-2">
-          <div className="flex items-center gap-2 text-blue-400 text-[10px] font-black uppercase tracking-[0.2em]">
-             <BarChart3 className="w-3.5 h-3.5" />
-             Performance Engine
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="space-y-1.5 text-left">
+          <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10.5px] font-mono uppercase tracking-wider bg-white/[0.04] border border-white/[0.08] text-white/60">
+             <BarChart3 className="w-3 h-3 text-blue-400" />
+             <span>Telemetry & Metrics</span>
           </div>
-          <h1 className="text-5xl font-black tracking-tighter">Analytics Dashboard</h1>
-          <p className="text-slate-500 text-lg font-light">Track your content strategy and execution metrics.</p>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white">Analytics Dashboard</h1>
+          <p className="text-white/50 text-sm md:text-base font-sans">Track your content strategy, format distributions, and publication metrics.</p>
         </div>
 
-        <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl p-4 backdrop-blur-xl">
+        <div className="flex items-center gap-3 bg-[#070707] border border-white/[0.08] rounded-xl p-3.5 shadow-md">
            <div className="text-right">
-              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-none mb-1">Strategy Velocity</p>
-              <p className="text-xl font-black text-emerald-400">{totalIdeasGenerated} Ideas</p>
+              <p className="text-[9.5px] font-mono text-white/40 uppercase tracking-wider mb-0.5">Strategy Velocity</p>
+              <p className="text-lg font-bold text-emerald-400 font-mono">{totalIdeasGenerated} Ideas</p>
            </div>
-           <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center">
-              <TrendingUp className="w-5 h-5 text-emerald-500" />
+           <div className="w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+              <TrendingUp className="w-4 h-4 text-emerald-400" />
            </div>
         </div>
       </header>
 
-      {/* Top-level Stats — always visible */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Top-level Stats */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
         {[
-          { label: 'Briefs Generated', val: totalBriefs, icon: Sparkles, color: 'text-blue-400', bg: 'bg-blue-500/10' },
-          { label: 'Ideas Created', val: totalIdeasGenerated, icon: Zap, color: 'text-purple-400', bg: 'bg-purple-500/10' },
-          { label: 'Ideas Saved', val: allSaved.length, icon: BookOpen, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
+          { label: 'Briefs Compiled', val: totalBriefs, icon: Sparkles, color: 'text-blue-400', bg: 'bg-blue-500/10 border-blue-500/20' },
+          { label: 'Strategies Created', val: totalIdeasGenerated, icon: Zap, color: 'text-purple-400', bg: 'bg-purple-500/10 border-purple-500/20' },
+          { label: 'Strategies Saved', val: allSaved.length, icon: BookOpen, color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/20' },
         ].map((s, i) => (
-          <div key={i} className="bg-white/[0.02] border border-white/5 rounded-[2.5rem] p-8 flex items-center gap-6 group hover:bg-white/[0.04] transition-all">
-             <div className={cn("w-16 h-16 rounded-[1.5rem] flex items-center justify-center shrink-0 transition-transform group-hover:scale-110", s.bg)}>
-                <s.icon className={cn("w-8 h-8", s.color)} />
+          <div key={i} className="bg-[#070707] border border-white/[0.08] hover:border-white/[0.18] rounded-xl p-5 flex items-center gap-4 transition-all shadow-[0_4px_20px_rgba(0,0,0,0.4)]">
+             <div className={cn("w-12 h-12 rounded-xl border flex items-center justify-center shrink-0", s.bg)}>
+                <s.icon className={cn("w-6 h-6", s.color)} />
              </div>
              <div>
-                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">{s.label}</p>
-                <p className="text-3xl font-black text-white tracking-tighter">{s.val}</p>
+                <p className="text-[10px] font-mono text-white/40 uppercase tracking-wider mb-0.5">{s.label}</p>
+                <p className="text-2xl font-bold font-mono text-white tracking-tight">{s.val}</p>
              </div>
           </div>
         ))}
       </div>
 
       {!hasBriefs ? (
-        /* Empty state — no briefs yet */
-        <div className="bg-white/[0.02] border border-dashed border-white/10 rounded-[3rem] p-20 text-center space-y-6">
-          <div className="w-16 h-16 rounded-full bg-blue-500/10 flex items-center justify-center mx-auto">
-            <Sparkles className="w-8 h-8 text-blue-400" />
+        /* Empty state */
+        <div className="bg-[#070707] border border-dashed border-white/[0.10] rounded-2xl p-16 text-center space-y-4">
+          <div className="w-12 h-12 rounded-xl bg-white/[0.04] border border-white/[0.10] flex items-center justify-center mx-auto">
+            <Sparkles className="w-6 h-6 text-blue-400" />
           </div>
-          <div className="space-y-2">
-            <h3 className="text-xl font-bold text-white">Generate your first brief</h3>
-            <p className="text-slate-500 text-sm max-w-sm mx-auto">Your analytics will populate as soon as you generate your first content brief.</p>
+          <div className="space-y-1">
+            <h3 className="text-lg font-bold text-white font-mono">Compile your first brief</h3>
+            <p className="text-white/50 text-xs max-w-sm mx-auto font-sans">Analytics will populate as soon as you generate your first content brief.</p>
           </div>
           <Link href="/dashboard">
-            <Button className="bg-blue-600 hover:bg-blue-500 text-white rounded-full px-8 h-12 font-black text-xs uppercase tracking-widest">
-              Go Generate a Brief
+            <Button className="bg-white text-black hover:bg-white/90 rounded-xl px-5 h-9 font-mono text-xs font-bold uppercase tracking-wider cursor-pointer">
+              Go Compile Brief →
             </Button>
           </Link>
         </div>
       ) : (
         <>
           {/* Format Breakdown from briefs */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2 space-y-6">
-              <div className="flex items-center justify-between px-2">
-                <h3 className="text-sm font-black uppercase tracking-widest text-slate-400">Format Breakdown</h3>
-                <Badge variant="outline" className="border-white/5 bg-white/5 text-[9px] uppercase font-bold text-slate-500">All Briefs</Badge>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 space-y-4">
+              <div className="flex items-center justify-between px-1">
+                <h3 className="text-xs font-mono uppercase tracking-wider text-white/40 font-semibold">Format Distribution</h3>
+                <span className="border border-white/[0.08] bg-white/[0.02] text-[9.5px] font-mono uppercase px-2 py-0.5 rounded text-white/50">All Briefs</span>
               </div>
 
-              <Card className="bg-black/40 border-white/5 rounded-[2.5rem] overflow-hidden backdrop-blur-xl">
-                <CardContent className="p-10 space-y-8">
+              <Card className="bg-[#070707] border-white/[0.08] rounded-xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.5)]">
+                <CardContent className="p-6 space-y-5">
                   {formatBreakdownList.map((f, i) => {
                     const Icon = FORMAT_ICONS[f.name] || LayoutGrid
-                    const colorClass = FORMAT_COLORS[f.name] || 'text-slate-400 bg-white/5 border-white/10'
+                    const colorClass = FORMAT_COLORS[f.name] || 'text-white/60'
 
                     return (
-                      <div key={i} className="space-y-3">
+                      <div key={i} className="space-y-2">
                         <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center">
-                              <Icon className="w-4 h-4 text-slate-400" />
+                          <div className="flex items-center gap-2.5">
+                            <div className="w-7 h-7 rounded-md bg-white/[0.04] border border-white/[0.08] flex items-center justify-center">
+                              <Icon className="w-3.5 h-3.5 text-white/60" />
                             </div>
-                            <span className="font-bold text-white uppercase text-xs tracking-widest">{f.name}s</span>
+                            <span className="font-mono font-medium text-white text-xs">{f.name}s</span>
                           </div>
-                          <div className="text-right">
-                            <span className="text-xs font-black text-white">{f.count} ideas</span>
-                            <span className="text-[10px] text-slate-500 block">{f.pct}% of total</span>
+                          <div className="text-right font-mono">
+                            <span className="text-xs font-semibold text-white">{f.count} ideas </span>
+                            <span className="text-[10px] text-white/40">({f.pct}%)</span>
                           </div>
                         </div>
-                        <div className="h-3 w-full bg-white/5 rounded-full overflow-hidden">
+                        <div className="h-2 w-full bg-white/[0.04] rounded-full overflow-hidden">
                           <div
-                            className={cn("h-full rounded-full transition-all duration-700", colorClass.includes('pink') ? 'bg-gradient-to-r from-pink-600 to-pink-400' : colorClass.includes('blue') ? 'bg-gradient-to-r from-blue-600 to-blue-400' : colorClass.includes('cyan') ? 'bg-gradient-to-r from-cyan-600 to-cyan-400' : colorClass.includes('emerald') ? 'bg-gradient-to-r from-emerald-600 to-emerald-400' : 'bg-gradient-to-r from-purple-600 to-purple-400')}
+                            className={cn("h-full rounded-full transition-all duration-700", colorClass.includes('pink') ? 'bg-pink-400' : colorClass.includes('blue') ? 'bg-blue-400' : colorClass.includes('cyan') ? 'bg-cyan-400' : colorClass.includes('emerald') ? 'bg-emerald-400' : 'bg-purple-400')}
                             style={{ width: `${Math.max(5, f.pct)}%` }}
                           />
                         </div>
@@ -222,48 +221,45 @@ export default async function AnalyticsPage() {
             </div>
 
             {/* Latest Brief Snapshot */}
-            <div className="space-y-6">
-              <h3 className="text-sm font-black uppercase tracking-widest text-slate-400 px-2">Latest Brief</h3>
-              <Card className="bg-gradient-to-br from-blue-600/20 via-black to-black border-blue-500/30 rounded-[2.5rem] overflow-hidden relative group">
-                <div className="absolute top-0 right-0 p-10 opacity-[0.03] group-hover:scale-110 transition-transform">
-                  <Sparkles className="w-48 h-48" />
-                </div>
-                <CardContent className="p-10 flex flex-col h-full space-y-6 relative z-10">
+            <div className="space-y-4">
+              <h3 className="text-xs font-mono uppercase tracking-wider text-white/40 font-semibold px-1">Latest Compiled Brief</h3>
+              <Card className="bg-[#070707] border-white/[0.08] rounded-xl overflow-hidden relative shadow-[0_4px_20px_rgba(0,0,0,0.5)]">
+                <CardContent className="p-6 flex flex-col h-full space-y-4 relative z-10">
                   {latestBrief ? (
                     <>
-                      <div className="space-y-2">
-                        <Badge className="bg-blue-500 text-white font-black text-[9px] uppercase tracking-widest px-3 py-1 rounded-full border-none">
-                          Most Recent
-                        </Badge>
-                        <p className="text-sm text-slate-400">
+                      <div className="space-y-1">
+                        <span className="bg-blue-500/10 text-blue-400 border border-blue-500/20 font-mono text-[9px] uppercase tracking-wider px-2 py-0.5 rounded">
+                          Active Week
+                        </span>
+                        <p className="text-xs text-white/60 font-mono pt-1">
                           {latestBrief.week_date
-                            ? new Date(latestBrief.week_date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
-                            : new Date(latestBrief.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}
+                            ? new Date(latestBrief.week_date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
+                            : new Date(latestBrief.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                         </p>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="bg-white/5 rounded-2xl p-4 border border-white/5">
-                          <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Ideas</p>
-                          <p className="text-lg font-black text-white">{latestIdeas.length}</p>
+                      <div className="grid grid-cols-2 gap-2.5">
+                        <div className="bg-white/[0.02] rounded-lg p-3 border border-white/[0.06]">
+                          <p className="text-[9.5px] font-mono text-white/40 uppercase tracking-wider mb-0.5">Strategies</p>
+                          <p className="text-base font-bold font-mono text-white">{latestIdeas.length}</p>
                         </div>
-                        <div className="bg-white/5 rounded-2xl p-4 border border-white/5">
-                          <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Formats</p>
-                          <p className="text-lg font-black text-white">{new Set(latestIdeas.map(i => i.format)).size}</p>
+                        <div className="bg-white/[0.02] rounded-lg p-3 border border-white/[0.06]">
+                          <p className="text-[9.5px] font-mono text-white/40 uppercase tracking-wider mb-0.5">Formats</p>
+                          <p className="text-base font-bold font-mono text-white">{new Set(latestIdeas.map(i => i.format)).size}</p>
                         </div>
                       </div>
 
                       <div className="pt-2 mt-auto">
                         <Link href="/dashboard">
-                          <Button className="w-full bg-white text-black hover:bg-slate-200 rounded-xl font-black text-[10px] uppercase tracking-[0.2em] h-12 shadow-2xl">
-                            View Brief <ArrowUpRight className="ml-2 w-3.5 h-3.5" />
+                          <Button className="w-full bg-white text-black hover:bg-white/90 rounded-lg font-mono text-xs font-bold uppercase tracking-wider h-9 cursor-pointer">
+                            <span>Open Studio Brief →</span>
                           </Button>
                         </Link>
                       </div>
                     </>
                   ) : (
-                    <div className="py-20 text-center opacity-40">
-                      <p className="text-xs font-bold uppercase tracking-widest">No data available</p>
+                    <div className="py-12 text-center opacity-40">
+                      <p className="text-xs font-mono uppercase">No data available</p>
                     </div>
                   )}
                 </CardContent>

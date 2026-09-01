@@ -13,7 +13,6 @@ import {
   Share2,
   X,
   Zap,
-  Lightbulb,
   ChevronLeft,
   Wand2,
   Loader2,
@@ -476,7 +475,7 @@ export function StrategicBriefView({
   const scriptPreviewLines = scriptFull.split('\n').slice(0, 4).join('\n')
 
   return (
-    <div className="w-full h-screen bg-[#050505] flex flex-col overflow-hidden text-slate-50 text-left">
+    <div className="w-full h-screen bg-[#000000] flex flex-col overflow-hidden text-white text-left font-sans antialiased selection:bg-white/20 selection:text-white">
 
       <ScheduleDialog
         isOpen={isScheduleOpen}
@@ -489,32 +488,32 @@ export function StrategicBriefView({
         }}
       />
 
-      <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-blue-600/[0.03] rounded-full blur-[160px] pointer-events-none" />
+      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-500/[0.02] rounded-full blur-[140px] pointer-events-none" />
 
       {/* Approval Bar — team plan only */}
       {isTeamPlan && !isApproved && (
         <div className={cn(
-          "h-12 flex items-center justify-center px-8 text-[10px] font-black uppercase tracking-widest gap-4 relative z-[110] transition-colors duration-500",
-          approvalStatus === 'pending' && "bg-amber-500/10 text-amber-400 border-b border-amber-500/20",
-          approvalStatus === 'rejected' && "bg-rose-500/10 text-rose-400 border-b border-rose-500/20",
-          approvalStatus === 'draft' && "bg-blue-500/5 text-blue-400/60 border-b border-white/5"
+          "h-10 flex items-center justify-center px-6 text-[10.5px] font-mono uppercase tracking-wider gap-3 relative z-[110] transition-colors duration-300",
+          approvalStatus === 'pending' && "bg-amber-500/10 text-amber-300 border-b border-amber-500/20",
+          approvalStatus === 'rejected' && "bg-rose-500/10 text-rose-300 border-b border-rose-500/20",
+          approvalStatus === 'draft' && "bg-blue-500/5 text-blue-300/80 border-b border-white/[0.06]"
         )}>
-          {approvalStatus === 'pending' && <><Clock className="w-4 h-4 animate-pulse" /> Pending Approval</>}
-          {approvalStatus === 'rejected' && <><AlertCircle className="w-4 h-4" /> Changes Requested: {feedbackNotes}</>}
-          {approvalStatus === 'draft' && <><Zap className="w-4 h-4" /> Ready to finalize this strategy?</>}
-          <div className="h-4 w-px bg-white/10" />
+          {approvalStatus === 'pending' && <><Clock className="w-3.5 h-3.5 animate-pulse" /> Pending Approval</>}
+          {approvalStatus === 'rejected' && <><AlertCircle className="w-3.5 h-3.5" /> Changes Requested: {feedbackNotes}</>}
+          {approvalStatus === 'draft' && <><Zap className="w-3.5 h-3.5" /> Ready to finalize this strategy?</>}
+          <div className="h-3.5 w-px bg-white/10" />
           {isOwnerOrAdmin ? (
-            <div className="flex items-center gap-4">
-              <button onClick={handleApprove} className="hover:text-white transition-colors flex items-center gap-1">
-                <CheckCircle2 className="w-3.5 h-3.5" /> Approve Now
+            <div className="flex items-center gap-3">
+              <button onClick={handleApprove} className="hover:text-white transition-colors flex items-center gap-1 cursor-pointer">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> Approve Now
               </button>
-              <button onClick={handleReject} className="hover:text-white transition-colors flex items-center gap-1">
-                <MessageSquare className="w-3.5 h-3.5" /> Request Edits
+              <button onClick={handleReject} className="hover:text-white transition-colors flex items-center gap-1 cursor-pointer">
+                <MessageSquare className="w-3.5 h-3.5 text-rose-400" /> Request Edits
               </button>
             </div>
           ) : (
             approvalStatus !== 'pending' && (
-              <button onClick={handleSubmitApproval} className="text-white hover:underline flex items-center gap-1">
+              <button onClick={handleSubmitApproval} className="text-white hover:underline flex items-center gap-1 cursor-pointer">
                 <ArrowRight className="w-3.5 h-3.5" /> Submit to Workspace Admin
               </button>
             )
@@ -522,43 +521,43 @@ export function StrategicBriefView({
         </div>
       )}
 
-      {/* Header */}
-      <div className="h-20 border-b border-white/5 flex items-center justify-between px-8 bg-black/40 backdrop-blur-xl relative z-[100] text-left">
-        <div className="flex items-center gap-6">
+      {/* Header Bar */}
+      <div className="h-14 border-b border-white/[0.08] flex items-center justify-between px-6 bg-[#090909]/95 backdrop-blur-xl relative z-[100] text-left">
+        <div className="flex items-center gap-4">
           <Link href="/dashboard">
-            <Button variant="ghost" className="h-10 pl-2 pr-4 rounded-full bg-white/5 border border-white/10 text-slate-400 hover:text-white gap-2">
-              <ChevronLeft className="w-4 h-4" />
-              <span className="text-[10px] font-black uppercase tracking-widest">Dashboard</span>
+            <Button variant="ghost" className="h-8 px-2.5 rounded-md bg-white/[0.04] border border-white/[0.10] text-white/70 hover:text-white hover:bg-white/[0.08] text-xs font-mono gap-1.5 cursor-pointer">
+              <ChevronLeft className="w-3.5 h-3.5" />
+              <span>Back</span>
             </Button>
           </Link>
-          <div className="h-6 w-px bg-white/10" />
-          <div className="flex items-center gap-3">
-            <Badge variant="outline" className="bg-blue-500/10 text-blue-400 border-blue-500/20 px-3 py-0.5 rounded-full text-[9px] font-black tracking-[0.2em] uppercase">
+          <div className="h-4 w-px bg-white/10" />
+          <div className="flex items-center gap-2.5">
+            <Badge variant="outline" className="bg-blue-500/10 text-blue-400 border-blue-500/20 px-2 py-0.5 rounded text-[9.5px] font-mono font-semibold tracking-wider uppercase">
               {currentIdea.format} STUDIO
             </Badge>
             {isApproved && isTeamPlan && (
-              <div className="flex items-center gap-1 text-emerald-400 px-2 py-0.5 rounded-full bg-emerald-400/10 border border-emerald-400/20">
+              <div className="flex items-center gap-1 text-emerald-400 px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20">
                 <ShieldCheck className="w-3 h-3" />
-                <span className="text-[8px] font-black uppercase tracking-widest">Workspace Approved</span>
+                <span className="text-[8.5px] font-mono font-bold uppercase tracking-wider">Approved</span>
               </div>
             )}
             {isStarter && (
-              <div className="flex items-center gap-1 text-slate-500 px-2 py-0.5 rounded-full bg-white/5 border border-white/10">
-                <span className="text-[8px] font-black uppercase tracking-widest">Free Preview</span>
+              <div className="flex items-center gap-1 text-white/40 px-2 py-0.5 rounded bg-white/[0.04] border border-white/[0.08]">
+                <span className="text-[8.5px] font-mono uppercase tracking-wider">Free Preview</span>
               </div>
             )}
-            <h2 className="text-lg font-bold text-white tracking-tight">{currentIdea.title}</h2>
+            <h2 className="text-sm font-semibold text-white tracking-tight truncate max-w-md">{currentIdea.title}</h2>
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
-          <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-500/5 border border-emerald-500/10">
-            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Strategic Sync Active</span>
+        <div className="flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-500/5 border border-emerald-500/10">
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-[10px] font-mono text-emerald-400 font-semibold uppercase tracking-wider">Studio Engine OK</span>
           </div>
           <Link href="/dashboard">
-            <button className="w-10 h-10 rounded-full flex items-center justify-center bg-white/5 hover:bg-rose-500/20 hover:text-rose-400 text-slate-500 transition-all">
-              <X className="w-5 h-5" />
+            <button className="w-8 h-8 rounded-md flex items-center justify-center bg-white/[0.04] hover:bg-rose-500/20 hover:text-rose-400 text-white/40 border border-white/[0.08] transition-all cursor-pointer">
+              <X className="w-4 h-4" />
             </button>
           </Link>
         </div>
@@ -567,35 +566,35 @@ export function StrategicBriefView({
       {/* Two-Column Content Area */}
       <div className="flex-1 flex overflow-hidden relative z-10">
 
-        {/* Left Column */}
-        <div className="flex-1 overflow-y-auto custom-scrollbar p-12 lg:p-20 space-y-20 pb-40">
+        {/* Left Column (Main Stage) */}
+        <div className="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-10 lg:p-12 space-y-12 pb-32">
 
-          {/* Phase 01: Hook — always fully visible */}
-          <section className="max-w-4xl mx-auto space-y-8">
-            <div className="flex items-center gap-3 px-1">
-              <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-              <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">Phase 01: Attention Architecture</span>
+          {/* Phase 01: Hook */}
+          <section className="max-w-3xl mx-auto space-y-4">
+            <div className="flex items-center gap-2 px-1">
+              <div className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+              <span className="text-[10.5px] font-mono uppercase tracking-wider text-white/40">Phase 01: Attention Architecture</span>
             </div>
             <div className="relative group">
-              <div className="absolute -inset-1 bg-gradient-to-r from-blue-600/10 to-emerald-600/10 rounded-[3rem] blur-2xl opacity-0 group-hover:opacity-100 transition duration-1000" />
-              <div className="relative p-12 md:p-16 rounded-[3rem] bg-white/[0.02] border border-white/5 overflow-hidden">
-                <div className="absolute top-0 right-0 p-8 opacity-[0.02] pointer-events-none">
-                  <TrendingUp className="w-40 h-40" />
-                </div>
-                <h3 className="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-6">The Viral Hook</h3>
-                <p className="text-3xl md:text-4xl italic text-white leading-tight font-light selection:bg-blue-500/50">
-                  &ldquo;{currentIdea.hook}&rdquo;
-                </p>
-                <div className="mt-10 flex items-center gap-4">
+              <div className="relative p-6 md:p-8 rounded-xl bg-[#070707] border border-white/[0.08] hover:border-white/[0.16] transition-all shadow-[0_10px_30px_rgba(0,0,0,0.6)]">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-[10px] font-mono uppercase tracking-wider text-blue-400 font-semibold flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5" />
+                    The Contrarian Hook
+                  </h3>
                   <Button
                     variant="ghost"
-                    className="h-10 px-5 rounded-full bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-white gap-2"
+                    size="sm"
+                    className="h-7 px-2.5 rounded text-[10.5px] font-mono text-white/60 hover:text-white bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] gap-1.5 cursor-pointer"
                     onClick={() => copyToClipboard(currentIdea.hook)}
                   >
-                    <Copy className="w-3.5 h-3.5" />
-                    Copy Hook
+                    <Copy className="w-3 h-3" />
+                    <span>Copy</span>
                   </Button>
                 </div>
+                <p className="text-xl md:text-2xl italic text-white leading-snug font-sans font-medium selection:bg-blue-500/40">
+                  &ldquo;{currentIdea.hook}&rdquo;
+                </p>
               </div>
             </div>
           </section>
@@ -607,155 +606,156 @@ export function StrategicBriefView({
           />
 
           {/* Phase 02: Script — gated for starter */}
-          <section className="max-w-4xl mx-auto space-y-12">
-            <div className="flex items-center gap-3 px-1">
-              <div className="w-1.5 h-1.5 rounded-full bg-purple-500" />
-              <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">Phase 02: Execution Logic</span>
+          <section className="max-w-3xl mx-auto space-y-4">
+            <div className="flex items-center justify-between px-1">
+              <div className="flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-purple-400" />
+                <span className="text-[10.5px] font-mono uppercase tracking-wider text-white/40">Phase 02: Execution Logic</span>
+              </div>
+              {/* Live Recording Mode */}
+              {(currentIdea.scriptDraft || currentIdea.description) && (
+                isStarter ? (
+                  <Button
+                    onClick={() => handleLockedClick('Live Recording Mode')}
+                    className="h-7 px-3 rounded-md bg-white/[0.04] border border-white/[0.10] text-white/50 font-mono text-[10.5px] uppercase tracking-wider gap-1.5 cursor-pointer"
+                  >
+                    <Lock className="w-3 h-3" />
+                    <span>Live Teleprompter</span>
+                    <ProBadge />
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={() => setIsPrompterOpen(true)}
+                    className="h-7 px-3 rounded-md bg-purple-600 hover:bg-purple-500 text-white font-mono text-[10.5px] uppercase tracking-wider gap-1.5 shadow-md shadow-purple-600/20 cursor-pointer"
+                  >
+                    <Smartphone className="w-3 h-3" />
+                    <span>Live Teleprompter</span>
+                  </Button>
+                )
+              )}
             </div>
 
-            <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <h4 className="text-xs font-black text-white uppercase tracking-widest">Full Production Script</h4>
-                {/* Live Recording — locked for starter */}
-                {(currentIdea.scriptDraft || currentIdea.description) && (
-                  isStarter ? (
-                    <Button
-                      onClick={() => handleLockedClick('Live Recording Mode')}
-                      className="h-9 px-5 rounded-full bg-white/5 border border-white/10 text-slate-500 font-black text-[10px] uppercase tracking-widest gap-2 transition-all"
-                    >
-                      <Lock className="w-3.5 h-3.5" />
-                      Live Recording Mode
-                      <ProBadge />
-                    </Button>
-                  ) : (
-                    <Button
-                      onClick={() => setIsPrompterOpen(true)}
-                      className="h-9 px-5 rounded-full bg-purple-600 hover:bg-purple-500 text-white font-black text-[10px] uppercase tracking-widest gap-2 shadow-lg shadow-purple-500/20"
-                    >
-                      <Smartphone className="w-3.5 h-3.5" />
-                      Live Recording Mode
-                    </Button>
-                  )
-                )}
-              </div>
-
-              {/* Script box */}
-              <div className="relative rounded-[2.5rem] bg-black border border-white/5 overflow-hidden shadow-2xl">
-                <div className="p-10">
-                  {/* Always show the copy button only for pro */}
-                  {!isStarter && (
-                    <div className="absolute top-6 right-6">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-10 w-10 text-slate-600 hover:text-white bg-white/5 rounded-full"
-                        onClick={() => copyToClipboard(scriptFull)}
-                      >
-                        <Copy className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  )}
-                  <p className="text-base md:text-lg text-slate-300 leading-relaxed font-mono whitespace-pre-wrap selection:bg-purple-500/30">
-                    {isStarter ? scriptPreviewLines : scriptFull}
-                  </p>
-                </div>
-
-                {/* Starter blur overlay */}
-                {isStarter && (
-                  <div className="absolute inset-x-0 bottom-0 h-48 flex flex-col items-center justify-end pb-8 gap-4"
-                    style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.98) 40%, rgba(0,0,0,0.7) 70%, transparent 100%)' }}
-                  >
-                    <div className="flex flex-col items-center gap-3 text-center px-8">
-                      <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center">
-                        <Lock className="w-4 h-4 text-purple-400" />
-                      </div>
-                      <p className="text-white font-black text-sm">Full script locked</p>
-                      <Button
-                        onClick={() => handleLockedClick('Full Script')}
-                        className="h-9 px-6 rounded-full bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-black uppercase tracking-widest gap-2 shadow-lg shadow-blue-500/20 hover:scale-105 transition-all"
-                      >
-                        <Zap className="w-3.5 h-3.5" />
-                        Upgrade to Pro — $19/mo
-                      </Button>
-                    </div>
+            {/* Script Editor Box */}
+            <div className="relative rounded-xl bg-[#070707] border border-white/[0.08] overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.6)]">
+              {/* Top window header */}
+              <div className="flex items-center justify-between px-4 py-2 border-b border-white/[0.06] bg-[#0c0c0c]">
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-white/20" />
+                    <span className="w-2 h-2 rounded-full bg-white/20" />
+                    <span className="w-2 h-2 rounded-full bg-white/20" />
                   </div>
+                  <span className="font-mono text-[10px] text-white/40 uppercase tracking-wider">production-script.txt</span>
+                </div>
+                {!isStarter && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 px-2 text-[10px] font-mono text-white/50 hover:text-white bg-white/[0.04] rounded border border-white/[0.08] gap-1 cursor-pointer"
+                    onClick={() => copyToClipboard(scriptFull)}
+                  >
+                    <Copy className="w-3 h-3" />
+                    <span>Copy All</span>
+                  </Button>
                 )}
               </div>
+
+              <div className="p-6 md:p-8">
+                <p className="text-sm md:text-base text-white/80 leading-relaxed font-mono whitespace-pre-wrap selection:bg-purple-500/30">
+                  {isStarter ? scriptPreviewLines : scriptFull}
+                </p>
+              </div>
+
+              {/* Starter blur overlay */}
+              {isStarter && (
+                <div className="absolute inset-x-0 bottom-0 h-40 flex flex-col items-center justify-end pb-6 gap-3 bg-gradient-to-t from-[#070707] via-[#070707]/90 to-transparent">
+                  <div className="flex flex-col items-center gap-2 text-center px-6">
+                    <div className="w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center">
+                      <Lock className="w-3.5 h-3.5 text-purple-400" />
+                    </div>
+                    <p className="text-white font-medium text-xs font-mono">Full production script & telemetry locked</p>
+                    <Button
+                      onClick={() => handleLockedClick('Full Script')}
+                      className="h-7 px-4 rounded-md bg-white text-black hover:bg-white/90 text-[10.5px] font-mono font-bold uppercase tracking-wider gap-1.5 shadow-md cursor-pointer"
+                    >
+                      <Zap className="w-3 h-3" />
+                      Upgrade to Pro — $19/mo
+                    </Button>
+                  </div>
+                </div>
+              )}
             </div>
           </section>
 
         </div>
 
         {/* Right Sidebar */}
-        <div className="w-[400px] border-l border-white/5 bg-white/[0.01] backdrop-blur-md flex flex-col relative z-20">
-          <div className="flex-1 overflow-y-auto p-8 space-y-10 custom-scrollbar">
+        <div className="w-[360px] border-l border-white/[0.08] bg-[#070707]/95 backdrop-blur-xl flex flex-col relative z-20">
+          <div className="flex-1 overflow-y-auto p-5 space-y-6 custom-scrollbar">
 
             {/* AI Strategy Remix */}
             {isStarter ? (
-              /* Locked state for starter */
-              <section className="rounded-[2rem] border border-blue-500/10 bg-blue-500/[0.03] p-6 space-y-5">
+              <section className="rounded-xl border border-blue-500/20 bg-blue-500/[0.03] p-4 space-y-3">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-xl bg-blue-600/10 border border-blue-500/20 text-blue-500/50">
-                      <Sparkles className="w-4 h-4" />
+                  <div className="flex items-center gap-2">
+                    <div className="p-1 rounded bg-blue-500/10 border border-blue-500/20 text-blue-400">
+                      <Sparkles className="w-3.5 h-3.5" />
                     </div>
-                    <h4 className="text-xs font-black text-slate-500 uppercase tracking-widest">AI Strategy Remix</h4>
+                    <h4 className="text-[10.5px] font-mono font-semibold text-white uppercase tracking-wider">AI Strategy Remix</h4>
                   </div>
                   <ProBadge />
                 </div>
 
-                <div className="space-y-3">
+                <div className="space-y-1.5">
                   {[
-                    'Rewrite the hook for a different tone',
-                    'Adapt this script to Italian',
-                    'Make it more aggressive & direct',
-                    'Add a CTA at the end',
+                    'Rewrite the hook for contrarian tone',
+                    'Translate & localize script to Italian',
+                    'Inject aggressive call-to-action',
                   ].map((example, i) => (
-                    <div key={i} className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/[0.02] border border-white/5">
-                      <div className="w-1.5 h-1.5 rounded-full bg-blue-500/40 shrink-0" />
-                      <span className="text-[11px] text-slate-600 italic">&ldquo;{example}&rdquo;</span>
+                    <div key={i} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/[0.02] border border-white/[0.06]">
+                      <div className="w-1 h-1 rounded-full bg-blue-400 shrink-0" />
+                      <span className="text-[10px] font-mono text-white/50 italic truncate">&ldquo;{example}&rdquo;</span>
                     </div>
                   ))}
                 </div>
 
                 <Button
                   onClick={() => handleLockedClick('AI Strategy Remix')}
-                  className="w-full h-11 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-black text-[10px] uppercase tracking-widest gap-2 shadow-lg shadow-blue-500/20 hover:scale-[1.02] transition-all"
+                  className="w-full h-8 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-mono text-[10px] font-bold uppercase tracking-wider gap-1.5 shadow-md cursor-pointer"
                 >
-                  <Zap className="w-3.5 h-3.5" />
+                  <Zap className="w-3 h-3" />
                   Unlock AI Remix — Pro
                 </Button>
               </section>
             ) : (
-              /* Full remix panel for pro */
-              <section className="space-y-6">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-xl bg-blue-600/20 border border-blue-500/30 text-blue-400">
-                    <Sparkles className="w-4 h-4" />
+              <section className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <div className="p-1 rounded bg-blue-500/10 border border-blue-500/20 text-blue-400">
+                    <Sparkles className="w-3.5 h-3.5" />
                   </div>
-                  <h4 className="text-xs font-black text-white uppercase tracking-widest">AI Strategy Remix</h4>
+                  <h4 className="text-[10.5px] font-mono font-semibold text-white uppercase tracking-wider">AI Strategy Remix</h4>
                 </div>
-                <div className="space-y-4">
-                  <p className="text-[11px] text-slate-500 leading-relaxed">
-                    Adjust the tone, lengthen the hook, or adapt this strategy for a specific trend.
+                <div className="space-y-2">
+                  <p className="text-[11px] text-white/50 font-sans">
+                    Refine tone, adjust pacing, or adapt for a secondary channel.
                   </p>
                   <div className="relative group">
                     <Textarea
-                      placeholder="e.g. 'Make it more aggressive', 'Translate to Italian', 'Add a call to action at the end'..."
+                      placeholder="e.g. 'Make it punchier', 'Translate to Italian', 'Add a lead magnet CTA'..."
                       value={remixInstruction}
                       onChange={(e) => setRemixInstruction(e.target.value)}
-                      className="min-h-[120px] bg-black border-white/10 rounded-2xl p-4 text-sm text-slate-300 focus:border-blue-500/50 transition-all resize-none"
+                      className="min-h-[100px] bg-[#0c0c0c] border-white/[0.08] rounded-xl p-3 text-xs text-white placeholder:text-white/30 focus:border-white/20 transition-all resize-none font-mono"
                       disabled={isApproved && !isOwnerOrAdmin}
                     />
-                    <div className="absolute bottom-3 right-3">
+                    <div className="absolute bottom-2.5 right-2.5">
                       <Button
                         size="sm"
                         disabled={!remixInstruction || isRemixing || (isApproved && !isOwnerOrAdmin)}
                         onClick={handleRemix}
-                        className="h-8 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-black text-[9px] uppercase tracking-widest gap-2 px-3 transition-all active:scale-95"
+                        className="h-7 rounded-md bg-white text-black hover:bg-white/90 font-mono text-[10px] font-bold uppercase tracking-wider gap-1 px-2.5 transition-all cursor-pointer"
                       >
                         {isRemixing ? <Loader2 className="w-3 h-3 animate-spin" /> : <Wand2 className="w-3 h-3" />}
-                        Apply Remix
+                        Remix
                       </Button>
                     </div>
                   </div>
@@ -763,53 +763,50 @@ export function StrategicBriefView({
               </section>
             )}
 
-            {/* Why it Works — always visible */}
-            <section className="p-6 rounded-[2rem] bg-emerald-500/[0.03] border border-emerald-500/10 space-y-4 relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-4 opacity-[0.05]">
-                <Lightbulb className="w-20 h-20 text-emerald-500" />
+            {/* Why it Works */}
+            <section className="p-4 rounded-xl bg-emerald-500/[0.03] border border-emerald-500/20 space-y-2 relative overflow-hidden">
+              <div className="flex items-center gap-1.5">
+                <Sparkles className="w-3 h-3 text-emerald-400" />
+                <span className="text-[10px] font-mono font-semibold text-emerald-400 uppercase tracking-wider">Growth Logic</span>
               </div>
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-                <span className="text-[9px] font-black text-emerald-500/70 uppercase tracking-widest">Growth Logic</span>
-              </div>
-              <p className="text-xs text-emerald-100/80 leading-relaxed font-medium italic relative z-10">
+              <p className="text-xs text-emerald-100/90 leading-relaxed font-sans italic relative z-10">
                 {currentIdea.whyItWorks}
               </p>
             </section>
 
-            {/* Trend Intelligence — always visible */}
+            {/* Trend Intelligence */}
             {(currentIdea.sources?.length || currentIdea.trendingAudioSuggestion || currentIdea.keyVisuals || currentIdea.alternativeHooks?.length) && (
               <TrendIntelligencePanel idea={currentIdea} />
             )}
 
-            {/* Production Data */}
-            <section className="space-y-6">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-white/5 border border-white/10 text-slate-400">
-                  <History className="w-4 h-4" />
+            {/* Production Metadata */}
+            <section className="space-y-3">
+              <div className="flex items-center gap-2">
+                <div className="p-1 rounded bg-white/[0.06] border border-white/[0.10] text-white/60">
+                  <History className="w-3.5 h-3.5" />
                 </div>
-                <h4 className="text-xs font-black text-white uppercase tracking-widest">Production Data</h4>
+                <h4 className="text-[10.5px] font-mono font-semibold text-white uppercase tracking-wider">Telemetry</h4>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 flex flex-col gap-1.5">
-                  <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Target Niche</span>
-                  <span className="text-[10px] font-black text-white uppercase tracking-widest truncate">{currentIdea.niche || 'General'}</span>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="p-3 rounded-lg bg-white/[0.02] border border-white/[0.06] flex flex-col gap-1">
+                  <span className="text-[9px] font-mono text-white/40 uppercase tracking-wider">Niche</span>
+                  <span className="text-[11px] font-mono text-white font-medium truncate">{currentIdea.niche || 'General'}</span>
                 </div>
-                <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 flex flex-col gap-1.5">
-                  <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Platform Opt.</span>
-                  <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest truncate">{currentIdea.format}</span>
+                <div className="p-3 rounded-lg bg-white/[0.02] border border-white/[0.06] flex flex-col gap-1">
+                  <span className="text-[9px] font-mono text-white/40 uppercase tracking-wider">Target Format</span>
+                  <span className="text-[11px] font-mono text-blue-400 font-medium truncate">{currentIdea.format}</span>
                 </div>
               </div>
 
-              {/* Calendar — available for all */}
+              {/* Schedule CTA */}
               <Button
                 onClick={handleGoogleCalendarAction}
                 disabled={!isApproved && !isOwnerOrAdmin}
-                className="w-full h-12 rounded-2xl bg-white/5 border border-white/10 text-white hover:bg-white/10 font-bold gap-3 justify-center"
+                className="w-full h-9 rounded-lg bg-white/[0.06] hover:bg-white/[0.10] border border-white/[0.10] text-white text-xs font-mono font-medium gap-2 justify-center cursor-pointer"
               >
-                <CalendarDays className="w-4 h-4 text-blue-400" />
-                {isGoogleConnected ? 'Sync to Calendar' : 'Schedule Production'}
+                <CalendarDays className="w-3.5 h-3.5 text-blue-400" />
+                <span>{isGoogleConnected ? 'Sync to Google Calendar' : 'Schedule Production'}</span>
               </Button>
             </section>
 
@@ -817,16 +814,17 @@ export function StrategicBriefView({
         </div>
       </div>
 
-      {/* Footer Distribution Bar */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[200] flex items-center gap-2 p-1.5 rounded-full bg-black/90 border border-white/15 backdrop-blur-3xl shadow-[0_20px_60px_rgba(0,0,0,0.8)] ring-1 ring-white/10">
-        {/* Notion — locked for starter */}
+      {/* Floating Distribution Bar */}
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-[200] flex items-center gap-1.5 p-1 rounded-full bg-[#0c0c0c]/90 border border-white/[0.12] backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.85)] ring-1 ring-white/5">
+        {/* Notion */}
         <Button
           variant="ghost"
+          size="sm"
           className={cn(
-            "h-[28px] px-4 rounded-full text-[9px] font-black uppercase tracking-[0.15em] gap-2 transition-all group",
+            "h-7 px-3 rounded-full text-[10px] font-mono uppercase tracking-wider gap-1.5 transition-all cursor-pointer",
             isStarter
-              ? "text-slate-600 hover:text-slate-400"
-              : isNotionConnected ? "text-white bg-blue-500/10 hover:bg-blue-500/20" : "text-slate-300 hover:text-white hover:bg-white/10"
+              ? "text-white/40 hover:text-white/60"
+              : isNotionConnected ? "text-white bg-blue-500/20 hover:bg-blue-500/30" : "text-white/70 hover:text-white hover:bg-white/[0.08]"
           )}
           onClick={handleNotionAction}
           disabled={isExportingToNotion}
@@ -836,70 +834,74 @@ export function StrategicBriefView({
           ) : isStarter ? (
             <Lock className="w-3 h-3" />
           ) : (
-            <FileText className={cn("w-3 h-3", isNotionConnected ? "text-blue-400" : "text-slate-500 group-hover:text-blue-400")} />
+            <FileText className="w-3 h-3 text-blue-400" />
           )}
-          {isNotionConnected && !isStarter ? 'SEND TO NOTION' : 'NOTION'}
+          <span>{isNotionConnected && !isStarter ? 'Sent to Notion' : 'Notion'}</span>
           {isStarter && <ProBadge />}
         </Button>
 
         <div className="w-px h-3 bg-white/10" />
 
-        {/* Calendar — always available */}
+        {/* Calendar */}
         <Button
           variant="ghost"
+          size="sm"
           className={cn(
-            "h-[28px] px-4 rounded-full text-[9px] font-black uppercase tracking-[0.15em] gap-2 transition-all group",
-            isGoogleConnected ? "text-white bg-blue-500/10 hover:bg-blue-500/20" : "text-slate-300 hover:text-white hover:bg-white/10"
+            "h-7 px-3 rounded-full text-[10px] font-mono uppercase tracking-wider gap-1.5 transition-all cursor-pointer",
+            isGoogleConnected ? "text-white bg-blue-500/20 hover:bg-blue-500/30" : "text-white/70 hover:text-white hover:bg-white/[0.08]"
           )}
           onClick={handleGoogleCalendarAction}
         >
-          <CalendarDays className={cn("w-3 h-3", isGoogleConnected ? "text-blue-400" : "text-slate-500 group-hover:text-blue-400")} />
-          {isGoogleConnected ? 'SYNC TO GCAL' : 'CALENDAR'}
+          <CalendarDays className="w-3 h-3 text-blue-400" />
+          <span>{isGoogleConnected ? 'In GCal' : 'Calendar'}</span>
         </Button>
 
         <div className="w-px h-3 bg-white/10" />
 
-        {/* PDF — locked for starter */}
+        {/* PDF */}
         <Button
           variant="ghost"
+          size="sm"
           className={cn(
-            "h-[28px] px-4 rounded-full text-[9px] font-black uppercase tracking-[0.15em] gap-2 transition-all group",
-            isStarter ? "text-slate-600 hover:text-slate-400" : "text-slate-300 hover:text-white hover:bg-white/10"
+            "h-7 px-3 rounded-full text-[10px] font-mono uppercase tracking-wider gap-1.5 transition-all cursor-pointer",
+            isStarter ? "text-white/40 hover:text-white/60" : "text-white/70 hover:text-white hover:bg-white/[0.08]"
           )}
           onClick={exportToPDF}
         >
-          {isStarter ? <Lock className="w-3 h-3" /> : <FileDown className="w-3 h-3 text-slate-500 group-hover:text-purple-400 transition-colors" />}
-          SAVE AS PDF
+          {isStarter ? <Lock className="w-3 h-3" /> : <FileDown className="w-3 h-3 text-purple-400" />}
+          <span>PDF</span>
           {isStarter && <ProBadge />}
         </Button>
 
         <div className="w-px h-3 bg-white/10" />
 
-        {/* Markdown — locked for starter */}
+        {/* Markdown */}
         <Button
           variant="ghost"
+          size="sm"
           className={cn(
-            "h-[28px] px-4 rounded-full text-[9px] font-black uppercase tracking-[0.15em] gap-2 transition-all group",
-            isStarter ? "text-slate-600 hover:text-slate-400" : "text-slate-300 hover:text-white hover:bg-white/10"
+            "h-7 px-3 rounded-full text-[10px] font-mono uppercase tracking-wider gap-1.5 transition-all cursor-pointer",
+            isStarter ? "text-white/40 hover:text-white/60" : "text-white/70 hover:text-white hover:bg-white/[0.08]"
           )}
           onClick={exportAsMarkdown}
         >
-          {isStarter ? <Lock className="w-3 h-3" /> : <FileCode className="w-3 h-3 text-slate-500 group-hover:text-emerald-400 transition-colors" />}
-          BRIEF.MD
+          {isStarter ? <Lock className="w-3 h-3" /> : <FileCode className="w-3 h-3 text-emerald-400" />}
+          <span>Brief.md</span>
           {isStarter && <ProBadge />}
         </Button>
 
         <div className="w-px h-3 bg-white/10" />
 
-        {/* Share — always available */}
+        {/* Share */}
         <Button
           variant="ghost"
-          className="h-[28px] px-4 rounded-full text-[9px] font-black uppercase tracking-[0.15em] text-blue-400 hover:text-white hover:bg-blue-600/20 bg-blue-500/5 gap-2 transition-all"
+          size="sm"
+          className="h-7 px-3 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider text-blue-400 hover:text-white hover:bg-blue-600/20 bg-blue-500/10 gap-1.5 transition-all cursor-pointer"
           onClick={handleSaveStrategy}
           disabled={isSharing}
         >
-          <Share2 className="w-3 h-3 text-blue-500" />
-          SHARE STRATEGY
+          <Share2 className="w-3 h-3 text-blue-400" />
+          <span>Share</span>
         </Button>
       </div>
 

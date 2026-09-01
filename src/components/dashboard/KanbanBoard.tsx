@@ -84,20 +84,20 @@ export function KanbanBoard({ initialIdeas, plan }: { initialIdeas: KanbanIdea[]
           return (
             <div key={col.id} className="flex-1 min-w-[320px] flex flex-col gap-4 text-left">
               {/* Column Header */}
-              <div className="flex items-center justify-between px-4 py-2 bg-white/[0.03] border border-white/5 rounded-2xl text-left">
-                <div className="flex items-center gap-3 text-left">
-                  <div className={cn("p-1.5 rounded-lg border border-white/5", col.bg)}>
-                    <Icon className={cn("w-4 h-4", col.color)} />
+              <div className="flex items-center justify-between px-3 py-2 bg-[#0c0c0c] border border-white/[0.08] rounded-xl text-left">
+                <div className="flex items-center gap-2.5 text-left">
+                  <div className={cn("p-1.5 rounded-lg border border-white/[0.08]", col.bg)}>
+                    <Icon className={cn("w-3.5 h-3.5", col.color)} />
                   </div>
-                  <span className="text-sm font-bold text-white tracking-tight uppercase tracking-widest text-left">
+                  <span className="text-xs font-mono font-semibold text-white tracking-wider uppercase">
                     {col.label}
                   </span>
-                  <span className="text-[10px] font-black text-slate-600 bg-white/5 px-2 py-0.5 rounded-full text-left">
+                  <span className="text-[10px] font-mono text-white/50 bg-white/[0.06] px-1.5 py-0.2 rounded">
                     {colIdeas.length}
                   </span>
                 </div>
-                <button className="text-slate-600 hover:text-white transition-colors">
-                  <MoreHorizontal className="w-4 h-4" />
+                <button className="text-white/30 hover:text-white transition-colors cursor-pointer">
+                  <MoreHorizontal className="w-3.5 h-3.5" />
                 </button>
               </div>
 
@@ -108,9 +108,8 @@ export function KanbanBoard({ initialIdeas, plan }: { initialIdeas: KanbanIdea[]
                     {...provided.droppableProps}
                     ref={provided.innerRef}
                     className={cn(
-                      "flex-1 rounded-3xl border border-dashed p-3 space-y-4 transition-all duration-300 min-h-[150px] text-left",
-                      snapshot.isDraggingOver ? "bg-white/[0.05] border-blue-500/30 border-solid" : "bg-transparent border-white/5",
-                      colIdeas.length > 0 && !snapshot.isDraggingOver && "bg-white/[0.01]"
+                      "flex-1 rounded-xl border p-2.5 space-y-2.5 transition-all duration-200 min-h-[160px] text-left",
+                      snapshot.isDraggingOver ? "bg-white/[0.04] border-blue-500/30" : "bg-[#070707]/60 border-white/[0.06]"
                     )}
                   >
                     {colIdeas.map((idea, index) => (
@@ -122,7 +121,7 @@ export function KanbanBoard({ initialIdeas, plan }: { initialIdeas: KanbanIdea[]
                             {...provided.dragHandleProps}
                             className={cn(
                               "relative group transition-transform duration-200 text-left",
-                              snapshot.isDragging && "z-50 scale-105 rotate-2"
+                              snapshot.isDragging && "z-50 scale-105 rotate-1"
                             )}
                           >
                             <BriefCard 
@@ -134,7 +133,7 @@ export function KanbanBoard({ initialIdeas, plan }: { initialIdeas: KanbanIdea[]
                             
                             {/* Drag Indicator */}
                             <div className="absolute top-1/2 -left-1 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity p-1 text-left">
-                               <GripVertical className="w-3 h-3 text-slate-600" />
+                               <GripVertical className="w-3 h-3 text-white/30" />
                             </div>
                           </div>
                         )}
@@ -143,8 +142,8 @@ export function KanbanBoard({ initialIdeas, plan }: { initialIdeas: KanbanIdea[]
                     {provided.placeholder}
 
                     {colIdeas.length === 0 && !snapshot.isDraggingOver && (
-                      <div className="h-32 flex flex-col items-center justify-center text-center p-6 border-2 border-dashed border-white/[0.02] rounded-3xl text-left">
-                         <p className="text-[10px] font-bold text-slate-700 uppercase tracking-widest text-left">Drop here</p>
+                      <div className="h-28 flex flex-col items-center justify-center text-center p-4 border border-dashed border-white/[0.06] rounded-xl text-left">
+                         <p className="text-[10px] font-mono text-white/30 uppercase tracking-wider">Empty stage</p>
                       </div>
                     )}
                   </div>

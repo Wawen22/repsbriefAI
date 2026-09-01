@@ -1,6 +1,6 @@
 # RepsBrief — PROJECT_CONTEXT (Single Source of Truth)
 
-Last update: 2026-08-30
+Last update: 2026-09-01
 Owner context: AI agents + team dev
 
 ## 1) Product Scope
@@ -21,7 +21,7 @@ Dominio: **repsbrief.com** (Hostinger DNS → Vercel)
 
 - Frontend: Next.js App Router, React, Tailwind.
 - Backend: Server Actions + API routes in `src/app/actions/*` e `src/app/api/*`.
-- DB/Auth/Storage: Supabase.
+- DB/Auth/Storage: Supabase (Project `qptnloozpjvcqqrfbmnj`, `eu-west-1`).
 - Billing: Stripe (launch: `starter` free, `pro` monthly; Team is held back pending validation).
 - Mail: Resend.
 - Integrations: Notion, Google Calendar, Slack, Discord, ClickUp, Trello, Webhooks (Zapier/Make).
@@ -46,15 +46,16 @@ Dominio: **repsbrief.com** (Hostinger DNS → Vercel)
   - [ ] P4.4 Observability hardening (Sentry + alerting) — backlog
   - [ ] P4.5 Publishing connectors (WordPress/Ghost) — backlog bassa priorità
   - [ ] P4.6 Cloud asset sync (Drive/Dropbox) — backlog bassa priorità
-- [ ] **Phase 6: Revenue Launch** (In corso — 2026-08-30)
+- [ ] **Phase 6: Revenue Launch** (In corso — 2026-09-01)
   - [x] Vercel deploy → https://repsbrief.com (GitHub CI/CD attivo)
   - [x] Stripe live mode: Pro $19/mo; Starter = Free
   - [x] Landing pricing/copy aligned to delivered Starter and Pro entitlements
   - [x] Trend-quality gate: no generated brief when active sources are empty, malformed, or stale
   - [x] Canonical public shares use `/s/[id]`; legacy `/share/[id]` redirects
   - [x] Referral customer credit has a Stripe idempotency key
+  - [x] Supabase Baseline Reconciliation Audit completato (`docs/audits/2026-09-01-supabase-reconciliation-audit.md`)
+  - [ ] Esecuzione autorizzata del Delta DDL (`teams.brand_voice`, `idea_images`) e allineamento `schema_migrations`
   - [ ] Resend domain verification + `RESEND_FROM_EMAIL` configured in Vercel
-  - [ ] Supabase migration history reconciled before applying current migration set
   - [ ] Production smoke test: signup → Starter brief → Pro checkout → webhook → cancellation
   - [ ] First cohort: recruit 10 Fitness & Nutrition creators
   - [ ] Weekly funnel review: signup → brief → trial → paid
@@ -65,7 +66,7 @@ Dominio: **repsbrief.com** (Hostinger DNS → Vercel)
 |:---|:---|:---:|:---:|
 | 13 | Guided Onboarding Tour | 🔴 High | ✅ Done |
 | 14 | Trends Visualizer | 🟡 Medium | ⬜ Todo |
-| 15 | Shareable Strategy Links (/s/[id]) | 🟡 Medium | ✅ Canonical route live; DB policy pending migration reconciliation |
+| 15 | Shareable Strategy Links (/s/[id]) | 🟡 Medium | ✅ Canonical route live; DB policy verified |
 | 16 | Custom Theme Accents | 🟢 Low | ⬜ Todo |
 | 17 | Email Capture (Landing Hero) + Welcome Email | 🔴 High | 🟡 Lead capture live; sending domain pending |
 | 18 | Idea Gate — Starter sees 5/20 ideas | 🔴 High | ✅ Done |
@@ -89,24 +90,31 @@ Webhook endpoint: https://repsbrief.com/api/stripe/webhook
 ```
 Tutte le chiavi Stripe sono in **live mode**. Il prodotto Starter $9 è stato archiviato (inactive).
 
-## 7) Validation Snapshot (2026-08-30)
+## 7) Validation Snapshot (2026-09-01)
 
 - [x] `npm run typecheck` passes.
 - [x] `npm run test` passes (38 tests); `npm run test:e2e` passes.
 - [x] `npm run lint` passes.
 - [x] `npm run build` passes with non-secret local placeholder environment values (the production environment supplies real values).
 
-## 8) DB / Migrations
+## 8) DB / Migrations & Reconciliation Baseline
 
-**Do not apply migrations blindly.** Production migration history still contains only six records while the repository contains a much longer migration chain. The independently verified hardening migration `20260830095438_harden_revenue_launch_access.sql` is applied; reconcile the older history before applying any remaining local migrations.
+**Audit Document:** `docs/audits/2026-09-01-supabase-reconciliation-audit.md`  
+**Test Suite:** `supabase/tests/2026-09-01-reconciliation-verification.sql`  
+
+- **Stato Remoto (Project `qptnloozpjvcqqrfbmnj`):** 15 tabelle presenti, 6 record in `supabase_migrations.schema_migrations`.
+- **Divergenze Rilevate:**
+  - `public.idea_images` e bucket `idea-images` mancanti in produzione.
+  - `public.teams` manca di `brand_voice` (TEXT) e `writing_samples` (TEXT[]), rendendo `update_team_brand_voice` non invocabile.
+- **Regola:** **NON applicare migration cieche né eseguire `migration repair` senza autorizzazione esplicita.** Seguire la sequenza Delta DDL documentata nell'audit.
 
 Variabili env richieste per prod: vedere `INTEGRATIONS_CHECKLIST.md`.
 
-## 9) Open Risks (aggiornato 2026-08-30)
+## 9) Open Risks (aggiornato 2026-09-01)
 
-- **Email**: Resend returned production delivery errors because no verified sender domain was configured. Lead persistence is safe; invitation delivery needs the manual DNS/domain step.
-- **Source reliability**: recent Reddit 403, Google Trends parsing failures, and RSS 429/404 exist. The initial beta enables only its configured source set and rejects bad source data rather than inventing a brief.
-- **Billing**: Stripe live mode has no active subscriptions yet. Validate the full webhook cycle with a live test checkout before acquisition.
-- **Data security**: anonymous `shared_strategies` reads and public queue-claim execution were hardened in production on 2026-08-30. Older remote migration history remains incomplete and must be reconciled before further schema work.
+- **Database**: `teams.brand_voice` e `idea_images` mancano su remoto; `schema_migrations` traccia solo 6 versioni su 38. La riconciliazione è pronta ma richiede approvazione esplicita per l'applicazione.
+- **Email**: Resend ha generato errori di delivery per mancanza di dominio mittente verificato (`RESEND_FROM_EMAIL`). Richiede passaggio manuale DNS.
+- **Source reliability**: YouTube e RSS sono le uniche fonti attive; Examine ha restituito 429 e RP/T-Nation 404. La pipeline asincrona Apify è pianificata nel worktree `feat/apify-trend-ingestion`.
+- **Billing**: Stripe live mode attivo ma senza abbonamenti reali. Validare ciclo webhook completo prima dell'acquisizione coorte.
 - Queue mode feature-flagged (`WEBHOOK_DELIVERY_MODE=inline` in prod): ok per lancio, da valutare switch a `queue` con traffico crescente.
 - `supabaseAdmin` fail-fast su production se `SUPABASE_SERVICE_ROLE_KEY` manca — chiave configurata su Vercel.

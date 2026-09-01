@@ -58,6 +58,8 @@ Dominio: **repsbrief.com** (Hostinger DNS → Vercel)
   - [x] Engagement mail no longer notifies Starter users from historical briefs
   - [x] Mail sender is centralized on `RESEND_FROM_EMAIL` and fails closed in production
   - [x] Supabase Baseline Reconciliation Audit completato (`docs/audits/2026-09-01-supabase-reconciliation-audit.md`)
+  - [x] Landing Page Interactive Studio Showcase completato (4 tab interattive: Trend Radar, AI Strategy Generator, Neural Brand Voice, Multi-Channel Sync con live micro-interactions) (2026-09-01)
+  - [x] GitHub Actions CI allineato a pnpm (`pnpm install --frozen-lockfile` con placeholder env per build) (2026-09-01)
   - [ ] Reconcile Supabase production history only from a confirmed backup, then apply the authorized Delta DDL (`teams.brand_voice`, `idea_images`) and align `schema_migrations`
   - [ ] Resend domain verification + `RESEND_FROM_EMAIL` configured in Vercel
   - [ ] Production smoke test: signup → Starter brief → Pro checkout → webhook → cancellation

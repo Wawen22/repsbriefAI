@@ -78,7 +78,8 @@ RepsBrief è una piattaforma SaaS multi-tenant (`Next.js + Supabase`) per creato
 | **fix-pnpm-stripe-consistency** | ✅ **Verified locally** | Senior Full-Stack / 🔴 P0 | Pnpm is canonical; lock resolution is Stripe 20.3.1 and its generated `2026-01-28.clover` API type matches the preserved client literal, fixing Vercel TypeScript builds. |
 | **fix/security-cost-controls** | ✅ **Integrated locally** | Senior Full-Stack / 🔴 P0 | Zod gates and rate limits integrated; remote images remain fail-closed (data URL raster only). |
 | **fix/revenue-truthfulness** | ✅ **Integrated locally** | Senior Full-Stack / 🔴 P0 | Active-source copy, mail safeguards, `/s/[id]`, and `/r/[code]` Route Handler integrated. |
-| **chore/supabase-baseline-audit** | ✅ **Integrated locally** | Senior Full-Stack / 🔴 P0 | Audit and static SQL test suite only; neither was executed. |
+| **feat-landing-interactive-studio** | ✅ **Merged & Pushed** | Senior Full-Stack / 🔴 P0 | Interactive 4-tab ADE Studio Mockup (Radar, Generator, Brand Voice, Sync) with dynamic state & micro-interactions. |
+| **ci-pnpm-alignment** | ✅ **Merged & Pushed** | DevOps / 🔴 P0 | GitHub Actions CI updated to pnpm setup and build placeholders matching canonical deployment. |
 | **feat/apify-trend-ingestion** | ⬜ In attesa | Senior Full-Stack / 🟡 P1 | Pipeline ingestion asincrona, adapter normalizzati, deduplica e provenance trend. |
 | **Resend Sender Domain** | ⬜ In attesa | DevOps / 🔴 P0 | Configurazione DNS e variabile `RESEND_FROM_EMAIL` su Vercel. |
 | **Supabase Remote DDL Apply** | ⏸️ **Bloccato** | Team Dev / 🔴 P0 | Create and verify a production backup, then obtain explicit authorization before executing Delta DDL or aligning `schema_migrations`. |

@@ -4,7 +4,14 @@ import { Resend } from 'resend';
 import { WeeklyBriefEmail } from '@/components/email/WeeklyBriefEmail';
 import { IdeaObject } from '@/types/niche';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = new Resend(process.env.RESEND_API_KEY || 're_missing');
+
+export function getEmailSender(): string | null {
+  if (process.env.RESEND_FROM_EMAIL) return process.env.RESEND_FROM_EMAIL
+  if (process.env.NODE_ENV !== 'production') return 'RepsBrief <onboarding@resend.dev>'
+  console.error('[Mail] RESEND_FROM_EMAIL must be configured in production')
+  return null
+}
 
 export async function sendWeeklyBriefEmail({
   email,
@@ -18,10 +25,10 @@ export async function sendWeeklyBriefEmail({
   userName?: string;
 }) {
   try {
-    // In Sandbox mode (senza dominio verificato), Resend accetta solo 'onboarding@resend.dev' come mittente
-    // e l'email del proprietario dell'account come destinatario.
+    const from = getEmailSender()
+    if (!from) return { success: false, error: new Error('Email sender is not configured') }
     const { data, error } = await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL || 'RepsBrief <onboarding@resend.dev>',
+      from,
       to: [email],
       subject: `Your Weekly Brief: ${ideas.length} strategies for ${nicheLabel}`,
       react: WeeklyBriefEmail({ nicheLabel, ideas, userName }),
@@ -63,14 +70,14 @@ export async function sendWelcomeSequenceEmail(
     `,
     3: `
       <h2 style="font-size:22px;font-weight:900;margin:0 0 16px;color:#f1f5f9">Your first brief is 30 seconds away</h2>
-      <p style="color:#94a3b8;line-height:1.6;margin:0 0 16px">We noticed you haven't generated your first brief yet. Our engine has already scraped this week's top trends for your niche — it just needs you to hit Generate.</p>
+      <p style="color:#94a3b8;line-height:1.6;margin:0 0 16px">We noticed you haven't generated your first brief yet. Generate one when you are ready to turn fresh YouTube and RSS signals into content ideas.</p>
       <a href="https://repsbrief.com/dashboard" style="display:inline-block;background:#2563eb;color:#fff;padding:14px 28px;border-radius:12px;font-weight:900;text-decoration:none;font-size:13px;letter-spacing:0.05em;text-transform:uppercase">Generate My Brief →</a>
     `,
     7: `
       <h2 style="font-size:22px;font-weight:900;margin:0 0 16px;color:#f1f5f9">The difference between free and Pro</h2>
       <p style="color:#94a3b8;line-height:1.6;margin:0 0 16px">Free gives you a taste. Pro gives you the whole engine:</p>
       <ul style="color:#94a3b8;line-height:2;padding-left:20px;margin:0 0 24px">
-        <li><strong style="color:#f1f5f9">Daily briefs</strong> instead of weekly</li>
+        <li><strong style="color:#f1f5f9">Daily manual generation</strong> instead of one manual brief per week</li>
         <li><strong style="color:#f1f5f9">All 20 strategies</strong> unlocked (free shows 5)</li>
         <li><strong style="color:#f1f5f9">AI Brand Voice</strong> trained on your writing</li>
         <li><strong style="color:#f1f5f9">Editorial calendar</strong> synced to Google Calendar</li>
@@ -80,8 +87,10 @@ export async function sendWelcomeSequenceEmail(
   }
 
   try {
+    const from = getEmailSender()
+    if (!from) return { success: false }
     const { error } = await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL || 'RepsBrief <onboarding@resend.dev>',
+      from,
       to: [email],
       subject: subjects[day],
       html: `
@@ -108,14 +117,12 @@ export async function sendBriefReadyEmail(
   nicheLabel: string,
   isPro: boolean
 ): Promise<{ success: boolean }> {
-  const subject = isPro
-    ? `Your daily brief is ready — 20 new ${nicheLabel} ideas`
-    : `Your weekly brief is ready — 20 ${nicheLabel} ideas this week`
+  const subject = `Your ${isPro ? 'new' : 'weekly'} brief is ready — 20 ${nicheLabel} ideas`
 
   const html = `
     <div style="font-family:sans-serif;max-width:560px;margin:0 auto;background:#050505;color:#f1f5f9;padding:40px;border-radius:16px">
       <h2 style="font-size:22px;font-weight:900;margin:0 0 8px;color:#f1f5f9">
-        Your ${isPro ? 'daily' : 'weekly'} brief is ready 🚀
+        Your brief is ready 🚀
       </h2>
       <p style="color:#94a3b8;font-size:15px;margin:0 0 24px;line-height:1.6">
         Hey ${userName || 'Creator'} — 20 trend-backed ${nicheLabel} content ideas are waiting for you in your Studio.
@@ -124,7 +131,7 @@ export async function sendBriefReadyEmail(
       <div style="background:#0f172a;border:1px solid #1e293b;border-radius:12px;padding:20px;margin:0 0 28px">
         <p style="color:#64748b;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:0.1em;margin:0 0 12px">What&apos;s inside this brief</p>
         <ul style="color:#94a3b8;line-height:2;padding-left:20px;margin:0;font-size:14px">
-          <li><strong style="color:#f1f5f9">20 AI-curated ideas</strong> filtered from Reddit, YouTube & Google Trends</li>
+          <li><strong style="color:#f1f5f9">20 AI-curated ideas</strong> informed by fresh YouTube and RSS signals</li>
           <li><strong style="color:#f1f5f9">Hook + script</strong> ready to record for each idea</li>
           <li><strong style="color:#f1f5f9">Format mix</strong> — Reels, Carousels, Threads, Newsletters</li>
         </ul>
@@ -136,8 +143,8 @@ export async function sendBriefReadyEmail(
 
       ${!isPro ? `
       <div style="margin-top:32px;padding:20px;border:1px solid #1e293b;border-radius:12px">
-        <p style="color:#64748b;font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:0.1em;margin:0 0 8px">Want briefs every day?</p>
-        <p style="color:#94a3b8;font-size:13px;margin:0 0 12px">Pro users get 20 fresh ideas daily + full scripts + AI remix. Try it free for 7 days.</p>
+        <p style="color:#64748b;font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:0.1em;margin:0 0 8px">Want more flexibility?</p>
+        <p style="color:#94a3b8;font-size:13px;margin:0 0 12px">Pro users can generate a fresh brief daily, with full scripts and AI remix. Try it free for 7 days.</p>
         <a href="https://repsbrief.com/dashboard/settings?tab=billing" style="color:#60a5fa;font-size:13px;font-weight:700;text-decoration:none">Upgrade to Pro — 7-day free trial →</a>
       </div>
       ` : ''}
@@ -147,8 +154,10 @@ export async function sendBriefReadyEmail(
   `
 
   try {
+    const from = getEmailSender()
+    if (!from) return { success: false }
     const { error } = await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL || 'RepsBrief <onboarding@resend.dev>',
+      from,
       to: [email],
       subject,
       html,

@@ -1,6 +1,6 @@
 # RepsBrief — PROJECT_CONTEXT (Single Source of Truth)
 
-Last update: 2026-08-30
+Last update: 2026-09-01
 Owner context: AI agents + team dev
 
 ## 1) Product Scope
@@ -53,6 +53,9 @@ Dominio: **repsbrief.com** (Hostinger DNS → Vercel)
   - [x] Trend-quality gate: no generated brief when active sources are empty, malformed, or stale
   - [x] Canonical public shares use `/s/[id]`; legacy `/share/[id]` redirects
   - [x] Referral customer credit has a Stripe idempotency key
+  - [x] Revenue truthfulness hardening: copy reflects active YouTube/RSS sources; public shares use `/s/[id]`; referral cookie uses a Route Handler
+  - [x] Engagement mail no longer notifies Starter users from historical briefs
+  - [x] Mail sender is centralized on `RESEND_FROM_EMAIL` and fails closed in production
   - [ ] Resend domain verification + `RESEND_FROM_EMAIL` configured in Vercel
   - [ ] Supabase migration history reconciled before applying current migration set
   - [ ] Production smoke test: signup → Starter brief → Pro checkout → webhook → cancellation

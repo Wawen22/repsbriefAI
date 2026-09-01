@@ -7,12 +7,10 @@ import { Badge } from '@/components/ui/badge'
 import { 
   Sparkles, 
   ArrowRight, 
-  TrendingUp, 
   Info,
   Orbit,
   Star,
   Maximize2,
-  Zap,
   Youtube,
   Rss
 } from 'lucide-react'
@@ -28,7 +26,7 @@ const SAMPLE_IDEAS = [
     format: "Reel" as const,
     whyItWorks: "Contrarian take on a universally accepted fact — high engagement bait with real science to back it up.",
     niche: "Fitness",
-    sources: ["reddit", "google-trends"],
+    sources: ["youtube", "rss"],
     scriptDraft: "[Scene: Holding a fitness tracker]\nNarrator: Stop obsessing over this number.\n[Cut to: Science paper screenshot]\nNarrator: Research shows that after 7,000 steps, benefits plateau. Here is what you should focus on instead..."
   },
   {
@@ -47,7 +45,7 @@ const SAMPLE_IDEAS = [
     format: "Thread" as const,
     whyItWorks: "Targets the huge overlap between fitness audience and remote workers. Posture content is evergreen.",
     niche: "Fitness",
-    sources: ["reddit"]
+    sources: ["rss"]
   },
   {
     title: "The 'Lazy' Morning Routine for 2x Focus",
@@ -56,7 +54,7 @@ const SAMPLE_IDEAS = [
     format: "Newsletter" as const,
     whyItWorks: "Reverses the 'hustle culture' narrative which is currently seeing a massive backlash on social media.",
     niche: "Self-Improvement",
-    sources: ["rss", "google-trends"]
+    sources: ["rss", "youtube"]
   },
   {
     title: "How to Build a 'Second Brain' for Content Ideas",
@@ -65,7 +63,7 @@ const SAMPLE_IDEAS = [
     format: "Carousel" as const,
     whyItWorks: "Tool-based productivity is a high-CPM niche with very loyal engagement.",
     niche: "Tech & AI",
-    sources: ["reddit", "youtube"]
+    sources: ["youtube", "rss"]
   },
   {
     title: "The Future of AI: From Chatbots to Agents",
@@ -74,7 +72,7 @@ const SAMPLE_IDEAS = [
     format: "Reel" as const,
     whyItWorks: "High authority content that positions you as a forward-thinker in the fastest moving industry.",
     niche: "Tech & AI",
-    sources: ["youtube", "google-trends"],
+    sources: ["youtube", "rss"],
     scriptDraft: "[Visual: AI interface typing]\nNarrator: Stop thinking of AI as a search engine.\n[Visual: Automation flow]\nNarrator: The real revolution is happening here..."
   }
 ]
@@ -90,9 +88,7 @@ const FORMAT_COLORS: Record<string, { bg: string, text: string, border: string }
 
 const SourceBadge = ({ source }: { source: string }) => {
   const configs: Record<string, { icon: SourceIcon; color: string; bg: string; label: string }> = {
-    'reddit': { icon: Zap, color: 'text-orange-500', bg: 'bg-orange-500/10', label: 'Reddit' },
     'youtube': { icon: Youtube, color: 'text-red-500', bg: 'bg-red-500/10', label: 'YouTube' },
-    'google-trends': { icon: TrendingUp, color: 'text-blue-500', bg: 'bg-blue-500/10', label: 'Trends' },
     'rss': { icon: Rss, color: 'text-amber-500', bg: 'bg-amber-500/10', label: 'RSS' },
   }
   const config = configs[source] || { icon: Sparkles, color: 'text-slate-400', bg: 'bg-white/5', label: source }

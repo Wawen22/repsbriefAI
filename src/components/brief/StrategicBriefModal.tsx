@@ -27,7 +27,7 @@ import {
 import { useState } from "react"
 import { toast } from "sonner"
 import { Teleprompter } from "@/components/dashboard/Teleprompter"
-import { shareIdeaAction } from "@/app/actions/ideas"
+import { createShareAction } from "@/app/actions/share"
 import { remixScriptAction } from "@/app/actions/remix"
 
 interface StrategicBriefModalProps {
@@ -75,9 +75,9 @@ export function StrategicBriefModal({
     setIsSharing(true)
     const tid = toast.loading("Generating public link...")
     try {
-      const res = await shareIdeaAction(currentIdea, currentIdea.niche || 'fitness')
-      if (res.success && res.shareId) {
-        const url = `${window.location.origin}/share/${res.shareId}`
+      const res = await createShareAction(currentIdea, currentIdea.niche || 'fitness')
+      if ('id' in res) {
+        const url = `${window.location.origin}/s/${res.id}`
         navigator.clipboard.writeText(url)
         toast.success("Strategy saved & Link copied!", { id: tid })
       } else {

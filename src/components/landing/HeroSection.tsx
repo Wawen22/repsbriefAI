@@ -88,7 +88,7 @@ export function HeroSection() {
 
         {/* Subtitle */}
         <p className="text-base sm:text-lg md:text-xl text-white/50 max-w-3xl mb-8 font-sans leading-relaxed text-balance animate-in fade-in duration-700 delay-300">
-          Run real-time trend scrapers, script generators, and neural brand voice side by side. 
+          Turn fresh source signals into content strategies, scripts, and Brand Voice drafts in one studio.
           Editorial calendar, teleprompter, and 1-click Notion sync keep your pipeline moving.
         </p>
 

@@ -199,7 +199,7 @@ export default async function DashboardPage({
             <div className="space-y-3 text-center">
               <h2 className="text-3xl font-bold text-white tracking-tight">Your briefing is ready to generate</h2>
               <p className="text-slate-400 text-lg leading-relaxed font-light px-6">
-                Our engine has analyzed the latest Reddit, YouTube, and Google trends for your niche.
+                Generate a brief from available YouTube and RSS signals for your niche.
               </p>
             </div>
 

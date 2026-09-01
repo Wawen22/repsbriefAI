@@ -14,22 +14,22 @@ const FEATURES = [
   {
     icon: Radio,
     tag: "Data Pipeline",
-    title: "Live Trend Radar & Scrapers",
-    desc: "Scrapes Reddit discussions, Google Trends spikes, YouTube transcripts, and RSS feeds in real time to capture breakout topics before competitors.",
+    title: "Trend signals for your brief",
+    desc: "Uses fresh YouTube and RSS signals to inform content ideas when you generate a brief.",
     badge: "Multi-Source",
     visual: (
       <div className="mt-4 p-3.5 rounded-xl border border-white/[0.08] bg-black/60 font-mono text-[11px] space-y-2">
         <div className="flex items-center justify-between text-white/50 text-[10px]">
           <span>FEED STREAM</span>
-          <span className="text-emerald-400">● LIVE</span>
+          <span className="text-emerald-400">● AVAILABLE</span>
         </div>
         <div className="flex items-center justify-between text-white/80">
-          <span>r/fitness · &quot;Zone 2 Threshold&quot;</span>
-          <span className="text-orange-400">+340%</span>
+          <span>YouTube · &quot;Zone 2 Threshold&quot;</span>
+          <span className="text-red-400">Video signal</span>
         </div>
         <div className="flex items-center justify-between text-white/80">
-          <span>Google Trends · &quot;Creatine Timing&quot;</span>
-          <span className="text-blue-400">Breakout</span>
+          <span>RSS · &quot;Creatine Timing&quot;</span>
+          <span className="text-amber-400">Article signal</span>
         </div>
       </div>
     )

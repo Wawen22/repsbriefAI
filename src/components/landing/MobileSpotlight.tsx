@@ -30,7 +30,7 @@ export function MobileSpotlight() {
 
             <div className="space-y-3 pt-2">
               {[
-                'Read automated 7:00 AM trend briefs on any device',
+                'Generate a fresh trend brief from any device',
                 '1-tap script approvals for editors and creators',
                 'Full-screen mobile teleprompter with auto-scroll and pace control',
                 'Instant push to Notion and Google Calendar'
@@ -125,4 +125,3 @@ export function MobileSpotlight() {
     </section>
   )
 }
-

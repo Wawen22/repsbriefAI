@@ -7,6 +7,7 @@ import { getSupabaseAdmin } from '@/lib/supabase'
 import { sendWelcomeSequenceEmail, sendBriefReadyEmail } from '@/lib/mail'
 import { NICHES } from '@/config/niches'
 import { recordDeliveryResult } from './results'
+import { todayStartIso } from '@/lib/engagement'
 
 export const dynamic = 'force-dynamic'
 
@@ -85,35 +86,27 @@ export async function GET(req: Request) {
   const isMonday = new Date().getDay() === 1
 
   if (isMonday) {
-    // Starter users: brief generated today (weekly brief runs Monday cron)
-    const { data: starterUsers } = await supabase
-      .from('profiles')
-      .select('id, email, full_name, active_niche')
-      .eq('plan', 'starter')
-      .not('email', 'is', null)
+    // Only a brief created by today's weekly run can notify a Starter user.
+    const { data: starterBriefsToday } = await supabase
+      .from('briefs')
+      .select('user_id, profiles!inner(email, full_name, plan, active_niche)')
+      .gte('created_at', todayStartIso())
+      .eq('profiles.plan', 'starter')
 
-    for (const user of starterUsers || []) {
-      if (!user.email) continue
-      // Check they have at least one brief
-      const { data: brief } = await supabase
-        .from('briefs')
-        .select('id')
-        .eq('user_id', user.id)
-        .limit(1)
-        .maybeSingle()
-      if (!brief) continue
-      const nicheLabel = NICHES[user.active_niche as string]?.label || 'content'
-      const r = await sendBriefReadyEmail(user.email, user.full_name || '', nicheLabel, false)
+    for (const row of starterBriefsToday || []) {
+      const profile = row.profiles as { email?: string; full_name?: string; active_niche?: string } | null
+      if (!profile?.email) continue
+      const nicheLabel = NICHES[profile.active_niche as string]?.label || 'content'
+      const r = await sendBriefReadyEmail(profile.email, profile.full_name || '', nicheLabel, false)
       recordDeliveryResult(results, 'briefReady', r.success)
     }
   }
 
   // Pro/Team users: notify every day their brief was generated today
-  const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0)
   const { data: proUsersWithBriefToday } = await supabase
     .from('briefs')
     .select('user_id, profiles!inner(email, full_name, plan, active_niche)')
-    .gte('created_at', todayStart.toISOString())
+    .gte('created_at', todayStartIso())
     .in('profiles.plan', ['pro', 'team'])
 
   for (const row of proUsersWithBriefToday || []) {

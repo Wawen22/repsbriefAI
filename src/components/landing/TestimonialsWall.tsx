@@ -10,7 +10,7 @@ const TESTIMONIALS = [
     followers: "240K Followers",
     avatar: "M",
     color: "bg-blue-500",
-    quote: "RepsBrief completely replaced my 4-hour Sunday research routine. Waking up to 20 trend-backed hooks with PubMed citations is like having a full-time research team in my pocket.",
+    quote: "RepsBrief helps me turn a focused research session into a practical list of content hooks.",
     highlight: "Saved 12+ hours every week"
   },
   {
@@ -60,7 +60,7 @@ const TESTIMONIALS = [
     followers: "65K Newsletter Readers",
     avatar: "L",
     color: "bg-rose-500",
-    quote: "The contrarian hook engine is the best in the industry. It doesn't write clickbait; it finds genuine debates happening on Reddit and structures them into high-converting posts.",
+    quote: "The hook workflow helps me shape an opinion into a clear, useful post without relying on clickbait.",
     highlight: "Contrarian hook algorithm"
   }
 ]
@@ -132,4 +132,3 @@ export function TestimonialsWall() {
     </section>
   )
 }
-

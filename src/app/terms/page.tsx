@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
+import { PublicStudioShell, publicStudioClasses } from '@/components/layout/PublicStudioShell'
 
 export const metadata = {
   title: 'Terms of Service — RepsBrief',
@@ -10,7 +11,7 @@ export default function TermsPage() {
   const lastUpdated = 'April 3, 2026'
 
   return (
-    <div className="min-h-screen bg-black text-slate-300">
+    <PublicStudioShell contentClassName="max-w-4xl">
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link
           href="/"
@@ -20,8 +21,9 @@ export default function TermsPage() {
           Back to RepsBrief
         </Link>
 
-        <h1 className="text-4xl font-black text-white tracking-tight mb-2">Terms of Service</h1>
-        <p className="text-slate-500 text-sm mb-12">Last updated: {lastUpdated}</p>
+        <p className={`${publicStudioClasses.metadata} mb-2`}>Legal</p>
+        <h1 className="text-4xl font-semibold text-white tracking-tight mb-2">Terms of Service</h1>
+        <p className="text-white/40 text-sm mb-12">Last updated: {lastUpdated}</p>
 
         <div className="space-y-10 text-sm leading-relaxed">
           <section className="space-y-3">
@@ -119,6 +121,6 @@ export default function TermsPage() {
           </section>
         </div>
       </div>
-    </div>
+    </PublicStudioShell>
   )
 }

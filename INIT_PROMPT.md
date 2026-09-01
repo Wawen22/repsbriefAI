@@ -6,7 +6,7 @@ Audit baseline: [2026-09-01 RepsBrief audit](docs/audits/2026-09-01-repsbrief-au
 
 - [x] Security/cost-control design and implementation plan documented.
 - [x] Input schemas, paid-plan gates, team Brand Voice hardening, and distributed rate-limit integration added.
-- [ ] Complete release verification and assess remaining dependency audit findings.
+- [ ] Complete release verification and assess remaining dependency audit findings; DNS pinning remains open.
 
 ## Task Status Tracking
 

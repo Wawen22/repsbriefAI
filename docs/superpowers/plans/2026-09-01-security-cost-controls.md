@@ -18,6 +18,14 @@
 - Configure `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`; missing variables return a fail-closed `503` before provider use.
 - Do not use `npm audit fix --force`.
 
+## Execution Status (2026-09-01)
+
+- [x] Shared input validation, entitlement gates, and Upstash fail-closed limiter added.
+- [x] Remix, Brand Voice, image generation, active niche, and team Brand Voice flows hardened.
+- [x] Raster-only image MIME validation and expanded non-public IP rejection tested.
+- [ ] DNS pinning and integration-level redirect/oversized-stream tests remain open.
+- [ ] Full typecheck, lint, and build require an environment execution window longer than 30 seconds.
+
 ---
 
 ### Task 1: Add dependencies and security primitives
@@ -176,4 +184,3 @@ Create `INIT_PROMPT.md` with Development Progress and Task Status Tracking check
 - [ ] **Step 4: Run final verification**
 
 Run: `npm test && npm run typecheck && npm run lint && npm run build && npm audit --omit=dev`
-

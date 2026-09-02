@@ -40,9 +40,10 @@ RepsBrief è una piattaforma SaaS multi-tenant (`Next.js + Supabase`) per creato
 - [x] Worktree Orca isolato `feat-apify-trend-resilience` aperto da `49c1062` per ingestion asincrona Apify, deduplica, provenance e fallback; nessuna implementazione ancora avviata.
 - [x] Piano smoke production sicuro documentato in `docs/runbooks/production-smoke-test.md`; checkout live, addebito, cancellazione e webhook reale rimangono esclusi senza autorizzazione esplicita.
 - [x] Audit read-only Vercel via MCP: deploy `5755e6d` `READY`, nessun runtime error nelle ultime 24 ore.
-- [x] Dominio mittente Resend `repsbrief.com` creato (US East); nessun DNS configurato o dominio rimosso.
-- [ ] In DNS per `repsbrief.com`, aggiungere i record DKIM/SPF forniti da Resend, poi verificare il dominio e configurare `RESEND_FROM_EMAIL` in Vercel Production.
+- [x] Dominio mittente Resend `repsbrief.com` creato (US East); record DKIM/SPF inseriti e verifica Resend avviata (stato `pending`). Nessun dominio rimosso.
+- [ ] Attendere `verified` in Resend, poi configurare `RESEND_FROM_EMAIL` in Vercel Production.
 - [ ] Riavviare Codex con `APIFY_TOKEN` disponibile nell'ambiente: l'MCP Apify è registrato globalmente; OAuth Codex non avvia il browser per incompatibilità dell'endpoint.
+- [x] Namecheap MCP registrato globalmente in Codex come endpoint Streamable HTTP (`https://mcp.namecheap.com/mcp`). Il login OAuth è bloccato prima del browser: Codex rifiuta i metadati perché l'origine dell'issuer non coincide con quella dell'authorization server.
 
 - [x] **Phase 1: Foundation** (Completata)
 - [x] **Phase 2: Scrapers & Generator** (Completata)
@@ -98,6 +99,7 @@ RepsBrief è una piattaforma SaaS multi-tenant (`Next.js + Supabase`) per creato
 | **ci-pnpm-alignment** | ✅ **Merged & Pushed** | DevOps / 🔴 P0 | GitHub Actions CI updated to pnpm setup and build placeholders matching canonical deployment. |
 | **feat-apify-trend-resilience** | 🟡 **In progress** | Senior Full-Stack / 🟡 P1 | Worktree isolato aperto da `49c1062`: progettare ingestion asincrona Apify, adapter normalizzati, deduplica, provenance e fallback YouTube/RSS. |
 | **Resend Sender Domain** | ⬜ In attesa | DevOps / 🔴 P0 | Configurazione DNS e variabile `RESEND_FROM_EMAIL` su Vercel. |
+| **Namecheap MCP** | 🟡 **Registrato / OAuth bloccato** | DevOps / 🟡 P1 | Endpoint remoto attivo in Codex; il login OAuth Namecheap è respinto dal controllo di origine dei metadati Codex prima dell'apertura del browser. |
 | **Supabase Remote DDL Apply** | ⏸️ **Bloccato** | Team Dev / 🔴 P0 | Create and verify a production backup, then obtain explicit authorization before executing Delta DDL or aligning `schema_migrations`. |
 | **Release Validation** | ✅ **Verified + deployed** | Senior Full-Stack / 🔴 P0 | `pnpm run typecheck`, `pnpm run lint`, and `pnpm test` passed (17 test files / 80 tests); Vercel production is `READY` on `ff6c6a1`. |
 

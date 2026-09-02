@@ -39,7 +39,8 @@ RepsBrief è una piattaforma SaaS multi-tenant (`Next.js + Supabase`) per creato
 - [x] Worktree Orca `feat-public-design-system`, `feat-public-design-system-2` e `feat-studio-command-center` marcati `completed` e preservati puliti per audit/rollback.
 - [x] Piano smoke production sicuro documentato in `docs/runbooks/production-smoke-test.md`; checkout live, addebito, cancellazione e webhook reale rimangono esclusi senza autorizzazione esplicita.
 - [x] Direzione Apify a quattro fonti approvata; spec di ingestion asincrona, provenance, deduplica, quality gate e fallback in `docs/superpowers/specs/2026-09-02-apify-trend-resilience-design.md`.
-- [ ] Review della spec Apify, quindi piano d'implementazione; Actor a pagamento, secret Vercel e migration restano soggetti ad autorizzazione.
+- [x] Spec Apify approvata e piano dettagliato disponibile in `docs/superpowers/plans/2026-09-02-apify-trend-resilience.md`.
+- [ ] Scelta esecutiva del piano; Actor a pagamento, secret Vercel e migration restano soggetti ad autorizzazione.
 - [ ] Ripristinare una credenziale Vercel CLI valida per audit read-only di deployment/env-name; non leggere o stampare valori segreti.
 
 - [x] **Phase 1: Foundation** (Completata)

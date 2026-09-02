@@ -75,7 +75,8 @@ Dominio: **repsbrief.com** (Hostinger DNS → Vercel)
   - [ ] First cohort: recruit 10 Fitness & Nutrition creators
   - [ ] Weekly funnel review: signup → brief → trial → paid
   - [x] Spec Apify trend resilience approvata: quattro fonti, ingestion asincrona, provenance e fallback
-  - [ ] Review della spec Apify, poi piano d'implementazione e benchmark Actor autorizzato
+  - [x] Spec Apify revisionata e approvata; piano dettagliato in `docs/superpowers/plans/2026-09-02-apify-trend-resilience.md`
+  - [ ] Scelta esecutiva del piano, poi benchmark Actor autorizzato
 
 ## 5) UI/UX Roadmap
 

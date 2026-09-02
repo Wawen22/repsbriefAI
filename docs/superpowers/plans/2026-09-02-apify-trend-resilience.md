@@ -66,11 +66,11 @@ export type NormalizedTrendSignal = { source: TrendSource; externalId: string; t
 
 **Consumes:** Task 1-3. **Produces:** job `trend-ingest` e run idempotente.
 
-- [ ] Testare dedupe key `trend-ingest:<source>:<niche>:<UTC-hour>`, backoff 5/15/45 minuti, dead letter per 401/403/schema e circuit breaker 3 fallimenti/24h.
-- [ ] Implementare scheduling di tutte le fonti configurate, con un job separato per fonte/nicchia.
-- [ ] Implementare chiamata asincrona Task Apify, verifica webhook constant-time e polling di recovery.
+- [x] Testare dedupe key `trend-ingest:<source>:<niche>:<UTC-hour>`, backoff 5/15/45 minuti, dead letter per 401/403/schema e circuit breaker 3 fallimenti/24h.
+- [x] Implementare scheduling di tutte le fonti configurate, con un job separato per fonte/nicchia.
+- [x] Implementare chiamata asincrona Task Apify, verifica webhook constant-time e polling di recovery.
 - [ ] Registrare durata, conteggio, costo quando disponibile e errore privo di segreti.
-- [ ] Eseguire test; commit `feat: run resilient asynchronous trend ingestion`.
+- [x] Eseguire test focalizzati; commit `feat: run resilient asynchronous trend ingestion`.
 
 ### Task 5: Snapshot, gate e generazione cache-only
 

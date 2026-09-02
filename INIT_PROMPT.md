@@ -43,6 +43,7 @@ RepsBrief è una piattaforma SaaS multi-tenant (`Next.js + Supabase`) per creato
 - [x] Task 1 Apify completato: contratti Zod, tipi source run/snapshot e `TREND_SOURCE_CONFIG`; Reddit/Google Trends disabilitate per default e test RED/GREEN registrato.
 - [x] Task 2 Apify completato localmente: migration versionata ma non applicata e repository trend; typecheck e 89 test verdi, lint completo inconclusivo per stall del runner (lint mirato verde). Actor a pagamento, secret Vercel e apply migration restano soggetti ad autorizzazione.
 - [x] Task 3 Apify completato localmente: adapter Zod puri YouTube/RSS/Reddit/Google Trends, con fixture per record validi, duplicati, URL HTTP, timestamp invalidi e dataset Apify malformato. Nessun token, Actor, chiamata remota o migration eseguita; test adapter, typecheck e lint mirato verdi.
+- [x] Task 4 Apify completato localmente: worker/scheduling orario idempotente, contratti retry/circuit breaker, start/poll server-side e webhook HMAC constant-time. Nessun Actor, token o chiamata remota eseguita; 8 test focalizzati verdi.
 - [ ] Ripristinare una credenziale Vercel CLI valida per audit read-only di deployment/env-name; non leggere o stampare valori segreti.
 
 - [x] **Phase 1: Foundation** (Completata)
@@ -97,7 +98,7 @@ RepsBrief è una piattaforma SaaS multi-tenant (`Next.js + Supabase`) per creato
 | **feat-public-design-system** | ✅ **Completed / preserved** | Senior Full-Stack / 🔴 P0 | Integrated in `main` (`ff6c6a1`); clean Orca checkout preserved for audit/rollback. |
 | **feat-public-design-system-2** | ✅ **Completed / preserved** | Senior Full-Stack / 🔴 P0 | Integrated in `main` (`ff6c6a1`); clean Orca checkout preserved for audit/rollback. |
 | **ci-pnpm-alignment** | ✅ **Merged & Pushed** | DevOps / 🔴 P0 | GitHub Actions CI updated to pnpm setup and build placeholders matching canonical deployment. |
-| **feat-apify-trend-resilience** | 🟡 **Task 3 completato** | Senior Full-Stack / 🟡 P1 | Contratti, feature flag, migration locale non applicata, repository e adapter validati; Reddit/Google Trends restano disabilitate, nessun Actor o migration applicata. |
+| **feat-apify-trend-resilience** | 🟡 **Task 4 completato** | Senior Full-Stack / 🟡 P1 | Contratti, persistenza, adapter e worker/webhook validati; Reddit/Google Trends restano disabilitate, nessun Actor o migration applicata. |
 | **Resend Sender Domain** | ⬜ In attesa | DevOps / 🔴 P0 | Configurazione DNS e variabile `RESEND_FROM_EMAIL` su Vercel. |
 | **Supabase Remote DDL Apply** | ⏸️ **Bloccato** | Team Dev / 🔴 P0 | Create and verify a production backup, then obtain explicit authorization before executing Delta DDL or aligning `schema_migrations`. |
 | **Release Validation** | ✅ **Verified + deployed** | Senior Full-Stack / 🔴 P0 | `pnpm run typecheck`, `pnpm run lint`, and `pnpm test` passed (17 test files / 80 tests); Vercel production is `READY` on `ff6c6a1`. |

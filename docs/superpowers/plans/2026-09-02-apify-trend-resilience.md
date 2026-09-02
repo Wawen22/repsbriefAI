@@ -55,10 +55,10 @@ export type NormalizedTrendSignal = { source: TrendSource; externalId: string; t
 
 **Produces:** `adapt(source, input, context): NormalizedTrendSignal[]`.
 
-- [ ] Aggiungere fixture valide, duplicate, URL HTTP, timestamp invalido e output Apify malformato.
-- [ ] Implementare adapter puri con Zod; scartare record invalidi senza abortire record sani.
-- [ ] Per Apify, leggere Task id/token esclusivamente nel chiamante server-side e portare in provenance solo id pubblici.
-- [ ] Eseguire test; commit `feat: normalize native and Apify trend sources`.
+- [x] Aggiungere fixture valide, duplicate, URL HTTP, timestamp invalido e output Apify malformato.
+- [x] Implementare adapter puri con Zod; scartare record invalidi senza abortire record sani.
+- [x] Per Apify, leggere Task id/token esclusivamente nel chiamante server-side e portare in provenance solo id pubblici.
+- [x] Eseguire test; commit `feat: normalize native and Apify trend sources`.
 
 ### Task 4: Worker ingestion, retry e webhook
 

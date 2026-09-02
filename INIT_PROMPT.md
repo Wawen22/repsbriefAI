@@ -40,7 +40,8 @@ RepsBrief è una piattaforma SaaS multi-tenant (`Next.js + Supabase`) per creato
 - [x] Piano smoke production sicuro documentato in `docs/runbooks/production-smoke-test.md`; checkout live, addebito, cancellazione e webhook reale rimangono esclusi senza autorizzazione esplicita.
 - [x] Direzione Apify a quattro fonti approvata; spec di ingestion asincrona, provenance, deduplica, quality gate e fallback in `docs/superpowers/specs/2026-09-02-apify-trend-resilience-design.md`.
 - [x] Spec Apify approvata e piano dettagliato disponibile in `docs/superpowers/plans/2026-09-02-apify-trend-resilience.md`.
-- [ ] Scelta esecutiva del piano; Actor a pagamento, secret Vercel e migration restano soggetti ad autorizzazione.
+- [x] Task 1 Apify completato: contratti Zod, tipi source run/snapshot e `TREND_SOURCE_CONFIG`; Reddit/Google Trends disabilitate per default e test RED/GREEN registrato.
+- [ ] Task 2 Apify: creare migration versionata ma non applicarla; Actor a pagamento, secret Vercel e apply migration restano soggetti ad autorizzazione.
 - [ ] Ripristinare una credenziale Vercel CLI valida per audit read-only di deployment/env-name; non leggere o stampare valori segreti.
 
 - [x] **Phase 1: Foundation** (Completata)
@@ -75,7 +76,7 @@ RepsBrief è una piattaforma SaaS multi-tenant (`Next.js + Supabase`) per creato
   - [x] Completed pnpm-backed release validation: 80 tests, typecheck, lint, and a clean placeholder-backed build all pass. `package.json` declares pnpm 11.25.0; explicit pnpm build-policy decisions deny unapproved third-party lifecycle scripts.
   - [ ] Create and verify a production backup, then obtain authorization for the Delta DDL (`teams.brand_voice`, `idea_images`) and `schema_migrations` reconciliation
   - [ ] Resend domain verification + `RESEND_FROM_EMAIL` configurato in Vercel
-  - [ ] Worktree `feat-apify-trend-resilience`: review spec, piano e pipeline asincrona trend
+  - [ ] Worktree `feat-apify-trend-resilience`: Task 2 — schema persistente non applicato e repository trend
   - [ ] Production smoke test: signup → Starter brief → gating → idee/calendario; checkout Stripe/webhook only after explicit authorization
   - [ ] Reclutamento prima coorte: 10 creator Fitness & Nutrition
 
@@ -95,7 +96,7 @@ RepsBrief è una piattaforma SaaS multi-tenant (`Next.js + Supabase`) per creato
 | **feat-public-design-system** | ✅ **Completed / preserved** | Senior Full-Stack / 🔴 P0 | Integrated in `main` (`ff6c6a1`); clean Orca checkout preserved for audit/rollback. |
 | **feat-public-design-system-2** | ✅ **Completed / preserved** | Senior Full-Stack / 🔴 P0 | Integrated in `main` (`ff6c6a1`); clean Orca checkout preserved for audit/rollback. |
 | **ci-pnpm-alignment** | ✅ **Merged & Pushed** | DevOps / 🔴 P0 | GitHub Actions CI updated to pnpm setup and build placeholders matching canonical deployment. |
-| **feat-apify-trend-resilience** | 🟡 **Spec pronta per review** | Senior Full-Stack / 🟡 P1 | Quattro fonti; design verificabile, senza Actor a pagamento né migration applicata. |
+| **feat-apify-trend-resilience** | 🟡 **Task 1 completato** | Senior Full-Stack / 🟡 P1 | Contratti e feature flag centralizzati; Reddit/Google Trends restano disabilitate, nessun Actor o migration applicata. |
 | **Resend Sender Domain** | ⬜ In attesa | DevOps / 🔴 P0 | Configurazione DNS e variabile `RESEND_FROM_EMAIL` su Vercel. |
 | **Supabase Remote DDL Apply** | ⏸️ **Bloccato** | Team Dev / 🔴 P0 | Create and verify a production backup, then obtain explicit authorization before executing Delta DDL or aligning `schema_migrations`. |
 | **Release Validation** | ✅ **Verified + deployed** | Senior Full-Stack / 🔴 P0 | `pnpm run typecheck`, `pnpm run lint`, and `pnpm test` passed (17 test files / 80 tests); Vercel production is `READY` on `ff6c6a1`. |

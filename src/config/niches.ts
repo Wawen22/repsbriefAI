@@ -1,6 +1,7 @@
 // src/config/niches.ts
 
-import type { NicheConfig, TrendItem } from '../types/niche'
+import type { TrendSource } from '@/lib/trends/contracts'
+import type { NicheConfig, NicheTrendSourceConfig, TrendItem } from '../types/niche'
 
 // Reddit and Google Trends stay implemented but are disabled until they use
 // authenticated, supported upstream APIs.
@@ -45,3 +46,30 @@ export const NICHES: Record<string, NicheConfig> = {
   },
   */
 }
+
+// Task identifiers are environment variable names only. Their values and the
+// APIFY_TOKEN remain server-only and are never committed to this configuration.
+export const TREND_SOURCE_CONFIG = {
+  youtube: {
+    enabled: true,
+    native: true,
+    niches: { fitness: { enabled: true } },
+  },
+  rss: {
+    enabled: true,
+    native: true,
+    niches: { fitness: { enabled: true } },
+  },
+  reddit: {
+    enabled: false,
+    native: false,
+    apifyTaskIdEnvVar: 'APIFY_REDDIT_TASK_ID',
+    niches: { fitness: { enabled: false } },
+  },
+  'google-trends': {
+    enabled: false,
+    native: false,
+    apifyTaskIdEnvVar: 'APIFY_GOOGLE_TRENDS_TASK_ID',
+    niches: { fitness: { enabled: false } },
+  },
+} as const satisfies Record<TrendSource, NicheTrendSourceConfig>

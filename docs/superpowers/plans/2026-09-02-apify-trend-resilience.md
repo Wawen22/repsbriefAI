@@ -26,8 +26,8 @@
 
 **Produces:** `TrendSource`, `NormalizedTrendSignal`, `TrendSnapshot`, `TrendSourceRun` e configurazione `TREND_SOURCE_CONFIG` per fonte/nicchia.
 
-- [ ] Scrivere test fallenti per campi obbligatori, fonti consentite e URL HTTPS.
-- [ ] Eseguire `pnpm test tests/unit/trend-contracts.test.ts`; atteso: fallimento per modulo assente.
+- [x] Scrivere test fallenti per campi obbligatori, fonti consentite e URL HTTPS.
+- [x] Eseguire `pnpm test tests/unit/trend-contracts.test.ts`; fallimento verificato per modulo assente.
 - [ ] Implementare il contratto:
 
 ```ts
@@ -35,8 +35,8 @@ export type TrendSource = 'youtube' | 'rss' | 'reddit' | 'google-trends'
 export type NormalizedTrendSignal = { source: TrendSource; externalId: string; title: string; canonicalUrl: string; publishedAt: string; observedAt: string; provenance: Record<string, string>; content?: string; score?: number; metadata?: Record<string, unknown> }
 ```
 
-- [ ] Aggiungere config per Task Apify opzionali e flag `enabled: false` per Reddit/Google Trends.
-- [ ] Rieseguire test focalizzato; commit `feat: add trend ingestion contracts`.
+- [x] Aggiungere config per Task Apify opzionali e flag `enabled: false` per Reddit/Google Trends.
+- [x] Rieseguire test focalizzato; commit `feat: add trend ingestion contracts`.
 
 ### Task 2: Schema persistente e repository
 

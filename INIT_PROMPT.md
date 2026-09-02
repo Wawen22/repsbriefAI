@@ -40,8 +40,8 @@ RepsBrief è una piattaforma SaaS multi-tenant (`Next.js + Supabase`) per creato
 - [x] Worktree Orca isolato `feat-apify-trend-resilience` aperto da `49c1062` per ingestion asincrona Apify, deduplica, provenance e fallback; nessuna implementazione ancora avviata.
 - [x] Piano smoke production sicuro documentato in `docs/runbooks/production-smoke-test.md`; checkout live, addebito, cancellazione e webhook reale rimangono esclusi senza autorizzazione esplicita.
 - [x] Audit read-only Vercel via MCP: deploy `5755e6d` `READY`, nessun runtime error nelle ultime 24 ore.
-- [x] Su richiesta esplicita, dominio mittente Resend `repsbrief.com` non verificato rimosso e ricreato in EU West (ID `1a072d64-21f1-420c-b5c6-49c7c1167693`); MX/SPF esistenti già coerenti, DKIM da sostituire. Nessun altro dominio rimosso.
-- [ ] Sostituire il DKIM Resend in DNS, attendere `verified`, poi configurare `RESEND_FROM_EMAIL` in Vercel Production.
+- [x] Su richiesta esplicita, dominio mittente Resend `repsbrief.com` non verificato rimosso e ricreato in EU West (ID `1a072d64-21f1-420c-b5c6-49c7c1167693`); DNS autorevole aggiornato al nuovo DKIM, MX/SPF `verified`. Nessun altro dominio rimosso.
+- [ ] Attendere la scadenza della cache Resend del vecchio DKIM (TTL precedente 14400), poi riavviare la verifica; a stato `verified`, configurare `RESEND_FROM_EMAIL` in Vercel Production.
 - [ ] Riavviare Codex con `APIFY_TOKEN` disponibile nell'ambiente: l'MCP Apify è registrato globalmente; OAuth Codex non avvia il browser per incompatibilità dell'endpoint.
 - [x] Namecheap MCP registrato globalmente in Codex come endpoint Streamable HTTP (`https://mcp.namecheap.com/mcp`). Il login OAuth è bloccato prima del browser: Codex rifiuta i metadati perché l'origine dell'issuer non coincide con quella dell'authorization server.
 

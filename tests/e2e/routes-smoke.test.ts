@@ -17,6 +17,8 @@ describe('api/auth + critical cron routes smoke imports', () => {
       import('@/app/api/auth/trello/start/route'),
       import('@/app/api/auth/trello/callback/route'),
       import('@/app/api/cron/webhook-queue/route'),
+      import('@/app/api/cron/trend-ingestion/route'),
+      import('@/app/api/webhooks/apify/route'),
     ])
 
     for (const route of routes) {

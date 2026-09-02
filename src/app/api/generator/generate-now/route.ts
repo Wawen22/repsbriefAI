@@ -6,8 +6,9 @@ import { createClient } from '@/lib/supabase/server'
 import { getSupabaseAdmin } from '@/lib/supabase'
 import { dispatchWebhookEvent } from '@/lib/jobs/webhookQueue'
 import { ENABLED_TREND_SOURCES, NICHES } from '@/config/niches'
+import { persistBriefTrendEvidence } from '@/lib/trends/evidence'
 import { getUsableTrends } from '@/lib/trends/quality'
-import { scrapeNiche } from '../../scraper'
+import { getTrendRepository } from '@/lib/trends/repository'
 import { generateBrief } from '../briefGenerator'
 import { parseActiveNiche } from '@/lib/security/schemas'
 
@@ -101,34 +102,10 @@ export async function POST() {
       .eq('niche', nicheId)
       .eq('week_date', weekDate)
 
-    let trendQuality = getUsableTrends(cachedTrends, {
+    const trendQuality = getUsableTrends(cachedTrends, {
       now: new Date(),
       allowedSources: ENABLED_TREND_SOURCES,
     })
-
-    if (trendQuality.ok) {
-      // Use cached data — fast path
-      console.log(`[GenerateNow] Using cached trends for ${nicheId} (${trendQuality.sources.join(', ')})`)
-    } else {
-      // Missing or degraded cache — scrape fresh before rejecting generation.
-      console.log(`[GenerateNow] Trend cache unavailable (${trendQuality.reason}), running fresh scrape for ${nicheId}...`)
-      try {
-        await scrapeNiche(niche)
-      } catch (scrapeErr) {
-        console.error('[GenerateNow] Fresh scrape failed:', scrapeErr)
-      }
-
-      const { data: freshTrends } = await supabaseAdmin
-        .from('trends_cache')
-        .select('data, source')
-        .eq('niche', nicheId)
-        .eq('week_date', weekDate)
-
-      trendQuality = getUsableTrends(freshTrends, {
-        now: new Date(),
-        allowedSources: ENABLED_TREND_SOURCES,
-      })
-    }
 
     if (!trendQuality.ok) {
       console.error(`[GenerateNow] No usable trends for ${nicheId}: ${trendQuality.reason}`)
@@ -143,7 +120,22 @@ export async function POST() {
       )
     }
 
+    console.log(`[GenerateNow] Using verified cached trends for ${nicheId} (${trendQuality.sources.join(', ')})`)
+
     const allTrends = trendQuality.trends
+    const trendRepository = await getTrendRepository()
+    const trendSnapshot = await trendRepository.getLatestValidSnapshot(nicheId, new Date().toISOString())
+    if (!trendSnapshot) {
+      return NextResponse.json(
+        {
+          error: 'trends_unavailable',
+          message: 'Fresh trend data is temporarily unavailable. Please try again shortly.',
+          reason: 'invalid_snapshot',
+          retryable: true,
+        },
+        { status: 503, headers: { 'Retry-After': '300' } }
+      )
+    }
 
     // 5. Load user's idea history for deduplication and performance learning
     const { data: history } = await supabaseAdmin
@@ -184,7 +176,7 @@ export async function POST() {
     }
 
     // 7. Save brief to Supabase
-    const { error: briefError } = await supabaseAdmin
+    const { data: brief, error: briefError } = await supabaseAdmin
       .from('briefs')
       .insert({
         user_id: user.id,
@@ -194,11 +186,20 @@ export async function POST() {
         ai_provider: process.env.AI_PROVIDER || 'openai',
         ai_model: process.env.AI_MODEL || 'gpt-4o-mini',
       })
+      .select('id')
+      .single()
 
-    if (briefError) {
+    if (briefError || !brief?.id) {
       console.error('[GenerateNow] Failed to save brief:', briefError)
       return NextResponse.json({ error: 'Failed to save brief' }, { status: 500 })
     }
+
+    await persistBriefTrendEvidence({
+      repository: trendRepository,
+      teamId: profile.current_team_id,
+      briefId: brief.id,
+      snapshot: trendSnapshot,
+    })
 
     if (profile.current_team_id) {
       await dispatchWebhookEvent({

@@ -5,12 +5,11 @@ Owner context: AI agents + team dev
 
 ## Operational status — 2026-09-02
 
-- Git: `main` is clean and aligned with `origin/main` at `5755e6d` (`docs: track trend resilience worktree`). The production deployment is `READY` on this commit; no runtime errors were reported in the preceding 24 hours.
+- Git: `main` is clean and aligned with `origin/main` at `ff6c6a1` (`merge: redesign studio command center`). The production deployment is `READY` on this commit; no runtime errors were reported in the preceding 24 hours.
 - Validation baseline: `pnpm run typecheck`, `pnpm run lint`, and `pnpm test` passed (17 files / 80 tests) before this operational session.
-- Orca hygiene: `feat-public-design-system`, `feat-public-design-system-2`, and `feat-studio-command-center` are marked `completed`; their clean checkouts remain preserved for audit/rollback. The isolated `feat-apify-trend-resilience` worktree is open from `49c1062` for the next resilience task.
-- Resend/Vercel audit: Vercel MCP confirms production `READY` on `5755e6d` with no runtime errors in the preceding 24 hours. At the user's explicit direction, the unverified `repsbrief.com` Resend domain was removed and recreated in EU West on 2026-09-02 (new ID `1a072d64-21f1-420c-b5c6-49c7c1167693`). The authoritative Hostinger nameservers now return the exact new DKIM value; SPF MX/TXT are `verified`. A Resend verification attempt still reports DKIM `failed`, attributed to its cached pre-change record (old TTL 14400); do not alter DNS or recreate the domain again. Wait for cache expiry, then restart verification before configuring `RESEND_FROM_EMAIL`. The pre-existing `wai.wawen.io` sender domain is unchanged and not used by RepsBrief. The installed code fails closed for production mail when the sender is absent. The Vercel MCP surface does not expose environment-variable mutation, so that final setting remains a dashboard action.
-- Apify MCP: registered globally in Codex as remote Streamable HTTP at `https://mcp.apify.com/`, using the secure `APIFY_TOKEN` environment-variable reference. Codex OAuth failed before browser launch because its authorization endpoint origin does not match the authorization-server origin; restart Codex with the environment variable set to activate bearer authentication and load its tools.
-- Namecheap MCP: registered globally in Codex as remote Streamable HTTP at `https://mcp.namecheap.com/mcp`. Its OAuth login currently fails before browser launch because Codex rejects the discovered authorization-server metadata: the issuer origin does not match the metadata origin. No Namecheap account access was granted.
+- Orca hygiene: `feat-public-design-system`, `feat-public-design-system-2`, and `feat-studio-command-center` are marked `completed`; their clean checkouts remain preserved for audit/rollback.
+- Apify trend resilience: direzione a quattro fonti approvata (YouTube, RSS, Reddit e Google Trends); spec in `docs/superpowers/specs/2026-09-02-apify-trend-resilience-design.md`. Task 1–6 completati localmente: contratti Zod/config feature-flag fail-closed, persistenza, adapter, worker asincrono, snapshot cache-only e runbook di rollout. Il gate richiede 12 segnali, due fonti sane, almeno una nativa e segnali entro 72 ore; snapshot scaduti o oltre 14 giorni non materializzano cache. `generate-now` restituisce `503` retryable senza cache verificata; `weeklyBrief` materializza snapshot senza scraping inline. Reddit/Google Trends restano disabilitate finché i flag server-side non sono esplicitamente `true` e un budget positivo e configurato; prima di ogni run il worker somma `cost_usd` noto del giorno UTC e blocca nuove chiamate Apify al raggiungimento o se il totale non e disponibile. Nessun Actor o secret è stato usato in questo task.
+- Resend/Vercel audit: `RESEND_FROM_EMAIL` remains a production blocker. The installed code fails closed for production mail when it is absent. The local Vercel CLI credential is invalid, so remote environment-name and deployment inspection requires a refreshed Vercel login/token; no secret values were requested or exposed.
 - Safe production smoke plan is documented in `docs/runbooks/production-smoke-test.md`. It deliberately excludes live checkout creation, payment, cancellation, and webhook delivery until explicitly authorized.
 
 ## 1) Product Scope
@@ -75,6 +74,14 @@ Dominio: **repsbrief.com** (Hostinger DNS → Vercel)
   - [ ] Production smoke test: signup → Starter brief → gating → idee/calendario; checkout Stripe/webhook only after explicit authorization
   - [ ] First cohort: recruit 10 Fitness & Nutrition creators
   - [ ] Weekly funnel review: signup → brief → trial → paid
+  - [x] Spec Apify trend resilience approvata: quattro fonti, ingestion asincrona, provenance e fallback
+  - [x] Spec Apify revisionata e approvata; piano dettagliato in `docs/superpowers/plans/2026-09-02-apify-trend-resilience.md`
+  - [x] Task 1 Apify: contratti trend runtime e configurazione feature-flag centralizzata, con test RED/GREEN
+  - [x] Task 2 Apify: migration non applicata e repository, con RLS team-safe per evidence e test RED/GREEN
+  - [x] Task 3 Apify: adapter Zod puri per YouTube/RSS/Reddit/Google Trends con fixture di record validi, duplicati e malformati; nessun token o chiamata remota
+  - [x] Task 5 Apify: brief generati da cache/snapshot verificati ora persistono evidence team-scoped verso ogni segnale dello snapshot; nessun servizio esterno invocato
+  - [x] Task 6 Apify: flag server-side fail-closed, validazione budget positiva e runbook per benchmark autorizzato, osservazione sette giorni e rollback
+  - [x] Release gate Apify: corretto il mock tipizzato del repository (`order`/`limit` ora preservano `gte`/`lt`); typecheck, lint, 24 file / 117 test e build placeholder verdi nel worktree.
 
 ## 5) UI/UX Roadmap
 
@@ -134,7 +141,7 @@ Variabili env richieste per prod: vedere `INTEGRATIONS_CHECKLIST.md`.
 - **Database**: `teams.brand_voice` e `idea_images` mancano su remoto; `schema_migrations` traccia solo 6 versioni su 38. Create and verify a production backup before the reconciliation, which also requires explicit authorization to apply.
 - **Security / Functions**: `claim_queue_jobs` ha `SECURITY DEFINER` con `search_path = public` (permessi già ristretti a service_role); resta da hardenare a `search_path = ''`.
 - **Email**: Resend ha generato errori di delivery per mancanza di dominio mittente verificato (`RESEND_FROM_EMAIL`). Richiede passaggio manuale DNS.
-- **Source reliability**: YouTube e RSS sono le uniche fonti attive; Examine ha restituito 429 e RP/T-Nation 404. La pipeline asincrona Apify è pianificata nel worktree `feat/apify-trend-ingestion`.
+- **Source reliability**: YouTube e RSS sono le uniche fonti attive; Examine ha restituito 429 e RP/T-Nation 404. La pipeline asincrona a quattro fonti è definita nel worktree `feat-apify-trend-resilience`; i brief team-scoped conservano ora provenance snapshot→segnale. Reddit/Google Trends restano disabilitati fino a benchmark e rollout autorizzati.
 - **Billing**: Stripe live mode attivo ma senza abbonamenti reali. Validare ciclo webhook completo prima dell'acquisizione coorte.
 - Queue mode feature-flagged (`WEBHOOK_DELIVERY_MODE=inline` in prod): ok per lancio, da valutare switch a `queue` con traffico crescente.
 - `supabaseAdmin` fail-fast su production se `SUPABASE_SERVICE_ROLE_KEY` manca — chiave configurata su Vercel.

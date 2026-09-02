@@ -34,16 +34,20 @@ RepsBrief è una piattaforma SaaS multi-tenant (`Next.js + Supabase`) per creato
 
 ### Operational update — 2026-09-02
 
-- [x] `main` pulito e allineato a `origin/main` su `5755e6d`; deploy Vercel production `READY` sullo stesso commit; nessun runtime error nelle ultime 24 ore.
+- [x] `main` pulito e allineato a `origin/main` su `ff6c6a1`; deploy Vercel production `READY` sullo stesso commit.
 - [x] Suite baseline: `pnpm run typecheck`, `pnpm run lint`, `pnpm test` — 17 file / 80 test verdi.
 - [x] Worktree Orca `feat-public-design-system`, `feat-public-design-system-2` e `feat-studio-command-center` marcati `completed` e preservati puliti per audit/rollback.
-- [x] Worktree Orca isolato `feat-apify-trend-resilience` aperto da `49c1062` per ingestion asincrona Apify, deduplica, provenance e fallback; nessuna implementazione ancora avviata.
 - [x] Piano smoke production sicuro documentato in `docs/runbooks/production-smoke-test.md`; checkout live, addebito, cancellazione e webhook reale rimangono esclusi senza autorizzazione esplicita.
-- [x] Audit read-only Vercel via MCP: deploy `5755e6d` `READY`, nessun runtime error nelle ultime 24 ore.
-- [x] Su richiesta esplicita, dominio mittente Resend `repsbrief.com` non verificato rimosso e ricreato in EU West (ID `1a072d64-21f1-420c-b5c6-49c7c1167693`); DNS autorevole aggiornato al nuovo DKIM, MX/SPF `verified`. Nessun altro dominio rimosso.
-- [ ] Attendere la scadenza della cache Resend del vecchio DKIM (TTL precedente 14400), poi riavviare la verifica; a stato `verified`, configurare `RESEND_FROM_EMAIL` in Vercel Production.
-- [ ] Riavviare Codex con `APIFY_TOKEN` disponibile nell'ambiente: l'MCP Apify è registrato globalmente; OAuth Codex non avvia il browser per incompatibilità dell'endpoint.
-- [x] Namecheap MCP registrato globalmente in Codex come endpoint Streamable HTTP (`https://mcp.namecheap.com/mcp`). Il login OAuth è bloccato prima del browser: Codex rifiuta i metadati perché l'origine dell'issuer non coincide con quella dell'authorization server.
+- [x] Direzione Apify a quattro fonti approvata; spec di ingestion asincrona, provenance, deduplica, quality gate e fallback in `docs/superpowers/specs/2026-09-02-apify-trend-resilience-design.md`.
+- [x] Spec Apify approvata e piano dettagliato disponibile in `docs/superpowers/plans/2026-09-02-apify-trend-resilience.md`.
+- [x] Task 1 Apify completato: contratti Zod, tipi source run/snapshot e `TREND_SOURCE_CONFIG`; Reddit/Google Trends disabilitate per default e test RED/GREEN registrato.
+- [x] Task 2 Apify completato localmente: migration versionata ma non applicata e repository trend; typecheck e 89 test verdi, lint completo inconclusivo per stall del runner (lint mirato verde). Actor a pagamento, secret Vercel e apply migration restano soggetti ad autorizzazione.
+- [x] Task 3 Apify completato localmente: adapter Zod puri YouTube/RSS/Reddit/Google Trends, con fixture per record validi, duplicati, URL HTTP, timestamp invalidi e dataset Apify malformato. Nessun token, Actor, chiamata remota o migration eseguita; test adapter, typecheck e lint mirato verdi.
+- [x] Task 4 Apify completato localmente: worker/scheduling orario idempotente, contratti retry/circuit breaker, start/poll server-side e webhook HMAC constant-time. Nessun Actor, token o chiamata remota eseguita; 8 test focalizzati verdi.
+- [x] Task 6 Apify completato localmente: flag Reddit/Google Trends fail-closed, budget positivo validato e runbook per benchmark autorizzato, osservazione di sette giorni e rollback. Nessun Actor, token, deploy o modifica remota eseguita.
+- [x] Enforce budget Apify completato localmente: senza budget positivo le fonti non entrano nello scheduler; il worker blocca una nuova run Apify se il `cost_usd` UTC noto ha raggiunto il ceiling o la lettura fallisce. Il budget operativo deve riservare headroom per una run in corso.
+- [x] Release gate Apify verificato: il typecheck non era bloccato; un mock del repository non rispettava la catena `SelectBuilder` dopo l'aggiunta di `gte`/`lt`. Corretto il mock e verificati typecheck, lint, 24 file / 117 test e build con placeholder.
+- [ ] Ripristinare una credenziale Vercel CLI valida per audit read-only di deployment/env-name; non leggere o stampare valori segreti.
 
 - [x] **Phase 1: Foundation** (Completata)
 - [x] **Phase 2: Scrapers & Generator** (Completata)
@@ -77,7 +81,7 @@ RepsBrief è una piattaforma SaaS multi-tenant (`Next.js + Supabase`) per creato
   - [x] Completed pnpm-backed release validation: 80 tests, typecheck, lint, and a clean placeholder-backed build all pass. `package.json` declares pnpm 11.25.0; explicit pnpm build-policy decisions deny unapproved third-party lifecycle scripts.
   - [ ] Create and verify a production backup, then obtain authorization for the Delta DDL (`teams.brand_voice`, `idea_images`) and `schema_migrations` reconciliation
   - [ ] Resend domain verification + `RESEND_FROM_EMAIL` configurato in Vercel
-  - [ ] Worktree `feat/apify-trend-ingestion`: pipeline asincrona trend
+  - [x] Worktree `feat-apify-trend-resilience`: Task 5 — snapshot verificati, gate qualità, brief cache-only ed evidence brief→segnale team-scoped
   - [ ] Production smoke test: signup → Starter brief → gating → idee/calendario; checkout Stripe/webhook only after explicit authorization
   - [ ] Reclutamento prima coorte: 10 creator Fitness & Nutrition
 
@@ -97,9 +101,8 @@ RepsBrief è una piattaforma SaaS multi-tenant (`Next.js + Supabase`) per creato
 | **feat-public-design-system** | ✅ **Completed / preserved** | Senior Full-Stack / 🔴 P0 | Integrated in `main` (`ff6c6a1`); clean Orca checkout preserved for audit/rollback. |
 | **feat-public-design-system-2** | ✅ **Completed / preserved** | Senior Full-Stack / 🔴 P0 | Integrated in `main` (`ff6c6a1`); clean Orca checkout preserved for audit/rollback. |
 | **ci-pnpm-alignment** | ✅ **Merged & Pushed** | DevOps / 🔴 P0 | GitHub Actions CI updated to pnpm setup and build placeholders matching canonical deployment. |
-| **feat-apify-trend-resilience** | 🟡 **In progress** | Senior Full-Stack / 🟡 P1 | Worktree isolato aperto da `49c1062`: progettare ingestion asincrona Apify, adapter normalizzati, deduplica, provenance e fallback YouTube/RSS. |
+| **feat-apify-trend-resilience** | 🟡 **Task 6 completato** | Senior Full-Stack / 🟡 P1 | Gate cache-only/evidence e controlli rollout fail-closed pronti; benchmark autorizzato e release validation restano aperti. |
 | **Resend Sender Domain** | ⬜ In attesa | DevOps / 🔴 P0 | Configurazione DNS e variabile `RESEND_FROM_EMAIL` su Vercel. |
-| **Namecheap MCP** | 🟡 **Registrato / OAuth bloccato** | DevOps / 🟡 P1 | Endpoint remoto attivo in Codex; il login OAuth Namecheap è respinto dal controllo di origine dei metadati Codex prima dell'apertura del browser. |
 | **Supabase Remote DDL Apply** | ⏸️ **Bloccato** | Team Dev / 🔴 P0 | Create and verify a production backup, then obtain explicit authorization before executing Delta DDL or aligning `schema_migrations`. |
 | **Release Validation** | ✅ **Verified + deployed** | Senior Full-Stack / 🔴 P0 | `pnpm run typecheck`, `pnpm run lint`, and `pnpm test` passed (17 test files / 80 tests); Vercel production is `READY` on `ff6c6a1`. |
 

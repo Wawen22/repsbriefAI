@@ -1,5 +1,7 @@
 // src/types/niche.ts
 
+import type { TrendSource } from '@/lib/trends/contracts'
+
 export interface NicheConfig {
   id: string
   label: string
@@ -11,9 +13,16 @@ export interface NicheConfig {
   claudePersona: string
 }
 
+export interface NicheTrendSourceConfig {
+  enabled: boolean
+  native: boolean
+  niches: Record<string, { enabled: boolean }>
+  apifyTaskIdEnvVar?: string
+}
+
 export interface TrendItem {
   id: string
-  source: 'reddit' | 'youtube' | 'google-trends' | 'rss'
+  source: TrendSource
   title: string
   url?: string
   content?: string
@@ -29,7 +38,7 @@ export interface IdeaObject {
   format: 'Reel' | 'Carousel' | 'Thread' | 'Newsletter' | 'Idea'
   whyItWorks: string
   niche?: string
-  sources?: ('reddit' | 'youtube' | 'google-trends' | 'rss')[]
+  sources?: TrendSource[]
   // Expanded fields
   scriptDraft?: string
   alternativeHooks?: string[]

@@ -22,7 +22,9 @@ describe('normalized trend signal contract', () => {
   })
 
   it('rejects a signal when a required field is missing', () => {
-    const { title: _title, ...withoutTitle } = validSignal
+    const withoutTitle = Object.fromEntries(
+      Object.entries(validSignal).filter(([key]) => key !== 'title')
+    )
 
     expect(normalizedTrendSignalSchema.safeParse(withoutTitle).success).toBe(false)
   })

@@ -46,6 +46,7 @@ RepsBrief è una piattaforma SaaS multi-tenant (`Next.js + Supabase`) per creato
 - [x] Task 4 Apify completato localmente: worker/scheduling orario idempotente, contratti retry/circuit breaker, start/poll server-side e webhook HMAC constant-time. Nessun Actor, token o chiamata remota eseguita; 8 test focalizzati verdi.
 - [x] Task 6 Apify completato localmente: flag Reddit/Google Trends fail-closed, budget positivo validato e runbook per benchmark autorizzato, osservazione di sette giorni e rollback. Nessun Actor, token, deploy o modifica remota eseguita.
 - [x] Enforce budget Apify completato localmente: senza budget positivo le fonti non entrano nello scheduler; il worker blocca una nuova run Apify se il `cost_usd` UTC noto ha raggiunto il ceiling o la lettura fallisce. Il budget operativo deve riservare headroom per una run in corso.
+- [x] Release gate Apify verificato: il typecheck non era bloccato; un mock del repository non rispettava la catena `SelectBuilder` dopo l'aggiunta di `gte`/`lt`. Corretto il mock e verificati typecheck, lint, 24 file / 117 test e build con placeholder.
 - [ ] Ripristinare una credenziale Vercel CLI valida per audit read-only di deployment/env-name; non leggere o stampare valori segreti.
 
 - [x] **Phase 1: Foundation** (Completata)

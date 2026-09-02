@@ -48,8 +48,8 @@ function createFakeClient(rows: Record<string, unknown> = {}) {
         call.filters.push([column, value])
         return Promise.resolve(result)
       }
-      const order = () => ({ ...terminal, eq, gt, order, limit, in: inFilter })
-      const limit = () => ({ ...terminal, eq, gt, order, limit, in: inFilter })
+      const order = () => ({ ...terminal, eq, gt, gte, lt, order, limit, in: inFilter })
+      const limit = () => ({ ...terminal, eq, gt, gte, lt, order, limit, in: inFilter })
 
       return {
         upsert(values: unknown, options: { onConflict: string }) {

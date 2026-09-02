@@ -81,6 +81,7 @@ Dominio: **repsbrief.com** (Hostinger DNS → Vercel)
   - [x] Task 3 Apify: adapter Zod puri per YouTube/RSS/Reddit/Google Trends con fixture di record validi, duplicati e malformati; nessun token o chiamata remota
   - [x] Task 5 Apify: brief generati da cache/snapshot verificati ora persistono evidence team-scoped verso ogni segnale dello snapshot; nessun servizio esterno invocato
   - [x] Task 6 Apify: flag server-side fail-closed, validazione budget positiva e runbook per benchmark autorizzato, osservazione sette giorni e rollback
+  - [x] Release gate Apify: corretto il mock tipizzato del repository (`order`/`limit` ora preservano `gte`/`lt`); typecheck, lint, 24 file / 117 test e build placeholder verdi nel worktree.
 
 ## 5) UI/UX Roadmap
 

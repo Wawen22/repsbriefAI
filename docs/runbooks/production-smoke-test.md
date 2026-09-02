@@ -7,6 +7,7 @@ Last updated: 2026-09-02
 - Use a fresh controlled test inbox and a non-privileged test account.
 - Confirm `RESEND_FROM_EMAIL` is a verified Resend-domain sender before expecting email delivery; production mail fails closed without it.
 - Record UTC timestamp, account identifier, request/result screenshots, and any error correlation IDs. Never record secrets, Stripe session URLs, or webhook signatures.
+- If an Apify rollout is approved, follow `docs/runbooks/apify-trend-rollout.md`; do not enable an Apify source during this smoke test.
 
 ## Safe execution path
 

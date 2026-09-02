@@ -47,9 +47,22 @@ export const NICHES: Record<string, NicheConfig> = {
   */
 }
 
-// Task identifiers are environment variable names only. Their values and the
-// APIFY_TOKEN remain server-only and are never committed to this configuration.
-export const TREND_SOURCE_CONFIG = {
+type TrendEnvironment = Record<string, string | undefined>
+
+function isExplicitlyEnabled(environment: TrendEnvironment, name: string) {
+  return environment[name] === 'true'
+}
+
+/**
+ * Builds the server-side source configuration from explicit feature flags.
+ * Apify sources are fail-closed: an absent, malformed, or false flag keeps
+ * them out of scheduling and therefore out of the generation quality gate.
+ */
+export function getTrendSourceConfig(environment: TrendEnvironment): Record<TrendSource, NicheTrendSourceConfig> {
+  const redditEnabled = isExplicitlyEnabled(environment, 'TREND_REDDIT_ENABLED')
+  const googleTrendsEnabled = isExplicitlyEnabled(environment, 'TREND_GOOGLE_TRENDS_ENABLED')
+
+  return {
   youtube: {
     enabled: true,
     native: true,
@@ -61,15 +74,33 @@ export const TREND_SOURCE_CONFIG = {
     niches: { fitness: { enabled: true } },
   },
   reddit: {
-    enabled: false,
+    enabled: redditEnabled,
     native: false,
     apifyTaskIdEnvVar: 'APIFY_REDDIT_TASK_ID',
-    niches: { fitness: { enabled: false } },
+    niches: { fitness: { enabled: redditEnabled } },
   },
   'google-trends': {
-    enabled: false,
+    enabled: googleTrendsEnabled,
     native: false,
     apifyTaskIdEnvVar: 'APIFY_GOOGLE_TRENDS_TASK_ID',
-    niches: { fitness: { enabled: false } },
+    niches: { fitness: { enabled: googleTrendsEnabled } },
   },
-} as const satisfies Record<TrendSource, NicheTrendSourceConfig>
+  }
+}
+
+/**
+ * A malformed or non-positive value is invalid and must block an Apify rollout.
+ * The deployment runbook defines the budget check to perform before enabling a
+ * source; native sources are unaffected.
+ */
+export function getTrendApifyDailyBudgetUsd(environment: TrendEnvironment): number | null {
+  const value = environment.TREND_APIFY_DAILY_BUDGET_USD
+  if (!value) return null
+
+  const budget = Number(value)
+  return Number.isFinite(budget) && budget > 0 ? budget : null
+}
+
+// Task identifiers are environment variable names only. Their values, flags,
+// budget and APIFY_TOKEN remain server-only and are never committed here.
+export const TREND_SOURCE_CONFIG = getTrendSourceConfig(process.env)

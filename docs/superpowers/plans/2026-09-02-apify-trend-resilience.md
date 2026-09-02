@@ -89,10 +89,10 @@ export type NormalizedTrendSignal = { source: TrendSource; externalId: string; t
 
 **Files:** Modify `src/config/niches.ts`, `.env.example`, `docs/runbooks/production-smoke-test.md`, `PROJECT_CONTEXT.md`, `INIT_PROMPT.md`; create `docs/runbooks/apify-trend-rollout.md`; tests `tests/unit/niches.test.ts`.
 
-- [ ] Testare che Reddit/Google Trends siano disabilitate per default e non entrino nel gate prima del flag.
-- [ ] Documentare `APIFY_TOKEN`, `APIFY_WEBHOOK_SECRET`, Task id e `TREND_APIFY_DAILY_BUDGET_USD` senza valori.
-- [ ] Documentare benchmark autorizzato, soglie di costo, osservazione sette giorni, rollback flag e nessuna modifica copy prima dell'esito.
-- [ ] Eseguire test; commit `docs: add Apify rollout controls`.
+- [x] Testare che Reddit/Google Trends siano disabilitate per default e non entrino nel gate prima del flag.
+- [x] Documentare `APIFY_TOKEN`, `APIFY_WEBHOOK_SECRET`, Task id e `TREND_APIFY_DAILY_BUDGET_USD` senza valori.
+- [x] Documentare benchmark autorizzato, soglie di costo, osservazione sette giorni, rollback flag e nessuna modifica copy prima dell'esito.
+- [x] Eseguire test focalizzato; commit `docs: add Apify rollout controls`.
 
 ### Task 7: Validazione release
 

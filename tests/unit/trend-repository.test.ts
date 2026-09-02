@@ -151,4 +151,33 @@ describe('trend repository', () => {
       filters: [['id', ['signal-1']]],
     })
   })
+
+  it('records each distinct verified snapshot signal as brief evidence', async () => {
+    const fake = createFakeClient()
+    const repository = createTrendRepository(fake.client)
+
+    await repository.recordBriefEvidence({
+      teamId: 'team-1',
+      briefId: 'brief-1',
+      snapshotId: 'snapshot-1',
+      signalIds: ['signal-1', 'signal-2', 'signal-1'],
+    })
+
+    const evidenceWrites = fake.calls.filter((call) => call.table === 'brief_trend_evidence')
+    expect(evidenceWrites).toHaveLength(2)
+    expect(evidenceWrites.map((call) => call.values)).toEqual([
+      {
+        team_id: 'team-1',
+        brief_id: 'brief-1',
+        trend_snapshot_id: 'snapshot-1',
+        trend_signal_id: 'signal-1',
+      },
+      {
+        team_id: 'team-1',
+        brief_id: 'brief-1',
+        trend_snapshot_id: 'snapshot-1',
+        trend_signal_id: 'signal-2',
+      },
+    ])
+  })
 })

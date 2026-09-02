@@ -5,7 +5,9 @@ import { ENABLED_TREND_SOURCES, NICHES } from '@/config/niches'
 import { refreshTrendCacheFromSnapshot } from '../../scraper'
 import { generateBrief } from '../../generator/briefGenerator'
 import { getSupabaseAdmin } from '@/lib/supabase'
+import { persistBriefTrendEvidence } from '@/lib/trends/evidence'
 import { getUsableTrends } from '@/lib/trends/quality'
+import { getTrendRepository } from '@/lib/trends/repository'
 import { dispatchWebhookEvent } from '@/lib/jobs/webhookQueue'
 import { sendBrief } from '../../email/sendBrief'
 import { ACTIVE_PAID_PLANS } from '@/lib/billing'
@@ -30,6 +32,7 @@ export async function GET(req: Request) {
 
   try {
     const supabaseAdmin = getSupabaseAdmin('api/cron/weeklyBrief')
+    const trendRepository = await getTrendRepository()
 
     // 2. Get active niches
     const activeNiches = Object.values(NICHES).filter((niche): niche is NicheConfig => niche.active)
@@ -76,6 +79,8 @@ export async function GET(req: Request) {
         }
 
         const allTrends = trendQuality.trends
+        const trendSnapshot = await trendRepository.getLatestValidSnapshot(nicheId, new Date().toISOString())
+        if (!trendSnapshot) throw new Error('Fresh trend data unavailable (invalid_snapshot)')
         
         // Get user's idea history
         const { data: history } = await supabaseAdmin
@@ -97,7 +102,7 @@ export async function GET(req: Request) {
         }
 
         // Save Brief to Supabase
-        const { error: briefError } = await supabaseAdmin
+        const { data: brief, error: briefError } = await supabaseAdmin
           .from('briefs')
           .insert({
             user_id: user.id,
@@ -107,8 +112,17 @@ export async function GET(req: Request) {
             ai_provider: briefData.aiProvider,
             ai_model: briefData.aiModel,
           })
+          .select('id')
+          .single()
 
-        if (briefError) throw briefError
+        if (briefError || !brief?.id) throw briefError ?? new Error('Failed to save brief')
+
+        await persistBriefTrendEvidence({
+          repository: trendRepository,
+          teamId: user.current_team_id,
+          briefId: brief.id,
+          snapshot: trendSnapshot,
+        })
 
         // TRIGGER WEBHOOK
         if (user.current_team_id) {

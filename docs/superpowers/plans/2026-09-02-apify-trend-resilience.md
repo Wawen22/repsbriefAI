@@ -79,7 +79,8 @@ export type NormalizedTrendSignal = { source: TrendSource; externalId: string; t
 **Produces:** gate con 12 segnali, 2 fonti sane, una nativa, 72h freshness e 14 giorni max age.
 
 - [ ] Scrivere test per fallback nativo, una sola fonte, snapshot 73h, Apify down e cache assente.
-- [ ] Materializzare `trends_cache` solo da snapshot valido e conservare evidenza brief-segnale.
+- [x] Materializzare `trends_cache` solo da snapshot valido e conservare evidenza brief-segnale.
+- [x] Salvare ogni brief team-scoped con l'ID dello snapshot verificato e tutti i relativi `trend_signal_id`, deduplicati prima della persistenza.
 - [ ] Rimuovere `scrapeNiche()` dalla request `generate-now`; risposta `503` con `Retry-After` se manca snapshot valido.
 - [ ] Mantenere compatibilita del cron: pianifica/legge ingestion, non esegue scraper inline.
 - [ ] Eseguire test; commit `feat: generate briefs from verified trend snapshots`.

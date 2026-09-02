@@ -79,6 +79,7 @@ Dominio: **repsbrief.com** (Hostinger DNS → Vercel)
   - [x] Task 1 Apify: contratti trend runtime e configurazione feature-flag centralizzata, con test RED/GREEN
   - [x] Task 2 Apify: migration non applicata e repository, con RLS team-safe per evidence e test RED/GREEN
   - [x] Task 3 Apify: adapter Zod puri per YouTube/RSS/Reddit/Google Trends con fixture di record validi, duplicati e malformati; nessun token o chiamata remota
+  - [x] Task 5 Apify: brief generati da cache/snapshot verificati ora persistono evidence team-scoped verso ogni segnale dello snapshot; nessun servizio esterno invocato
 
 ## 5) UI/UX Roadmap
 
@@ -138,7 +139,7 @@ Variabili env richieste per prod: vedere `INTEGRATIONS_CHECKLIST.md`.
 - **Database**: `teams.brand_voice` e `idea_images` mancano su remoto; `schema_migrations` traccia solo 6 versioni su 38. Create and verify a production backup before the reconciliation, which also requires explicit authorization to apply.
 - **Security / Functions**: `claim_queue_jobs` ha `SECURITY DEFINER` con `search_path = public` (permessi già ristretti a service_role); resta da hardenare a `search_path = ''`.
 - **Email**: Resend ha generato errori di delivery per mancanza di dominio mittente verificato (`RESEND_FROM_EMAIL`). Richiede passaggio manuale DNS.
-- **Source reliability**: YouTube e RSS sono le uniche fonti attive; Examine ha restituito 429 e RP/T-Nation 404. La pipeline asincrona a quattro fonti e definita nel worktree `feat-apify-trend-resilience`, ma Reddit/Google Trends restano disabilitati fino a benchmark e rollout autorizzati.
+- **Source reliability**: YouTube e RSS sono le uniche fonti attive; Examine ha restituito 429 e RP/T-Nation 404. La pipeline asincrona a quattro fonti è definita nel worktree `feat-apify-trend-resilience`; i brief team-scoped conservano ora provenance snapshot→segnale. Reddit/Google Trends restano disabilitati fino a benchmark e rollout autorizzati.
 - **Billing**: Stripe live mode attivo ma senza abbonamenti reali. Validare ciclo webhook completo prima dell'acquisizione coorte.
 - Queue mode feature-flagged (`WEBHOOK_DELIVERY_MODE=inline` in prod): ok per lancio, da valutare switch a `queue` con traffico crescente.
 - `supabaseAdmin` fail-fast su production se `SUPABASE_SERVICE_ROLE_KEY` manca — chiave configurata su Vercel.

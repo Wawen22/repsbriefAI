@@ -39,6 +39,15 @@ type StoredSnapshot = {
   expires_at: string
 }
 
+export type PersistedTrendSnapshot = TrendSnapshot & { id: string }
+
+export type BriefTrendEvidence = {
+  teamId: string
+  briefId: string
+  snapshotId: string
+  signalIds: string[]
+}
+
 function sanitizePersistenceError(error: QueryError): never {
   const code = error?.code
   if (code === '23505') throw new Error('Trend record already exists.')
@@ -145,6 +154,23 @@ export function createTrendRepository(client: TrendRepositoryClient) {
       return requireId(data, error)
     },
 
+    async recordBriefEvidence({ teamId, briefId, snapshotId, signalIds }: BriefTrendEvidence) {
+      for (const signalId of new Set(signalIds)) {
+        const { data, error } = await client
+          .from('brief_trend_evidence')
+          .insert({
+            team_id: teamId,
+            brief_id: briefId,
+            trend_snapshot_id: snapshotId,
+            trend_signal_id: signalId,
+          })
+          .select('id')
+          .single()
+
+        requireId(data, error)
+      }
+    },
+
     async getSignals(signalIds: string[]) {
       if (signalIds.length === 0) return []
 
@@ -176,7 +202,7 @@ export function createTrendRepository(client: TrendRepositoryClient) {
       })
     },
 
-    async getLatestValidSnapshot(niche: string, now: string): Promise<TrendSnapshot | null> {
+    async getLatestValidSnapshot(niche: string, now: string): Promise<PersistedTrendSnapshot | null> {
       const { data, error } = await client
         .from('trend_snapshots')
         .select('id, niche, as_of, signal_ids, source_summary, quality, expires_at')
@@ -193,6 +219,7 @@ export function createTrendRepository(client: TrendRepositoryClient) {
       if (!snapshot || Date.parse(snapshot.expires_at) <= Date.parse(now)) return null
 
       return {
+        id: snapshot.id,
         niche: snapshot.niche,
         asOf: snapshot.as_of,
         signalIds: snapshot.signal_ids,

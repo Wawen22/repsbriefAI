@@ -40,7 +40,8 @@ RepsBrief è una piattaforma SaaS multi-tenant (`Next.js + Supabase`) per creato
 - [x] Worktree Orca isolato `feat-apify-trend-resilience` aperto da `49c1062` per ingestion asincrona Apify, deduplica, provenance e fallback; nessuna implementazione ancora avviata.
 - [x] Piano smoke production sicuro documentato in `docs/runbooks/production-smoke-test.md`; checkout live, addebito, cancellazione e webhook reale rimangono esclusi senza autorizzazione esplicita.
 - [x] Audit read-only Vercel via MCP: deploy `5755e6d` `READY`, nessun runtime error nelle ultime 24 ore.
-- [ ] In DNS per `wai.wawen.io`, aggiungere i record DKIM/SPF forniti da Resend, poi verificare il dominio e configurare `RESEND_FROM_EMAIL` in Vercel Production.
+- [x] Dominio mittente Resend `repsbrief.com` creato (US East); nessun DNS configurato o dominio rimosso.
+- [ ] In DNS per `repsbrief.com`, aggiungere i record DKIM/SPF forniti da Resend, poi verificare il dominio e configurare `RESEND_FROM_EMAIL` in Vercel Production.
 - [ ] Riavviare Codex con `APIFY_TOKEN` disponibile nell'ambiente: l'MCP Apify è registrato globalmente; OAuth Codex non avvia il browser per incompatibilità dell'endpoint.
 
 - [x] **Phase 1: Foundation** (Completata)

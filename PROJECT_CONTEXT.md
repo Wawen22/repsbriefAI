@@ -8,6 +8,7 @@ Owner context: AI agents + team dev
 - Git: `main` is clean and aligned with `origin/main` at `ff6c6a1` (`merge: redesign studio command center`). The production deployment is `READY` on this commit; no runtime errors were reported in the preceding 24 hours.
 - Validation baseline: `pnpm run typecheck`, `pnpm run lint`, and `pnpm test` passed (17 files / 80 tests) before this operational session.
 - Orca hygiene: `feat-public-design-system`, `feat-public-design-system-2`, and `feat-studio-command-center` are marked `completed`; their clean checkouts remain preserved for audit/rollback.
+- Apify trend resilience: direzione a quattro fonti approvata (YouTube, RSS, Reddit e Google Trends); spec in `docs/superpowers/specs/2026-09-02-apify-trend-resilience-design.md`. Nessun Actor a pagamento, secret o migration e stato usato/applicato.
 - Resend/Vercel audit: `RESEND_FROM_EMAIL` remains a production blocker. The installed code fails closed for production mail when it is absent. The local Vercel CLI credential is invalid, so remote environment-name and deployment inspection requires a refreshed Vercel login/token; no secret values were requested or exposed.
 - Safe production smoke plan is documented in `docs/runbooks/production-smoke-test.md`. It deliberately excludes live checkout creation, payment, cancellation, and webhook delivery until explicitly authorized.
 
@@ -73,6 +74,8 @@ Dominio: **repsbrief.com** (Hostinger DNS → Vercel)
   - [ ] Production smoke test: signup → Starter brief → gating → idee/calendario; checkout Stripe/webhook only after explicit authorization
   - [ ] First cohort: recruit 10 Fitness & Nutrition creators
   - [ ] Weekly funnel review: signup → brief → trial → paid
+  - [x] Spec Apify trend resilience approvata: quattro fonti, ingestion asincrona, provenance e fallback
+  - [ ] Review della spec Apify, poi piano d'implementazione e benchmark Actor autorizzato
 
 ## 5) UI/UX Roadmap
 
@@ -132,7 +135,7 @@ Variabili env richieste per prod: vedere `INTEGRATIONS_CHECKLIST.md`.
 - **Database**: `teams.brand_voice` e `idea_images` mancano su remoto; `schema_migrations` traccia solo 6 versioni su 38. Create and verify a production backup before the reconciliation, which also requires explicit authorization to apply.
 - **Security / Functions**: `claim_queue_jobs` ha `SECURITY DEFINER` con `search_path = public` (permessi già ristretti a service_role); resta da hardenare a `search_path = ''`.
 - **Email**: Resend ha generato errori di delivery per mancanza di dominio mittente verificato (`RESEND_FROM_EMAIL`). Richiede passaggio manuale DNS.
-- **Source reliability**: YouTube e RSS sono le uniche fonti attive; Examine ha restituito 429 e RP/T-Nation 404. La pipeline asincrona Apify è pianificata nel worktree `feat/apify-trend-ingestion`.
+- **Source reliability**: YouTube e RSS sono le uniche fonti attive; Examine ha restituito 429 e RP/T-Nation 404. La pipeline asincrona a quattro fonti e definita nel worktree `feat-apify-trend-resilience`, ma Reddit/Google Trends restano disabilitati fino a benchmark e rollout autorizzati.
 - **Billing**: Stripe live mode attivo ma senza abbonamenti reali. Validare ciclo webhook completo prima dell'acquisizione coorte.
 - Queue mode feature-flagged (`WEBHOOK_DELIVERY_MODE=inline` in prod): ok per lancio, da valutare switch a `queue` con traffico crescente.
 - `supabaseAdmin` fail-fast su production se `SUPABASE_SERVICE_ROLE_KEY` manca — chiave configurata su Vercel.

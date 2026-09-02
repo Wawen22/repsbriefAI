@@ -34,12 +34,14 @@ RepsBrief è una piattaforma SaaS multi-tenant (`Next.js + Supabase`) per creato
 
 ### Operational update — 2026-09-02
 
-- [x] `main` pulito e allineato a `origin/main` su `ff6c6a1`; deploy Vercel production `READY` sullo stesso commit.
+- [x] `main` pulito e allineato a `origin/main` su `5755e6d`; deploy Vercel production `READY` sullo stesso commit; nessun runtime error nelle ultime 24 ore.
 - [x] Suite baseline: `pnpm run typecheck`, `pnpm run lint`, `pnpm test` — 17 file / 80 test verdi.
 - [x] Worktree Orca `feat-public-design-system`, `feat-public-design-system-2` e `feat-studio-command-center` marcati `completed` e preservati puliti per audit/rollback.
 - [x] Worktree Orca isolato `feat-apify-trend-resilience` aperto da `49c1062` per ingestion asincrona Apify, deduplica, provenance e fallback; nessuna implementazione ancora avviata.
 - [x] Piano smoke production sicuro documentato in `docs/runbooks/production-smoke-test.md`; checkout live, addebito, cancellazione e webhook reale rimangono esclusi senza autorizzazione esplicita.
-- [ ] Ripristinare una credenziale Vercel CLI valida per audit read-only di deployment/env-name; non leggere o stampare valori segreti.
+- [x] Audit read-only Vercel via MCP: deploy `5755e6d` `READY`, nessun runtime error nelle ultime 24 ore.
+- [ ] In DNS per `wai.wawen.io`, aggiungere i record DKIM/SPF forniti da Resend, poi verificare il dominio e configurare `RESEND_FROM_EMAIL` in Vercel Production.
+- [ ] Riavviare Codex con `APIFY_TOKEN` disponibile nell'ambiente: l'MCP Apify è registrato globalmente; OAuth Codex non avvia il browser per incompatibilità dell'endpoint.
 
 - [x] **Phase 1: Foundation** (Completata)
 - [x] **Phase 2: Scrapers & Generator** (Completata)

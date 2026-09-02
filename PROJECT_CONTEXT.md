@@ -5,10 +5,11 @@ Owner context: AI agents + team dev
 
 ## Operational status — 2026-09-02
 
-- Git: `main` is clean and aligned with `origin/main` at `ff6c6a1` (`merge: redesign studio command center`). The production deployment is `READY` on this commit; no runtime errors were reported in the preceding 24 hours.
+- Git: `main` is clean and aligned with `origin/main` at `5755e6d` (`docs: track trend resilience worktree`). The production deployment is `READY` on this commit; no runtime errors were reported in the preceding 24 hours.
 - Validation baseline: `pnpm run typecheck`, `pnpm run lint`, and `pnpm test` passed (17 files / 80 tests) before this operational session.
 - Orca hygiene: `feat-public-design-system`, `feat-public-design-system-2`, and `feat-studio-command-center` are marked `completed`; their clean checkouts remain preserved for audit/rollback. The isolated `feat-apify-trend-resilience` worktree is open from `49c1062` for the next resilience task.
-- Resend/Vercel audit: `RESEND_FROM_EMAIL` remains a production blocker. The installed code fails closed for production mail when it is absent. The local Vercel CLI credential is invalid, so remote environment-name and deployment inspection requires a refreshed Vercel login/token; no secret values were requested or exposed.
+- Resend/Vercel audit: Vercel MCP confirms production `READY` on `5755e6d` with no runtime errors in the preceding 24 hours. The single Resend domain is `wai.wawen.io` (EU West) and is `not_started`: DKIM TXT plus SPF MX/TXT records must be added in its DNS zone before `RESEND_FROM_EMAIL` can be configured. The installed code fails closed for production mail when it is absent. The Vercel MCP surface does not expose environment-variable mutation, so that final setting remains a dashboard action.
+- Apify MCP: registered globally in Codex as remote Streamable HTTP at `https://mcp.apify.com/`, using the secure `APIFY_TOKEN` environment-variable reference. Codex OAuth failed before browser launch because its authorization endpoint origin does not match the authorization-server origin; restart Codex with the environment variable set to activate bearer authentication and load its tools.
 - Safe production smoke plan is documented in `docs/runbooks/production-smoke-test.md`. It deliberately excludes live checkout creation, payment, cancellation, and webhook delivery until explicitly authorized.
 
 ## 1) Product Scope

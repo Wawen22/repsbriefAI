@@ -27,17 +27,21 @@ function createFakeClient(rows: Record<string, unknown> = {}) {
       calls.push(call)
       const result = { data: rows[table] ?? { id: `${table}-id` }, error: null }
       const terminal = { single: async () => result, maybeSingle: async () => result }
-      const select = () => ({ ...terminal, eq, gt, order, limit })
+      const select = () => ({ ...terminal, eq, gt, order, limit, in: inFilter })
       const eq = (column: string, value: unknown) => {
         call.filters.push([column, value])
-        return { ...terminal, eq, gt, order, limit }
+        return { ...terminal, eq, gt, order, limit, in: inFilter }
       }
       const gt = (column: string, value: unknown) => {
         call.filters.push([column, value])
-        return { ...terminal, eq, gt, order, limit }
+        return { ...terminal, eq, gt, order, limit, in: inFilter }
       }
-      const order = () => ({ ...terminal, eq, gt, order, limit })
-      const limit = () => ({ ...terminal, eq, gt, order, limit })
+      const inFilter = (column: string, value: unknown) => {
+        call.filters.push([column, value])
+        return Promise.resolve(result)
+      }
+      const order = () => ({ ...terminal, eq, gt, order, limit, in: inFilter })
+      const limit = () => ({ ...terminal, eq, gt, order, limit, in: inFilter })
 
       return {
         upsert(values: unknown, options: { onConflict: string }) {
@@ -125,6 +129,26 @@ describe('trend repository', () => {
         ['quality', 'valid'],
         ['expires_at', '2026-09-02T12:00:00.000Z'],
       ],
+    })
+  })
+
+  it('loads the persisted signals referenced by a snapshot', async () => {
+    const fake = createFakeClient({
+      trend_signals: [{
+        id: 'signal-1', source: 'rss', external_id: 'rss-1', title: 'Fresh evidence',
+        canonical_url: 'https://example.com/rss-1', published_at: '2026-09-02T10:00:00.000Z',
+        observed_at: '2026-09-02T11:00:00.000Z', provenance: { provider: 'rss' },
+        content: null, score: null, metadata: {},
+      }],
+    })
+    const repository = createTrendRepository(fake.client)
+
+    const signals = await repository.getSignals(['signal-1'])
+
+    expect(signals).toEqual([expect.objectContaining({ id: 'signal-1', source: 'rss' })])
+    expect(fake.calls[0]).toMatchObject({
+      table: 'trend_signals',
+      filters: [['id', ['signal-1']]],
     })
   })
 })

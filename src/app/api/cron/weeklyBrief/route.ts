@@ -2,7 +2,7 @@
 
 import { NextResponse } from 'next/server'
 import { ENABLED_TREND_SOURCES, NICHES } from '@/config/niches'
-import { scrapeNiche } from '../../scraper'
+import { refreshTrendCacheFromSnapshot } from '../../scraper'
 import { generateBrief } from '../../generator/briefGenerator'
 import { getSupabaseAdmin } from '@/lib/supabase'
 import { getUsableTrends } from '@/lib/trends/quality'
@@ -35,9 +35,12 @@ export async function GET(req: Request) {
     const activeNiches = Object.values(NICHES).filter((niche): niche is NicheConfig => niche.active)
     results.totalNiches = activeNiches.length
 
-    // 3. For each niche: scrape → cache
+    // 3. For each niche: materialize the last verified ingestion snapshot.
     for (const niche of activeNiches) {
-      await scrapeNiche(niche)
+      const quality = await refreshTrendCacheFromSnapshot(niche.id)
+      if (!quality.ok) {
+        console.warn(`[Cron] No verified trend snapshot for ${niche.id}: ${quality.reason}`)
+      }
     }
 
     // 4. Get all users with active paid plans

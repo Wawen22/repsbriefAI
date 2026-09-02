@@ -7,7 +7,6 @@ import { getSupabaseAdmin } from '@/lib/supabase'
 import { dispatchWebhookEvent } from '@/lib/jobs/webhookQueue'
 import { ENABLED_TREND_SOURCES, NICHES } from '@/config/niches'
 import { getUsableTrends } from '@/lib/trends/quality'
-import { scrapeNiche } from '../../scraper'
 import { generateBrief } from '../briefGenerator'
 import { parseActiveNiche } from '@/lib/security/schemas'
 
@@ -101,34 +100,10 @@ export async function POST() {
       .eq('niche', nicheId)
       .eq('week_date', weekDate)
 
-    let trendQuality = getUsableTrends(cachedTrends, {
+    const trendQuality = getUsableTrends(cachedTrends, {
       now: new Date(),
       allowedSources: ENABLED_TREND_SOURCES,
     })
-
-    if (trendQuality.ok) {
-      // Use cached data — fast path
-      console.log(`[GenerateNow] Using cached trends for ${nicheId} (${trendQuality.sources.join(', ')})`)
-    } else {
-      // Missing or degraded cache — scrape fresh before rejecting generation.
-      console.log(`[GenerateNow] Trend cache unavailable (${trendQuality.reason}), running fresh scrape for ${nicheId}...`)
-      try {
-        await scrapeNiche(niche)
-      } catch (scrapeErr) {
-        console.error('[GenerateNow] Fresh scrape failed:', scrapeErr)
-      }
-
-      const { data: freshTrends } = await supabaseAdmin
-        .from('trends_cache')
-        .select('data, source')
-        .eq('niche', nicheId)
-        .eq('week_date', weekDate)
-
-      trendQuality = getUsableTrends(freshTrends, {
-        now: new Date(),
-        allowedSources: ENABLED_TREND_SOURCES,
-      })
-    }
 
     if (!trendQuality.ok) {
       console.error(`[GenerateNow] No usable trends for ${nicheId}: ${trendQuality.reason}`)
@@ -142,6 +117,8 @@ export async function POST() {
         { status: 503, headers: { 'Retry-After': '300' } }
       )
     }
+
+    console.log(`[GenerateNow] Using verified cached trends for ${nicheId} (${trendQuality.sources.join(', ')})`)
 
     const allTrends = trendQuality.trends
 

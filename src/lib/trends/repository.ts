@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto'
 
-import type { NormalizedTrendSignal, TrendSnapshot, TrendSourceRun } from './contracts'
+import { normalizedTrendSignalSchema, type NormalizedTrendSignal, type TrendSnapshot, type TrendSourceRun } from './contracts'
 
 type QueryError = { code?: string; message?: string } | null
 type QueryResult = { data: unknown; error: QueryError }
@@ -12,6 +12,7 @@ type SelectBuilder = {
   gt(column: string, value: unknown): SelectBuilder
   order(column: string, options: { ascending: boolean }): SelectBuilder
   limit(count: number): SelectBuilder
+  in(column: string, values: unknown[]): Promise<QueryResult>
 }
 
 type MutationBuilder = {
@@ -142,6 +143,37 @@ export function createTrendRepository(client: TrendRepositoryClient) {
         .single()
 
       return requireId(data, error)
+    },
+
+    async getSignals(signalIds: string[]) {
+      if (signalIds.length === 0) return []
+
+      const { data, error } = await client
+        .from('trend_signals')
+        .select('id, source, external_id, title, canonical_url, published_at, observed_at, provenance, content, score, metadata')
+        .in('id', signalIds)
+
+      if (error) sanitizePersistenceError(error)
+      if (!Array.isArray(data)) return []
+
+      return data.flatMap((row) => {
+        if (!row || typeof row !== 'object') return []
+        const stored = row as Record<string, unknown>
+        if (typeof stored.id !== 'string') return []
+        const parsed = normalizedTrendSignalSchema.safeParse({
+          source: stored.source,
+          externalId: stored.external_id,
+          title: stored.title,
+          canonicalUrl: stored.canonical_url,
+          publishedAt: stored.published_at,
+          observedAt: stored.observed_at,
+          provenance: stored.provenance,
+          content: stored.content ?? undefined,
+          score: stored.score ?? undefined,
+          metadata: stored.metadata,
+        })
+        return parsed.success ? [{ id: stored.id, ...parsed.data }] : []
+      })
     },
 
     async getLatestValidSnapshot(niche: string, now: string): Promise<TrendSnapshot | null> {

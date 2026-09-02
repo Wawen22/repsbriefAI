@@ -1,7 +1,7 @@
 # RepsBrief — Project Initialization & Agent Protocols (INIT_PROMPT)
 
 > **Document Version:** 1.0.0  
-> **Last Updated:** 2026-09-01  
+> **Last Updated:** 2026-09-02  
 > **Target Environment:** Next.js (App Router), Supabase PostgreSQL, Stripe Live, Vercel, Resend  
 
 ---
@@ -32,6 +32,14 @@ RepsBrief è una piattaforma SaaS multi-tenant (`Next.js + Supabase`) per creato
 
 ## 3. Development Progress
 
+### Operational update — 2026-09-02
+
+- [x] `main` pulito e allineato a `origin/main` su `ff6c6a1`; deploy Vercel production `READY` sullo stesso commit.
+- [x] Suite baseline: `pnpm run typecheck`, `pnpm run lint`, `pnpm test` — 17 file / 80 test verdi.
+- [x] Worktree Orca `feat-public-design-system`, `feat-public-design-system-2` e `feat-studio-command-center` marcati `completed` e preservati puliti per audit/rollback.
+- [x] Piano smoke production sicuro documentato in `docs/runbooks/production-smoke-test.md`; checkout live, addebito, cancellazione e webhook reale rimangono esclusi senza autorizzazione esplicita.
+- [ ] Ripristinare una credenziale Vercel CLI valida per audit read-only di deployment/env-name; non leggere o stampare valori segreti.
+
 - [x] **Phase 1: Foundation** (Completata)
 - [x] **Phase 2: Scrapers & Generator** (Completata)
 - [x] **Phase 3: Automation & Delivery** (Completata)
@@ -60,12 +68,12 @@ RepsBrief è una piattaforma SaaS multi-tenant (`Next.js + Supabase`) per creato
   - [x] Revenue truthfulness integrated locally: active YouTube/RSS copy, canonical shares, and referral Route Handler
   - [x] Security/cost controls integrated locally: schemas, paid-plan gates, and fail-closed remote image policy
   - [x] **Supabase Baseline Reconciliation Audit** ([audit documentato](docs/audits/2026-09-01-supabase-reconciliation-audit.md))
-  - [x] Local integration completed with ordered no-ff merges; no push and no Supabase migration execution
-  - [x] Completed pnpm-backed release validation: frozen install, 74 tests, typecheck, lint, and a clean placeholder-backed build all pass. `package.json` declares pnpm 11.25.0; explicit pnpm build-policy decisions deny unapproved third-party lifecycle scripts.
+  - [x] Local integration completed with ordered no-ff merges and pushed; no Supabase migration execution
+  - [x] Completed pnpm-backed release validation: 80 tests, typecheck, lint, and a clean placeholder-backed build all pass. `package.json` declares pnpm 11.25.0; explicit pnpm build-policy decisions deny unapproved third-party lifecycle scripts.
   - [ ] Create and verify a production backup, then obtain authorization for the Delta DDL (`teams.brand_voice`, `idea_images`) and `schema_migrations` reconciliation
   - [ ] Resend domain verification + `RESEND_FROM_EMAIL` configurato in Vercel
   - [ ] Worktree `feat/apify-trend-ingestion`: pipeline asincrona trend
-  - [ ] Production smoke test: signup → Starter brief → Pro checkout → webhook → cancellation
+  - [ ] Production smoke test: signup → Starter brief → gating → idee/calendario; checkout Stripe/webhook only after explicit authorization
   - [ ] Reclutamento prima coorte: 10 creator Fitness & Nutrition
 
 ---
@@ -80,13 +88,14 @@ RepsBrief è una piattaforma SaaS multi-tenant (`Next.js + Supabase`) per creato
 | **fix/revenue-truthfulness** | ✅ **Integrated locally** | Senior Full-Stack / 🔴 P0 | Active-source copy, mail safeguards, `/s/[id]`, and `/r/[code]` Route Handler integrated. |
 | **feat-landing-interactive-studio** | ✅ **Merged & Pushed** | Senior Full-Stack / 🔴 P0 | Interactive 4-tab ADE Studio Mockup (Radar, Generator, Brand Voice, Sync) with dynamic state & micro-interactions. |
 | **feat-app-design-unification** | ✅ **Merged to main** | Senior Full-Stack / 🔴 P0 | Complete UI/UX refactor of dashboard, studio views, cards, kanban, history, analytics, settings to match landing Dark IDE aesthetic. |
-| **feat-studio-command-center** | ✅ **Validated locally** | Senior Full-Stack / 🔴 P0 | Replaced the dashboard’s competing header/stat cards and duplicate no-brief CTA with one data-backed decision canvas; active-brief-only workflow state, actual source/format evidence, inventory navigation, and the existing calendar path preserve plan gating, checkout synchronization, filtering, saving, and onboarding. |
-| **feat-public-design-system** | 🟡 **In validation** | Senior Full-Stack / 🔴 P0 | Extends Dark IDE Studio primitives to auth, invitation, public sharing and legal routes without changing application behaviour. |
+| **feat-studio-command-center** | ✅ **Production / preserved** | Senior Full-Stack / 🔴 P0 | Redesign is live on `ff6c6a1`; clean Orca checkout preserved for audit/rollback. |
+| **feat-public-design-system** | ✅ **Completed / preserved** | Senior Full-Stack / 🔴 P0 | Integrated in `main` (`ff6c6a1`); clean Orca checkout preserved for audit/rollback. |
+| **feat-public-design-system-2** | ✅ **Completed / preserved** | Senior Full-Stack / 🔴 P0 | Integrated in `main` (`ff6c6a1`); clean Orca checkout preserved for audit/rollback. |
 | **ci-pnpm-alignment** | ✅ **Merged & Pushed** | DevOps / 🔴 P0 | GitHub Actions CI updated to pnpm setup and build placeholders matching canonical deployment. |
 | **feat/apify-trend-ingestion** | ⬜ In attesa | Senior Full-Stack / 🟡 P1 | Pipeline ingestion asincrona, adapter normalizzati, deduplica e provenance trend. |
 | **Resend Sender Domain** | ⬜ In attesa | DevOps / 🔴 P0 | Configurazione DNS e variabile `RESEND_FROM_EMAIL` su Vercel. |
 | **Supabase Remote DDL Apply** | ⏸️ **Bloccato** | Team Dev / 🔴 P0 | Create and verify a production backup, then obtain explicit authorization before executing Delta DDL or aligning `schema_migrations`. |
-| **Release Validation** | ✅ **Verified locally** | Senior Full-Stack / 🔴 P0 | `pnpm install --frozen-lockfile`, 15 test files / 74 tests, typecheck, lint (0 warnings), and a clean placeholder-backed build pass. |
+| **Release Validation** | ✅ **Verified + deployed** | Senior Full-Stack / 🔴 P0 | `pnpm run typecheck`, `pnpm run lint`, and `pnpm test` passed (17 test files / 80 tests); Vercel production is `READY` on `ff6c6a1`. |
 
 ---
 

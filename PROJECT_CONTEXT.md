@@ -1,7 +1,15 @@
 # RepsBrief — PROJECT_CONTEXT (Single Source of Truth)
 
-Last update: 2026-09-01
+Last update: 2026-09-02
 Owner context: AI agents + team dev
+
+## Operational status — 2026-09-02
+
+- Git: `main` is clean and aligned with `origin/main` at `ff6c6a1` (`merge: redesign studio command center`). The production deployment is `READY` on this commit; no runtime errors were reported in the preceding 24 hours.
+- Validation baseline: `pnpm run typecheck`, `pnpm run lint`, and `pnpm test` passed (17 files / 80 tests) before this operational session.
+- Orca hygiene: `feat-public-design-system`, `feat-public-design-system-2`, and `feat-studio-command-center` are marked `completed`; their clean checkouts remain preserved for audit/rollback.
+- Resend/Vercel audit: `RESEND_FROM_EMAIL` remains a production blocker. The installed code fails closed for production mail when it is absent. The local Vercel CLI credential is invalid, so remote environment-name and deployment inspection requires a refreshed Vercel login/token; no secret values were requested or exposed.
+- Safe production smoke plan is documented in `docs/runbooks/production-smoke-test.md`. It deliberately excludes live checkout creation, payment, cancellation, and webhook delivery until explicitly authorized.
 
 ## 1) Product Scope
 
@@ -42,7 +50,7 @@ Dominio: **repsbrief.com** (Hostinger DNS → Vercel)
   - [x] Automation Logs UI
   - [x] Queue/Jobs spike (DB queue + retry/dead-letter)
   - [x] OAuth-first blueprint (tutti i provider)
-  - [x] Lint/typecheck/test/build — tutto clean (2026-03-09)
+  - [x] Lint/typecheck/test/build — tutto clean (2026-09-02; 17 test file / 80 test)
   - [ ] P4.4 Observability hardening (Sentry + alerting) — backlog
   - [ ] P4.5 Publishing connectors (WordPress/Ghost) — backlog bassa priorità
   - [ ] P4.6 Cloud asset sync (Drive/Dropbox) — backlog bassa priorità
@@ -62,7 +70,7 @@ Dominio: **repsbrief.com** (Hostinger DNS → Vercel)
   - [x] GitHub Actions CI allineato a pnpm (`pnpm install --frozen-lockfile` con placeholder env per build) (2026-09-01)
   - [ ] Reconcile Supabase production history only from a confirmed backup, then apply the authorized Delta DDL (`teams.brand_voice`, `idea_images`) and align `schema_migrations`
   - [ ] Resend domain verification + `RESEND_FROM_EMAIL` configured in Vercel
-  - [ ] Production smoke test: signup → Starter brief → Pro checkout → webhook → cancellation
+  - [ ] Production smoke test: signup → Starter brief → gating → idee/calendario; checkout Stripe/webhook only after explicit authorization
   - [ ] First cohort: recruit 10 Fitness & Nutrition creators
   - [ ] Weekly funnel review: signup → brief → trial → paid
 
@@ -102,7 +110,7 @@ Tutte le chiavi Stripe sono in **live mode**. Il prodotto Starter $9 è stato ar
 - [x] Pnpm 11.25.0 is declared in `package.json` and is the sole deployment package manager; `package-lock.json` was removed to prevent npm/pnpm resolution drift.
 - [x] `pnpm-lock.yaml` retains `stripe: ^20.3.1` in the manifest but pins its direct resolution to 20.3.1. The installed generated `ApiVersion` is exactly `2026-01-28.clover`, matching `src/lib/stripe.ts` and fixing Vercel's TypeScript failure.
 - [x] `pnpm install --frozen-lockfile` passed; explicit pnpm 11 build-policy decisions deny pending third-party lifecycle scripts without changing dependency versions.
-- [x] `pnpm test` passed: 15 files, 74 tests; `pnpm run typecheck` and `pnpm run lint` passed (0 errors, 0 warnings).
+- [x] `pnpm test` passed: 17 files, 80 tests; `pnpm run typecheck` and `pnpm run lint` passed (0 errors, 0 warnings) (2026-09-02).
 - [x] `pnpm run build` passed with harmless Supabase, Stripe, Resend, OpenAI, and app-URL placeholders.
 - [x] Studio Command Center redesign: dashboard now provides one data-backed decision canvas, active-brief-only workflow completion, source/format evidence, inventory navigation, and a safe calendar path without simulated momentum (2026-09-01).
 

@@ -37,6 +37,7 @@ RepsBrief è una piattaforma SaaS multi-tenant (`Next.js + Supabase`) per creato
 - [x] `main` pulito e allineato a `origin/main` su `ff6c6a1`; deploy Vercel production `READY` sullo stesso commit.
 - [x] Suite baseline: `pnpm run typecheck`, `pnpm run lint`, `pnpm test` — 17 file / 80 test verdi.
 - [x] Worktree Orca `feat-public-design-system`, `feat-public-design-system-2` e `feat-studio-command-center` marcati `completed` e preservati puliti per audit/rollback.
+- [x] Worktree Orca isolato `feat-apify-trend-resilience` aperto da `49c1062` per ingestion asincrona Apify, deduplica, provenance e fallback; nessuna implementazione ancora avviata.
 - [x] Piano smoke production sicuro documentato in `docs/runbooks/production-smoke-test.md`; checkout live, addebito, cancellazione e webhook reale rimangono esclusi senza autorizzazione esplicita.
 - [ ] Ripristinare una credenziale Vercel CLI valida per audit read-only di deployment/env-name; non leggere o stampare valori segreti.
 
@@ -92,7 +93,7 @@ RepsBrief è una piattaforma SaaS multi-tenant (`Next.js + Supabase`) per creato
 | **feat-public-design-system** | ✅ **Completed / preserved** | Senior Full-Stack / 🔴 P0 | Integrated in `main` (`ff6c6a1`); clean Orca checkout preserved for audit/rollback. |
 | **feat-public-design-system-2** | ✅ **Completed / preserved** | Senior Full-Stack / 🔴 P0 | Integrated in `main` (`ff6c6a1`); clean Orca checkout preserved for audit/rollback. |
 | **ci-pnpm-alignment** | ✅ **Merged & Pushed** | DevOps / 🔴 P0 | GitHub Actions CI updated to pnpm setup and build placeholders matching canonical deployment. |
-| **feat/apify-trend-ingestion** | ⬜ In attesa | Senior Full-Stack / 🟡 P1 | Pipeline ingestion asincrona, adapter normalizzati, deduplica e provenance trend. |
+| **feat-apify-trend-resilience** | 🟡 **In progress** | Senior Full-Stack / 🟡 P1 | Worktree isolato aperto da `49c1062`: progettare ingestion asincrona Apify, adapter normalizzati, deduplica, provenance e fallback YouTube/RSS. |
 | **Resend Sender Domain** | ⬜ In attesa | DevOps / 🔴 P0 | Configurazione DNS e variabile `RESEND_FROM_EMAIL` su Vercel. |
 | **Supabase Remote DDL Apply** | ⏸️ **Bloccato** | Team Dev / 🔴 P0 | Create and verify a production backup, then obtain explicit authorization before executing Delta DDL or aligning `schema_migrations`. |
 | **Release Validation** | ✅ **Verified + deployed** | Senior Full-Stack / 🔴 P0 | `pnpm run typecheck`, `pnpm run lint`, and `pnpm test` passed (17 test files / 80 tests); Vercel production is `READY` on `ff6c6a1`. |

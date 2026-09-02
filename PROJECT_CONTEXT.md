@@ -7,7 +7,7 @@ Owner context: AI agents + team dev
 
 - Git: `main` is clean and aligned with `origin/main` at `ff6c6a1` (`merge: redesign studio command center`). The production deployment is `READY` on this commit; no runtime errors were reported in the preceding 24 hours.
 - Validation baseline: `pnpm run typecheck`, `pnpm run lint`, and `pnpm test` passed (17 files / 80 tests) before this operational session.
-- Orca hygiene: `feat-public-design-system`, `feat-public-design-system-2`, and `feat-studio-command-center` are marked `completed`; their clean checkouts remain preserved for audit/rollback.
+- Orca hygiene: `feat-public-design-system`, `feat-public-design-system-2`, and `feat-studio-command-center` are marked `completed`; their clean checkouts remain preserved for audit/rollback. The isolated `feat-apify-trend-resilience` worktree is open from `49c1062` for the next resilience task.
 - Resend/Vercel audit: `RESEND_FROM_EMAIL` remains a production blocker. The installed code fails closed for production mail when it is absent. The local Vercel CLI credential is invalid, so remote environment-name and deployment inspection requires a refreshed Vercel login/token; no secret values were requested or exposed.
 - Safe production smoke plan is documented in `docs/runbooks/production-smoke-test.md`. It deliberately excludes live checkout creation, payment, cancellation, and webhook delivery until explicitly authorized.
 

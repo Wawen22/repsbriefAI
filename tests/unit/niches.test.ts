@@ -37,6 +37,7 @@ describe('niches configuration', () => {
       sourceConfig: getTrendSourceConfig({
         TREND_REDDIT_ENABLED: 'true',
         TREND_GOOGLE_TRENDS_ENABLED: 'true',
+        TREND_APIFY_DAILY_BUDGET_USD: '5',
       }),
     })
 
@@ -50,5 +51,12 @@ describe('niches configuration', () => {
     expect(getTrendApifyDailyBudgetUsd({ TREND_APIFY_DAILY_BUDGET_USD: '3.5' })).toBe(3.5)
     expect(getTrendApifyDailyBudgetUsd({ TREND_APIFY_DAILY_BUDGET_USD: '0' })).toBeNull()
     expect(getTrendApifyDailyBudgetUsd({ TREND_APIFY_DAILY_BUDGET_USD: 'not-a-number' })).toBeNull()
+  })
+
+  it('keeps Apify sources disabled when their feature flags lack a valid daily budget', () => {
+    const sourceConfig = getTrendSourceConfig({ TREND_REDDIT_ENABLED: 'true' })
+
+    expect(sourceConfig.reddit.enabled).toBe(false)
+    expect(sourceConfig.reddit.niches.fitness.enabled).toBe(false)
   })
 })

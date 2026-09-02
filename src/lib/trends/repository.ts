@@ -10,6 +10,8 @@ type SelectBuilder = {
   maybeSingle(): Promise<QueryResult>
   eq(column: string, value: unknown): SelectBuilder
   gt(column: string, value: unknown): SelectBuilder
+  gte(column: string, value: unknown): SelectBuilder
+  lt(column: string, value: unknown): SelectBuilder
   order(column: string, options: { ascending: boolean }): SelectBuilder
   limit(count: number): SelectBuilder
   in(column: string, values: unknown[]): Promise<QueryResult>
@@ -88,6 +90,28 @@ export function hashTrendSignal(signal: Pick<NormalizedTrendSignal, 'canonicalUr
 
 export function createTrendRepository(client: TrendRepositoryClient) {
   return {
+    async getDailyApifySpendUsd(now: Date) {
+      const dayStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()))
+      const dayEnd = new Date(dayStart)
+      dayEnd.setUTCDate(dayEnd.getUTCDate() + 1)
+      const { data, error } = await client
+        .from('trend_source_runs')
+        .select('cost_usd')
+        .gte('started_at', dayStart.toISOString())
+        .lt('started_at', dayEnd.toISOString())
+        .in('source', ['reddit', 'google-trends'])
+
+      if (error) sanitizePersistenceError(error)
+      if (!Array.isArray(data)) return 0
+
+      return data.reduce((total, row) => {
+        if (!row || typeof row !== 'object') return total
+        const value = (row as { cost_usd?: unknown }).cost_usd
+        const cost = typeof value === 'number' ? value : Number(value)
+        return Number.isFinite(cost) && cost >= 0 ? total + cost : total
+      }, 0)
+    },
+
     async recordSourceRun(run: TrendSourceRun) {
       const { data, error } = await client
         .from('trend_source_runs')

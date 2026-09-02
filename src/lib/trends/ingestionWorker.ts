@@ -6,6 +6,7 @@ import type { TrendSource, TrendSourceRun } from './contracts'
 const RETRY_DELAYS_MS = [5 * 60_000, 15 * 60_000, 45 * 60_000] as const
 const CIRCUIT_FAILURE_THRESHOLD = 3
 const CIRCUIT_WINDOW_MS = 24 * 60 * 60_000
+const APIFY_TREND_SOURCES = new Set<TrendSource>(['reddit', 'google-trends'])
 
 type SourceConfig = {
   enabled: boolean
@@ -21,15 +22,52 @@ export type TrendIngestionJob = {
 type ExecuteTrendIngestionDependencies = {
   now?: Date
   recentFailures: string[]
+  apifyDailyBudgetUsd?: number | null
+  getDailyApifySpendUsd?: (now: Date) => Promise<number>
   recordRun: (run: TrendSourceRun) => Promise<string>
   ingest: () => Promise<{ itemCount?: number; costUsd?: number; providerRunId?: string }>
 }
 
 export async function executeTrendIngestionJob(
   job: TrendIngestionJob,
-  { now = new Date(), recentFailures, recordRun, ingest }: ExecuteTrendIngestionDependencies
+  {
+    now = new Date(),
+    recentFailures,
+    apifyDailyBudgetUsd,
+    getDailyApifySpendUsd,
+    recordRun,
+    ingest,
+  }: ExecuteTrendIngestionDependencies
 ): Promise<{ status: TrendSourceRun['status'] }> {
   const startedAt = now.toISOString()
+  if (APIFY_TREND_SOURCES.has(job.source)) {
+    const budget = apifyDailyBudgetUsd
+    if (!Number.isFinite(budget) || !budget || budget <= 0 || !getDailyApifySpendUsd) {
+      await recordRun({
+        source: job.source, niche: job.niche, providerRunId: job.dedupeKey,
+        status: 'dead-letter', attempt: 1, startedAt, finishedAt: startedAt, errorCode: 'budget_not_configured',
+      })
+      return { status: 'dead-letter' }
+    }
+
+    try {
+      const spent = await getDailyApifySpendUsd(now)
+      if (!Number.isFinite(spent) || spent < 0 || spent >= budget) {
+        await recordRun({
+          source: job.source, niche: job.niche, providerRunId: job.dedupeKey,
+          status: 'dead-letter', attempt: 1, startedAt, finishedAt: startedAt, errorCode: 'budget_exceeded',
+        })
+        return { status: 'dead-letter' }
+      }
+    } catch {
+      await recordRun({
+        source: job.source, niche: job.niche, providerRunId: job.dedupeKey,
+        status: 'dead-letter', attempt: 1, startedAt, finishedAt: startedAt, errorCode: 'budget_unavailable',
+      })
+      return { status: 'dead-letter' }
+    }
+  }
+
   if (shouldOpenTrendCircuit(recentFailures, now)) {
     await recordRun({
       source: job.source, niche: job.niche, providerRunId: job.dedupeKey,

@@ -27,14 +27,22 @@ function createFakeClient(rows: Record<string, unknown> = {}) {
       calls.push(call)
       const result = { data: rows[table] ?? { id: `${table}-id` }, error: null }
       const terminal = { single: async () => result, maybeSingle: async () => result }
-      const select = () => ({ ...terminal, eq, gt, order, limit, in: inFilter })
+      const select = () => ({ ...terminal, eq, gt, gte, lt, order, limit, in: inFilter })
       const eq = (column: string, value: unknown) => {
         call.filters.push([column, value])
-        return { ...terminal, eq, gt, order, limit, in: inFilter }
+        return { ...terminal, eq, gt, gte, lt, order, limit, in: inFilter }
       }
       const gt = (column: string, value: unknown) => {
         call.filters.push([column, value])
-        return { ...terminal, eq, gt, order, limit, in: inFilter }
+        return { ...terminal, eq, gt, gte, lt, order, limit, in: inFilter }
+      }
+      const gte = (column: string, value: unknown) => {
+        call.filters.push([`${column}_gte`, value])
+        return { ...terminal, eq, gt, gte, lt, order, limit, in: inFilter }
+      }
+      const lt = (column: string, value: unknown) => {
+        call.filters.push([`${column}_lt`, value])
+        return { ...terminal, eq, gt, gte, lt, order, limit, in: inFilter }
       }
       const inFilter = (column: string, value: unknown) => {
         call.filters.push([column, value])
@@ -179,5 +187,22 @@ describe('trend repository', () => {
         trend_signal_id: 'signal-2',
       },
     ])
+  })
+
+  it('totals only known Apify run costs from the current UTC day', async () => {
+    const fake = createFakeClient({
+      trend_source_runs: [{ cost_usd: '1.25' }, { cost_usd: 0.75 }, { cost_usd: null }],
+    })
+    const repository = createTrendRepository(fake.client)
+
+    await expect(repository.getDailyApifySpendUsd(new Date('2026-09-02T10:00:00.000Z'))).resolves.toBe(2)
+    expect(fake.calls[0]).toMatchObject({
+      table: 'trend_source_runs',
+      filters: [
+        ['started_at_gte', '2026-09-02T00:00:00.000Z'],
+        ['started_at_lt', '2026-09-03T00:00:00.000Z'],
+        ['source', ['reddit', 'google-trends']],
+      ],
+    })
   })
 })

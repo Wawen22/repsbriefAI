@@ -92,6 +92,7 @@ export type NormalizedTrendSignal = { source: TrendSource; externalId: string; t
 - [x] Testare che Reddit/Google Trends siano disabilitate per default e non entrino nel gate prima del flag.
 - [x] Documentare `APIFY_TOKEN`, `APIFY_WEBHOOK_SECRET`, Task id e `TREND_APIFY_DAILY_BUDGET_USD` senza valori.
 - [x] Documentare benchmark autorizzato, soglie di costo, osservazione sette giorni, rollback flag e nessuna modifica copy prima dell'esito.
+- [x] Enforce runtime del budget: scheduler fail-closed senza budget valido; worker blocca le nuove run Apify al raggiungimento del `cost_usd` UTC noto o se il totale non e leggibile.
 - [x] Eseguire test focalizzato; commit `docs: add Apify rollout controls`.
 
 ### Task 7: Validazione release

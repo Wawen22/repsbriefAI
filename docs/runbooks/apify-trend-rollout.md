@@ -29,7 +29,12 @@ secrets unless marked as a flag; do not commit them.
 | `TREND_APIFY_DAILY_BUDGET_USD` | cost ceiling | positive finite USD value approved for the benchmark |
 
 The absence of either source flag, any value other than literal `true`, or a
-missing source Task leaves that source out of ingestion. Do not expose any of
+missing/invalid daily budget leaves that source out of ingestion. Before every
+Apify run the worker sums known `cost_usd` for the current UTC day and blocks
+the run when the ceiling has been reached; if that query is unavailable it
+fails closed. Because Apify reports the final cost after a run completes, the
+ceiling prevents subsequent runs and must include headroom for one in-flight
+run. Do not expose any of
 these names through `NEXT_PUBLIC_*` variables.
 
 ## Benchmark gate

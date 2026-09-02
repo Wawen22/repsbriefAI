@@ -107,6 +107,8 @@ describe('trend ingestion worker', () => {
       {
         now: new Date('2026-09-02T10:00:00.000Z'),
         recentFailures: [],
+        apifyDailyBudgetUsd: 5,
+        getDailyApifySpendUsd: async () => 0,
         recordRun: async (run) => { recorded.push(run); return 'run-row-1' },
         ingest: async () => { throw new Error('HTTP 401 unauthorized') },
       }
@@ -114,5 +116,29 @@ describe('trend ingestion worker', () => {
 
     expect(result).toEqual({ status: 'dead-letter' })
     expect(recorded.at(-1)).toMatchObject({ status: 'dead-letter', errorCode: 'terminal_failure' })
+  })
+
+  it('does not start an Apify ingestion when known daily spend has reached its budget', async () => {
+    const recorded: Array<Record<string, unknown>> = []
+    let ingestions = 0
+
+    const result = await executeTrendIngestionJob(
+      { source: 'reddit', niche: 'fitness', dedupeKey: 'trend-ingest:reddit:fitness:2026-09-02T10' },
+      {
+        now: new Date('2026-09-02T10:00:00.000Z'),
+        recentFailures: [],
+        apifyDailyBudgetUsd: 5,
+        getDailyApifySpendUsd: async () => 5,
+        recordRun: async (run) => { recorded.push(run); return 'run-row-1' },
+        ingest: async () => { ingestions += 1; return { costUsd: 0.5 } },
+      }
+    )
+
+    expect(result).toEqual({ status: 'dead-letter' })
+    expect(ingestions).toBe(0)
+    expect(recorded).toEqual([expect.objectContaining({
+      status: 'dead-letter',
+      errorCode: 'budget_exceeded',
+    })])
   })
 })

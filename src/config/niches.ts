@@ -59,8 +59,9 @@ function isExplicitlyEnabled(environment: TrendEnvironment, name: string) {
  * them out of scheduling and therefore out of the generation quality gate.
  */
 export function getTrendSourceConfig(environment: TrendEnvironment): Record<TrendSource, NicheTrendSourceConfig> {
-  const redditEnabled = isExplicitlyEnabled(environment, 'TREND_REDDIT_ENABLED')
-  const googleTrendsEnabled = isExplicitlyEnabled(environment, 'TREND_GOOGLE_TRENDS_ENABLED')
+  const hasApifyBudget = getTrendApifyDailyBudgetUsd(environment) !== null
+  const redditEnabled = hasApifyBudget && isExplicitlyEnabled(environment, 'TREND_REDDIT_ENABLED')
+  const googleTrendsEnabled = hasApifyBudget && isExplicitlyEnabled(environment, 'TREND_GOOGLE_TRENDS_ENABLED')
 
   return {
   youtube: {

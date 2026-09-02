@@ -45,6 +45,7 @@ RepsBrief è una piattaforma SaaS multi-tenant (`Next.js + Supabase`) per creato
 - [x] Task 3 Apify completato localmente: adapter Zod puri YouTube/RSS/Reddit/Google Trends, con fixture per record validi, duplicati, URL HTTP, timestamp invalidi e dataset Apify malformato. Nessun token, Actor, chiamata remota o migration eseguita; test adapter, typecheck e lint mirato verdi.
 - [x] Task 4 Apify completato localmente: worker/scheduling orario idempotente, contratti retry/circuit breaker, start/poll server-side e webhook HMAC constant-time. Nessun Actor, token o chiamata remota eseguita; 8 test focalizzati verdi.
 - [x] Task 6 Apify completato localmente: flag Reddit/Google Trends fail-closed, budget positivo validato e runbook per benchmark autorizzato, osservazione di sette giorni e rollback. Nessun Actor, token, deploy o modifica remota eseguita.
+- [x] Enforce budget Apify completato localmente: senza budget positivo le fonti non entrano nello scheduler; il worker blocca una nuova run Apify se il `cost_usd` UTC noto ha raggiunto il ceiling o la lettura fallisce. Il budget operativo deve riservare headroom per una run in corso.
 - [ ] Ripristinare una credenziale Vercel CLI valida per audit read-only di deployment/env-name; non leggere o stampare valori segreti.
 
 - [x] **Phase 1: Foundation** (Completata)

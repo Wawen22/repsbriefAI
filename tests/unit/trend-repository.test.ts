@@ -1,0 +1,130 @@
+import { describe, expect, it } from 'vitest'
+import {
+  createTrendRepository,
+  hashTrendSignal,
+  type TrendRepositoryClient,
+} from '@/lib/trends/repository'
+
+const signal = {
+  source: 'youtube' as const,
+  externalId: 'video-123',
+  title: 'Progressive overload for beginners',
+  canonicalUrl: 'https://www.youtube.com/watch?v=video-123',
+  publishedAt: '2026-09-02T09:00:00.000Z',
+  observedAt: '2026-09-02T10:00:00.000Z',
+  provenance: { provider: 'youtube-data-api' },
+  content: 'Use progressive overload safely.',
+}
+
+type Call = { table: string; method: string; values?: unknown; options?: unknown; filters: Array<[string, unknown]> }
+
+function createFakeClient(rows: Record<string, unknown> = {}) {
+  const calls: Call[] = []
+
+  const client: TrendRepositoryClient = {
+    from(table) {
+      const call: Call = { table, method: '', filters: [] }
+      calls.push(call)
+      const result = { data: rows[table] ?? { id: `${table}-id` }, error: null }
+      const terminal = { single: async () => result, maybeSingle: async () => result }
+      const select = () => ({ ...terminal, eq, gt, order, limit })
+      const eq = (column: string, value: unknown) => {
+        call.filters.push([column, value])
+        return { ...terminal, eq, gt, order, limit }
+      }
+      const gt = (column: string, value: unknown) => {
+        call.filters.push([column, value])
+        return { ...terminal, eq, gt, order, limit }
+      }
+      const order = () => ({ ...terminal, eq, gt, order, limit })
+      const limit = () => ({ ...terminal, eq, gt, order, limit })
+
+      return {
+        upsert(values: unknown, options: { onConflict: string }) {
+          call.method = 'upsert'
+          call.values = values
+          call.options = options
+          return { select }
+        },
+        insert(values: unknown) {
+          call.method = 'insert'
+          call.values = values
+          return { select }
+        },
+        select,
+      }
+    },
+  }
+
+  return { client, calls }
+}
+
+describe('trend repository', () => {
+  it('uses source and external id as the signal idempotency key', async () => {
+    const fake = createFakeClient()
+    const repository = createTrendRepository(fake.client)
+
+    await repository.upsertSignals('fitness', [signal])
+
+    expect(fake.calls[0]).toMatchObject({
+      table: 'trend_signals',
+      method: 'upsert',
+      options: { onConflict: 'source,external_id' },
+      values: [
+        expect.objectContaining({
+          source: 'youtube',
+          external_id: 'video-123',
+          canonical_url: signal.canonicalUrl,
+        }),
+      ],
+    })
+  })
+
+  it('persists a stable content hash derived from a signal URL and content', async () => {
+    const fake = createFakeClient()
+    const repository = createTrendRepository(fake.client)
+
+    await repository.upsertSignals('fitness', [signal])
+
+    const values = fake.calls[0].values as Array<{ content_hash: string }>
+    expect(values[0].content_hash).toBe(hashTrendSignal(signal))
+    expect(values[0].content_hash).toMatch(/^[a-f0-9]{64}$/)
+  })
+
+  it('uses source, niche and provider run id to make source runs idempotent', async () => {
+    const fake = createFakeClient()
+    const repository = createTrendRepository(fake.client)
+
+    await repository.recordSourceRun({
+      source: 'reddit',
+      niche: 'fitness',
+      providerRunId: 'apify-run-1',
+      status: 'running',
+      attempt: 1,
+      startedAt: '2026-09-02T10:00:00.000Z',
+    })
+
+    expect(fake.calls[0]).toMatchObject({
+      table: 'trend_source_runs',
+      method: 'upsert',
+      options: { onConflict: 'source,niche,provider_run_id' },
+    })
+  })
+
+  it('does not return an expired snapshot', async () => {
+    const fake = createFakeClient({ trend_snapshots: null })
+    const repository = createTrendRepository(fake.client)
+
+    const snapshot = await repository.getLatestValidSnapshot('fitness', '2026-09-02T12:00:00.000Z')
+
+    expect(snapshot).toBeNull()
+    expect(fake.calls[0]).toMatchObject({
+      table: 'trend_snapshots',
+      filters: [
+        ['niche', 'fitness'],
+        ['quality', 'valid'],
+        ['expires_at', '2026-09-02T12:00:00.000Z'],
+      ],
+    })
+  })
+})

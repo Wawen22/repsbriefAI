@@ -28,7 +28,7 @@
 
 - [x] Scrivere test fallenti per campi obbligatori, fonti consentite e URL HTTPS.
 - [x] Eseguire `pnpm test tests/unit/trend-contracts.test.ts`; fallimento verificato per modulo assente.
-- [ ] Implementare il contratto:
+- [x] Implementare il contratto:
 
 ```ts
 export type TrendSource = 'youtube' | 'rss' | 'reddit' | 'google-trends'
@@ -44,10 +44,10 @@ export type NormalizedTrendSignal = { source: TrendSource; externalId: string; t
 
 **Consumes:** contratti Task 1. **Produces:** repository `recordSourceRun`, `upsertSignals`, `createSnapshot`, `getLatestValidSnapshot`.
 
-- [ ] Scrivere test per chiavi `source+external_id`, URL e hash, idempotenza `provider_run_id`, snapshot scaduto.
-- [ ] Creare migration non applicata con `trend_source_runs`, `trend_signals`, `trend_snapshots`, `brief_trend_evidence`, indici unici e RLS team-safe.
-- [ ] Implementare repository server-only con query parametrizzate e errori sanitizzati.
-- [ ] Verificare test; commit `feat: persist trend runs and evidence`.
+- [x] Scrivere test per chiavi `source+external_id`, URL e hash, idempotenza `provider_run_id`, snapshot scaduto.
+- [x] Creare migration non applicata con `trend_source_runs`, `trend_signals`, `trend_snapshots`, `brief_trend_evidence`, indici unici e RLS team-safe.
+- [x] Implementare repository server-only con query parametrizzate e errori sanitizzati.
+- [x] Verificare test; commit `feat: persist trend runs and evidence`.
 
 ### Task 3: Adapter e validazione dataset
 

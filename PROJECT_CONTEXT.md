@@ -8,7 +8,7 @@ Owner context: AI agents + team dev
 - Git: `main` is clean and aligned with `origin/main` at `ff6c6a1` (`merge: redesign studio command center`). The production deployment is `READY` on this commit; no runtime errors were reported in the preceding 24 hours.
 - Validation baseline: `pnpm run typecheck`, `pnpm run lint`, and `pnpm test` passed (17 files / 80 tests) before this operational session.
 - Orca hygiene: `feat-public-design-system`, `feat-public-design-system-2`, and `feat-studio-command-center` are marked `completed`; their clean checkouts remain preserved for audit/rollback.
-- Apify trend resilience: direzione a quattro fonti approvata (YouTube, RSS, Reddit e Google Trends); spec in `docs/superpowers/specs/2026-09-02-apify-trend-resilience-design.md`. Task 1 completato: contratti Zod per segnali normalizzati, run e snapshot, con `TREND_SOURCE_CONFIG` centralizzata; Reddit/Google Trends restano disabilitate per Fitness. Nessun Actor a pagamento, secret o migration e stato usato/applicato.
+- Apify trend resilience: direzione a quattro fonti approvata (YouTube, RSS, Reddit e Google Trends); spec in `docs/superpowers/specs/2026-09-02-apify-trend-resilience-design.md`. Task 1 e 2 completati localmente: contratti Zod/config feature-flag, migration versionata non applicata e repository server-only per run, segnali, snapshot ed evidence. Reddit/Google Trends restano disabilitate per Fitness. Nessun Actor a pagamento, secret o migration e stato usato/applicato. Validazione Task 2: typecheck e 89 test verdi; lint completo inconclusivo per stall del runner, mentre il lint mirato dei file TypeScript e verde.
 - Resend/Vercel audit: `RESEND_FROM_EMAIL` remains a production blocker. The installed code fails closed for production mail when it is absent. The local Vercel CLI credential is invalid, so remote environment-name and deployment inspection requires a refreshed Vercel login/token; no secret values were requested or exposed.
 - Safe production smoke plan is documented in `docs/runbooks/production-smoke-test.md`. It deliberately excludes live checkout creation, payment, cancellation, and webhook delivery until explicitly authorized.
 
@@ -77,7 +77,7 @@ Dominio: **repsbrief.com** (Hostinger DNS → Vercel)
   - [x] Spec Apify trend resilience approvata: quattro fonti, ingestion asincrona, provenance e fallback
   - [x] Spec Apify revisionata e approvata; piano dettagliato in `docs/superpowers/plans/2026-09-02-apify-trend-resilience.md`
   - [x] Task 1 Apify: contratti trend runtime e configurazione feature-flag centralizzata, con test RED/GREEN
-  - [ ] Task 2 Apify: migration non applicata e repository; richiede solo review locale, non autorizzazione di apply
+  - [x] Task 2 Apify: migration non applicata e repository, con RLS team-safe per evidence e test RED/GREEN
 
 ## 5) UI/UX Roadmap
 
